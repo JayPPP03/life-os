@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>⚔️ AI Interview Arena — Jay Patel</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;
+--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24;--blue:#60A5FA;--purple:#A78BFA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5;padding:24px 16px}
+.wrap{max-width:880px;margin:0 auto}
+.hidden{display:none}
+a{color:var(--teal)}
+h1{font-size:1.6rem;letter-spacing:-.02em}
+h1 span{color:var(--teal)}
+.sub{color:var(--muted);font-size:.85rem;margin:.3rem 0 1.2rem}
+.topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-bottom:18px}
+.chip{font-size:.85rem;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px 12px}
+.chip b{font-size:1rem}
+.chip .delta{font-size:.72rem;margin-left:6px}
+.delta.up{color:var(--green)}.delta.down{color:var(--red)}
+.xpwrap{flex:1;min-width:160px}
+.xpbar{height:8px;background:var(--bg2);border-radius:999px;overflow:hidden;margin-top:4px}
+.xpbar>i{display:block;height:100%;background:var(--purple);border-radius:999px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.mode{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:transform .1s,border-color .15s;position:relative}
+.mode:hover{transform:translateY(-2px);border-color:var(--teal)}
+.mode h3{font-size:1rem;margin-bottom:.3rem}
+.mode p{font-size:.8rem;color:var(--muted)}
+.mode .meta{margin-top:.6rem;font-size:.75rem;color:var(--teal)}
+.mode.locked{opacity:.55}
+.mode .streakfire{position:absolute;top:10px;right:14px;font-size:1.2rem}
+.sect{font-size:1rem;margin:1.4rem 0 .7rem;color:var(--teal)}
+.qhead{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:8px}
+.timerbar{height:8px;background:var(--bg2);border-radius:999px;overflow:hidden;margin-bottom:14px}
+.timerbar>i{display:block;height:100%;background:var(--teal);border-radius:999px}
+.hpwrap{margin-bottom:12px}
+.hpline{display:grid;grid-template-columns:70px 1fr 52px;gap:8px;align-items:center;font-size:.75rem;color:var(--muted)}
+.hpbar{height:14px;background:var(--bg2);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+.hpbar>i{display:block;height:100%;border-radius:999px}
+.qtext{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;font-size:1.02rem;margin-bottom:14px}
+.opts{display:grid;gap:8px}
+.opt{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 16px;cursor:pointer;font-size:.93rem;text-align:left;color:var(--text);transition:border-color .12s}
+.opt:hover{border-color:var(--teal)}
+.opt.correct{border-color:var(--green);background:rgba(52,211,153,.12)}
+.opt.wrongpick{border-color:var(--red);background:rgba(248,113,113,.12)}
+.opt:disabled{cursor:default}
+.expl{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:12px;padding:14px;margin:12px 0;font-size:.88rem}
+.expl .verdict{font-weight:700}
+.expl .verdict.ok{color:var(--green)}.expl .verdict.no{color:var(--red)}
+.expl .rem{display:block;margin-top:.4rem;color:var(--muted);font-size:.8rem}
+.expl a{color:var(--teal)}
+.nextbtn{background:var(--teal);color:var(--bg);border:0;border-radius:12px;padding:.7rem 1.4rem;font-weight:800;font-size:.95rem;cursor:pointer;margin-top:4px}
+.homebtn{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:.7rem 1.2rem;font-weight:600;cursor:pointer;font-size:.85rem;margin-top:4px;margin-left:8px}
+.result{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;text-align:center}
+.result .huge{font-size:2rem;font-weight:800}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:.5rem}
+.badge{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:.78rem}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.catcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;font-size:.88rem}
+.catcard:hover{border-color:var(--teal)}
+.catcard small{color:var(--muted)}
+.bosses{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.bosscard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;position:relative}
+.bosscard:hover{border-color:var(--red)}
+.bosscard h3{font-size:1rem}
+.bosscard small{color:var(--muted)}
+.bosscard .slain{position:absolute;top:10px;right:12px;color:var(--green);font-weight:700;font-size:.8rem}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--teal);color:var(--text);border-radius:12px;padding:10px 18px;font-size:.85rem;display:none;z-index:50}
+.mini{font-size:.75rem;color:var(--muted)}
+.linkrow{margin-top:1.4rem;display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="scr-home">
+    <h1>⚔️ AI Interview <span>Arena</span></h1>
+    <p class="sub">Your resume, turned into a ranked grind. Every correct answer is a rep for the 18-LPA interview.</p>
+    <div class="topbar">
+      <div class="chip">🏆 Rating <b id="hud-rating">800</b><span class="delta" id="hud-ratingdelta"></span></div>
+      <div class="chip">🔥 Streak <b id="hud-streak">0</b></div>
+      <div class="chip">🎯 Level <b id="hud-level">1</b></div>
+      <div class="chip">🗡️ Weakness queue <b id="hud-weak">0</b></div>
+      <div class="xpwrap"><div class="mini">XP <span id="hud-xp">0</span> · next level at <span id="hud-nextlvl">300</span></div>
+      <div class="xpbar"><i id="hud-xpbar" style="width:0%"></i></div></div>
+    </div>
+
+    <div class="sect">Play</div>
+    <div class="modes">
+      <div class="mode" onclick="startDaily()">
+        <div class="streakfire" id="dailyfire">📅</div>
+        <h3>Daily Challenge</h3>
+        <p>10 mixed questions. Once a day. Doubles XP, keeps your 🔥 streak alive.</p>
+        <div class="meta" id="daily-meta"></div>
+      </div>
+      <div class="mode" onclick="startRanked()">
+        <h3>⚡ Ranked Blitz</h3>
+        <p>10 questions · 30s each. Your 🏆 rating is on the line. Hard questions pay more.</p>
+        <div class="meta">rating moves here — chess rules</div>
+      </div>
+      <div class="mode" onclick="showCampaignPick()">
+        <h3>🗺️ Campaign</h3>
+        <p>Pick a category, clear stages at ≥80%. Safe XP — no rating risk.</p>
+        <div class="meta" id="campaign-meta"></div>
+      </div>
+      <div class="mode" onclick="showBossPick()">
+        <h3>👾 Boss Battles</h3>
+        <p>5-round boss fights with HP bars. Slay all seven to complete the resume.</p>
+        <div class="meta" id="boss-meta"></div>
+      </div>
+      <div class="mode" onclick="startHunter()">
+        <h3>🩸 Weakness Hunter</h3>
+        <p>Every question you ever got wrong comes back here, oldest first. Two clean kills retire it.</p>
+        <div class="meta" id="hunter-meta"></div>
+      </div>
+    </div>
+
+    <div class="sect">Trophies</div>
+    <div class="badges" id="badges"></div>
+
+    <div class="linkrow">
+      <a href="../../PROGRESS_DASHBOARD.html">← Progress Dashboard</a>
+      <a href="../krish-ml-6h/index.html">📚 ML Study Center (26 notes+quizzes)</a>
+      <span class="mini" onclick="if(confirm('Wipe ALL arena progress?')){localStorage.removeItem('arena_save_v1');location.reload();}" style="cursor:pointer">reset progress</span>
+    </div>
+  </div>
+
+  <div id="scr-pick" class="hidden"></div>
+
+  <div id="scr-quiz" class="hidden">
+    <div class="qhead">
+      <span id="q-mode"></span>
+      <span id="q-progress"></span>
+    </div>
+    <div class="timerbar hidden" id="timerwrap"><i id="timerfill" style="width:100%"></i></div>
+    <div class="hpwrap hidden" id="hpwrap">
+      <div class="hpline"><span id="bossname">BOSS</span><div class="hpbar"><i id="bosshp" style="width:100%;background:var(--red)"></i></div><span id="bosshpn">100</span></div>
+      <div class="hpline"><span>YOU</span><div class="hpbar"><i id="youhp" style="width:100%;background:var(--green)"></i></div><span id="youhpn">100</span></div>
+    </div>
+    <div class="qtext" id="q-text"></div>
+    <div class="opts" id="q-opts"></div>
+    <div id="q-feedback"></div>
+    <button class="nextbtn hidden" id="btn-next" onclick="nextQ()">Next →</button>
+    <button class="homebtn" onclick="quitToHome()">Home</button>
+  </div>
+
+  <div id="scr-result" class="hidden"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data/bank_ml.js"></script>
+<script src="data/bank_genai.js"></script>
+<script src="data/bank_stats.js"></script>
+<script src="data/bank_sql.js"></script>
+<script src="data/bank_python.js"></script>
+<script src="data/bank_forecast.js"></script>
+<script src="data/bank_metrics.js"></script>
+<script src="data/bank_mlops.js"></script>
+<script src="data/bank_cloud.js"></script>
+<script src="data/bank_projects.js"></script>
+<script src="data/bank_behavioral.js"></script>
+<script>
+/* ============ BANKS ============ */
+const ALL = [];
+function reg(v){ if (typeof v !== 'undefined' && Array.isArray(v)) ALL.push(...v); }
+reg(typeof BANK_ML !== 'undefined' ? BANK_ML : []);
+reg(typeof BANK_GENAI !== 'undefined' ? BANK_GENAI : []);
+reg(typeof BANK_STATS !== 'undefined' ? BANK_STATS : []);
+reg(typeof BANK_SQL !== 'undefined' ? BANK_SQL : []);
+reg(typeof BANK_PYTHON !== 'undefined' ? BANK_PYTHON : []);
+reg(typeof BANK_FORECAST !== 'undefined' ? BANK_FORECAST : []);
+reg(typeof BANK_METRICS !== 'undefined' ? BANK_METRICS : []);
+reg(typeof BANK_MLOPS !== 'undefined' ? BANK_MLOPS : []);
+reg(typeof BANK_CLOUD !== 'undefined' ? BANK_CLOUD : []);
+reg(typeof BANK_PROJECTS !== 'undefined' ? BANK_PROJECTS : []);
+reg(typeof BANK_BEHAVIORAL !== 'undefined' ? BANK_BEHAVIORAL : []);
+const QMAP = {};
+ALL.forEach(q => { if (q && q.id && !QMAP[q.id]) QMAP[q.id] = q; });
+const QIDS = Object.keys(QMAP);
+
+const CATMETA = {
+  ml:      {label:'ML Fundamentals 🐉', boss:'ML DRAGON'},
+  forecast:{label:'Forecasting (ARIMA/SARIMA/XGB) ⚡', boss:'FORECAST WRAITH'},
+  metrics: {label:'Classification Metrics 🎯', boss:'CHURN TITAN'},
+  stats:   {label:'Stats & Experimentation 🎲', boss:'STATS SPECTER'},
+  sql:     {label:'SQL 🗄️', boss:null},
+  python:  {label:'Python / Pandas 🐍', boss:null},
+  genai:   {label:'GenAI / LLM / RAG 🔥', boss:'RAG PHOENIX'},
+  mlops:   {label:'MLOps 🛠️', boss:null},
+  cloud:   {label:'Cloud & Big Data ☁️', boss:null},
+  projects:{label:'Resume Projects 🏆', boss:null},
+  behavioral:{label:'Behavioral 🗣️', boss:null}
+};
+const BOSSES = [
+  {name:'ML DRAGON',        icon:'🐉', cats:['ml'],        taunt:'26 fundamentals stand between you and it.'},
+  {name:'FORECAST WRAITH',  icon:'⚡', cats:['forecast'],  taunt:'ARIMA, SARIMA, SARIMAX — name them or fade.'},
+  {name:'CHURN TITAN',      icon:'🎯', cats:['metrics'],   taunt:'Precision vs recall — choose your weapon.'},
+  {name:'STATS SPECTER',    icon:'🎲', cats:['stats'],     taunt:'Your p-value means nothing here.'},
+  {name:'DATA GOLEM',       icon:'🗄️', cats:['sql','python'], taunt:'Joins and groupbys are its fists.'},
+  {name:'PIPELINE OVERLORD',icon:'🛠️', cats:['mlops','cloud'], taunt:'Deploy, monitor, roll back — or perish.'},
+  {name:'RAG PHOENIX',      icon:'🔥', cats:['genai'],     taunt:'The one that made you skip 18 LPA. Kill it.'}
+];
+
+/* ============ SAVE ============ */
+const SAVE_KEY = 'arena_save_v1';
+let S = defaultSave();
+function defaultSave(){ return {
+  rating:800, xp:0,
+  streak:{count:0,last:null}, freezes:2,
+  daily:{last:null},
+  bosses:{}, campaign:{},
+  unlocked:{ml:true},
+  hist:{}, wrong:[],
+  badges:[], plays:0, corrects:0
+};}
+const CAMPAIGN_ORDER = ['ml','sql','python','forecast','metrics','stats','mlops','cloud','projects','behavioral','genai']; // learning path: GenAI LAST
+const LESSONS = { ml:'../krish-ml-6h/index.html' }; // study material per track (null = lesson pack coming soon)
+function unlockedCats(){ return catsPresent().filter(c => S.unlocked[c]); }
+function unlockNext(afterCat){
+  const i = CAMPAIGN_ORDER.indexOf(afterCat);
+  for (let j = i + 1; j < CAMPAIGN_ORDER.length; j++) {
+    if (catsPresent().includes(CAMPAIGN_ORDER[j]) && !S.unlocked[CAMPAIGN_ORDER[j]]) {
+      S.unlocked[CAMPAIGN_ORDER[j]] = true;
+      toast('🔓 Unlocked: ' + (CATMETA[CAMPAIGN_ORDER[j]] ? CATMETA[CAMPAIGN_ORDER[j]].label : CAMPAIGN_ORDER[j]));
+      return;
+    }
+  }
+}
+function markStudied(cat){
+  S.unlocked[cat] = true;
+  save(); renderHUD();
+  toast('🔓 Unlocked: ' + (CATMETA[cat] ? CATMETA[cat].label : cat) + ' — remember: study first, then play');
+  showCampaignPick();
+}
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const raw = localStorage.getItem(SAVE_KEY); if (raw) S = Object.assign(defaultSave(), JSON.parse(raw)); }catch(e){}
+  if (!S.unlocked || !S.unlocked.ml) S.unlocked = Object.assign({ml:true}, S.unlocked || {});
+}
+
+/* ============ HELPERS ============ */
+const $ = id => document.getElementById(id);
+function show(id){ ['scr-home','scr-pick','scr-quiz','scr-result'].forEach(s => $(s).classList.add('hidden')); $(id).classList.remove('hidden'); window.scrollTo(0,0); }
+function today(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function yesterday(){ const d = new Date(Date.now()-86400000); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(()=>t.style.display='none', 2600); }
+function xpFor(q){ return 10 + 5*(q.diff||2); }
+function levelOf(xp){ return Math.floor(xp/300)+1; }
+function catsPresent(){ const s = new Set(); ALL.forEach(q => s.add(q.cat)); return [...s].filter(c => CATMETA[c]); }
+
+/* ============ HUD ============ */
+function renderHUD(){
+  $('hud-rating').textContent = S.rating;
+  $('hud-streak').textContent = S.streak.count;
+  $('hud-level').textContent = levelOf(S.xp);
+  $('hud-xp').textContent = S.xp;
+  $('hud-nextlvl').textContent = levelOf(S.xp)*300;
+  $('hud-xpbar').style.width = Math.round(100*(S.xp % 300)/300) + '%';
+  $('hud-weak').textContent = S.wrong.length;
+  // badges
+  const b = [];
+  if (S.badges.includes('first_ranked_win')) b.push('🥇 First ranked win');
+  if (S.streak.count >= 7) b.push('🔥 7-day streak');
+  Object.keys(S.bosses).forEach(k => { const bs = BOSSES.find(x=>x.name===k); if (bs) b.push(bs.icon + ' ' + k + ' slain'); });
+  if (Object.keys(S.campaign).length >= catsPresent().length && catsPresent().length) b.push('🗺️ Campaign conqueror');
+  $('badges').innerHTML = b.length ? b.map(x=>'<span class="badge">'+x+'</span>').join('') : '<span class="mini">No trophies yet — slay something.</span>';
+  // metas
+  $('daily-meta').textContent = S.daily.last === today() ? '✅ done today — streak ' + S.streak.count : 'not played today';
+  const cleared = Object.keys(S.campaign).length;
+  $('campaign-meta').textContent = cleared + ' stages cleared · ' + unlockedCats().length + ' track(s) unlocked';
+  const slain = Object.keys(S.bosses).length;
+  $('boss-meta').textContent = slain + ' / ' + BOSSES.length + ' bosses slain';
+  $('hunter-meta').textContent = S.wrong.length + ' questions waiting for revenge';
+  $('hud-ratingdelta').textContent = '';
+}
+
+/* ============ PICKERS ============ */
+function leastSeen(pool, n){
+  const scored = pool.map(q => {
+    const h = S.hist[q.id];
+    const seen = h ? (h.c + h.w) : 0;
+    return { q, seen, r: Math.random() };
+  });
+  scored.sort((a,b) => (a.seen - b.seen) || (a.r - b.r));
+  return scored.slice(0, n).map(x => x.q);
+}
+function mixed(n){
+  const tracks = unlockedCats();
+  const byCat = {};
+  tracks.forEach(c => byCat[c] = ALL.filter(q => q.cat === c));
+  const pools = shuffle(tracks).map(c => shuffle(byCat[c]));
+  const out = [];
+  let i = 0;
+  while (out.length < n && pools.some(p => p.length)) {
+    const p = pools[i % pools.length]; i++;
+    const q = p.shift(); if (q) out.push(q);
+  }
+  return out;
+}
+
+/* ============ DIFFICULTY CURVE ============ */
+// Motivation rule: sessions START easy, ramp up, hardest question LAST.
+// Low-rating players never see difficulty-3 questions early (or at all).
+function gateByRating(pool, n){
+  if (S.rating < 850) {
+    const soft = pool.filter(q => (q.diff||2) < 3);
+    if (soft.length >= n) return soft;
+  } else if (S.rating < 1000) {
+    // allow at most 2 hard questions per session
+    const soft = pool.filter(q => (q.diff||2) < 3);
+    const hard = pool.filter(q => (q.diff||2) >= 3);
+    if (soft.length >= n - 2 && hard.length) return soft.slice(0, n - Math.min(2, hard.length)).concat(hard.slice(0, 2));
+  }
+  return pool;
+}
+function rampQuestions(qs){
+  return qs.slice().sort((a,b) => (a.diff||2) - (b.diff||2));
+}
+
+/* ============ SESSION ENGINE ============ */
+let SESS = null, timer = null;
+
+function beginSession(opts){
+  SESS = { mode: opts.mode, qs: opts.qs, i: 0, correct: 0, corrects: 0, xpGain: 0,
+           ratingStart: S.rating, timed: !!opts.timed, boss: opts.boss || null,
+           bossHP: opts.boss ? 100 : 0, youHP: opts.boss ? 100 : 0, log: [], answered:false };
+  show('scr-quiz');
+  renderQ();
+}
+function renderQ(){
+  const q = SESS.qs[SESS.i];
+  SESS.answered = false;
+  $('q-mode').textContent = ({daily:'📅 Daily',ranked:'⚡ Ranked Blitz',campaign:'🗺️ Campaign',boss:'👾 '+(SESS.boss?SESS.boss.name:''),hunter:'🩸 Weakness Hunter'})[SESS.mode];
+  $('q-progress').textContent = (SESS.i+1) + ' / ' + SESS.qs.length;
+  $('q-text').textContent = q.q + '  ';
+  const diffChip = document.createElement('span');
+  diffChip.className = 'mini';
+  diffChip.textContent = '· ' + (CATMETA[q.cat] ? CATMETA[q.cat].label : q.cat) + ' · difficulty ' + (q.diff||2) + '/3';
+  $('q-text').appendChild(diffChip);
+  $('q-feedback').innerHTML = '';
+  $('btn-next').classList.add('hidden');
+  // boss HP refresh
+  if (SESS.mode === 'boss') {
+    $('hpwrap').classList.remove('hidden');
+    $('bossname').textContent = SESS.boss.icon + ' ' + SESS.boss.name;
+    $('bosshp').style.width = SESS.bossHP + '%'; $('bosshpn').textContent = SESS.bossHP;
+    $('youhp').style.width = SESS.youHP + '%'; $('youhpn').textContent = SESS.youHP;
+  } else $('hpwrap').classList.add('hidden');
+  // options (shuffled display order)
+  const order = shuffle(q.options.map((_,j)=>j));
+  const wrap = $('q-opts'); wrap.innerHTML = '';
+  order.forEach(j => {
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = q.options[j];
+    b.onclick = () => answer(j, b);
+    wrap.appendChild(b);
+  });
+  // timer
+  if (timer) { clearInterval(timer); timer = null; }
+  if (SESS.timed) {
+    $('timerwrap').classList.remove('hidden');
+    let t0 = Date.now(), T = 30000;
+    $('timerfill').style.width = '100%';
+    timer = setInterval(() => {
+      const left = T - (Date.now() - t0);
+      $('timerfill').style.width = Math.max(0, 100*left/T) + '%';
+      if (left <= 0) { clearInterval(timer); timer = null; if (!SESS.answered) answer(-1, null); }
+    }, 100);
+  } else $('timerwrap').classList.add('hidden');
+}
+function answer(pick, btn){
+  if (SESS.answered) return;
+  SESS.answered = true;
+  if (timer) { clearInterval(timer); timer = null; }
+  const q = SESS.qs[SESS.i];
+  const correct = pick === q.a;
+  if (correct) SESS.corrects++;
+  const h = S.hist[q.id] || {c:0,w:0,ts:0};
+  let ratingDelta = 0;
+  // record
+  if (correct) {
+    S.corrects++; h.c++; h.streak = (h.streak||0)+1;
+    const gain = xpFor(q) * (SESS.mode === 'daily' ? 2 : 1);
+    SESS.xpGain += gain; S.xp += gain;
+    if (SESS.mode === 'ranked') { ratingDelta = 10 + 4*(q.diff||2); S.rating += ratingDelta; }
+    if (SESS.mode === 'boss') { SESS.bossHP = Math.max(0, SESS.bossHP - 20); }
+    // weakness queue: retire after 2 consecutive corrects
+    if (S.wrong.includes(q.id) && h.streak >= 2) {
+      S.wrong = S.wrong.filter(id => id !== q.id);
+      toast('🩸 weakness retired: ' + q.id);
+    }
+  } else {
+    h.w++; h.streak = 0;
+    if (SESS.mode === 'ranked') { ratingDelta = -10; S.rating = Math.max(400, S.rating + ratingDelta); }
+    if (SESS.mode === 'boss') { SESS.youHP = Math.max(0, SESS.youHP - 25); }
+    if (!S.wrong.includes(q.id)) S.wrong.push(q.id);
+  }
+  h.ts = Date.now();
+  S.hist[q.id] = h;
+  // UI feedback
+  const btns = [...document.querySelectorAll('#q-opts .opt')];
+  btns.forEach(b => b.disabled = true);
+  btns.forEach(b => {
+    if (b.textContent === q.options[q.a]) b.classList.add('correct');
+    if (b === btn && !correct) b.classList.add('wrongpick');
+  });
+  const rem = q.remedy
+    ? '<span class="rem">📖 ' + (q.remedy.startsWith('http') || q.remedy.startsWith('../') ? '<a href="' + q.remedy + '" target="_blank">open remedy</a>' : q.remedy) + '</span>'
+    : '';
+  $('q-feedback').innerHTML = '<div class="expl"><span class="verdict ' + (correct?'ok':'no') + '">' + (correct?'✅ Correct!':(pick===-1?'⏰ Time up!':'❌ Wrong.')) + (SESS.mode==='ranked' ? ' <span class="' + (ratingDelta>=0?'':'no') + '" style="color:'+(ratingDelta>=0?'var(--green)':'var(--red)')+'">Rating ' + (ratingDelta>=0?'+':'') + ratingDelta + '</span>' : '') + '</span>' + q.expl + rem + '</div>';
+  $('btn-next').classList.remove('hidden');
+  $('btn-next').textContent = (SESS.i + 1 >= SESS.qs.length) ? 'Finish' : 'Next →';
+  save();
+}
+function nextQ(){
+  SESS.i++;
+  if (SESS.i >= SESS.qs.length) { finishSession(); return; }
+  if (SESS.mode === 'boss' && (SESS.bossHP <= 0 || SESS.youHP <= 0)) { finishSession(); return; }
+  renderQ();
+}
+function quitToHome(){ if (timer) clearInterval(timer); save(); renderHUD(); show('scr-home'); }
+
+/* correctness helper for live summary */
+const _origAnswer = answer;
+
+function finishSession(){
+  if (timer) clearInterval(timer);
+  const total = SESS.qs.length;
+  const correct = SESS.corrects;
+  const pct = Math.round(100*correct/total);
+  S.plays++;
+  let lines = [];
+  let extraXP = 0;
+  // daily: streak + completion
+  if (SESS.mode === 'daily') {
+    S.daily.last = today();
+    if (S.streak.last === yesterday()) S.streak.count++;
+    else if (S.streak.last && S.streak.last !== today() && S.streak.last < yesterday() && S.freezes > 0) { S.freezes--; S.streak.count++; toast('🧊 streak freeze used'); }
+    else S.streak.count = 1;
+    S.streak.last = today();
+    if (S.streak.count >= 7 && !S.badges.includes('streak7')) { S.badges.push('streak7'); lines.push('🔥 Badge unlocked: 7-day streak'); }
+  }
+  // ranked summary
+  if (SESS.mode === 'ranked') {
+    const d = S.rating - SESS.ratingStart;
+    lines.push('🏆 Rating ' + (d >= 0 ? '+' : '') + d + ' → now ' + S.rating);
+    if (d > 0 && !S.badges.includes('first_ranked_win')) { S.badges.push('first_ranked_win'); lines.push('🥇 Badge unlocked: First ranked win'); }
+  }
+  // campaign clear
+  if (SESS.mode === 'campaign' && pct >= 80) {
+    const cat = SESS.cat;
+    const wasNew = !S.campaign[cat];
+    if (wasNew) { S.campaign[cat] = true; lines.push('🗺️ Stage cleared: ' + (CATMETA[cat]?CATMETA[cat].label:cat)); unlockNext(cat); }
+    const allCleared = CAMPAIGN_ORDER.filter(c => catsPresent().includes(c)).every(c => S.campaign[c]);
+    if (allCleared && !S.badges.includes('campaign_all')) { S.badges.push('campaign_all'); lines.push('🗺️ Badge unlocked: Campaign conqueror'); }
+  }
+  // boss result
+  if (SESS.mode === 'boss') {
+    const win = SESS.bossHP <= 0;
+    if (win) {
+      extraXP = 100; S.xp += 100;
+      S.bosses[SESS.boss.name] = true;
+      lines.push('👾 ' + SESS.boss.name + ' SLAIN · +100 XP · badge earned');
+    } else {
+      lines.push('💀 Defeated — the boss keeps its crown. Retry when ready.');
+    }
+  }
+  S.xp += extraXP;
+  save(); renderHUD();
+  // render result screen
+  let html = '<div class="result"><div class="huge">' + correct + ' / ' + total + '</div>'
+    + '<p class="sub">' + pct + '% · +' + (SESS.xpGain + extraXP) + ' XP' + (SESS.mode==='ranked' ? ' · rating now ' + S.rating : '') + '</p>';
+  lines.forEach(l => html += '<p style="margin:.3rem 0">' + l + '</p>');
+  if (pct >= 80) html += '<p style="color:var(--green);font-weight:700;margin-top:.5rem">✅ Cleared. The 18-LPA version of you says thanks.</p>';
+  else html += '<p style="color:var(--amber);font-weight:700;margin-top:.5rem">Below 80% — the Weakness Hunter just got fed. It will resurface these.</p>';
+  html += '<div style="margin-top:1rem"><button class="nextbtn" onclick="quitToHome()">Back to Arena</button></div></div>';
+  $('scr-result').innerHTML = html;
+  show('scr-result');
+}
+
+/* ============ MODES ============ */
+function startDaily(){
+  if (S.daily.last === today()) { toast('📅 Daily already done today — streak ' + S.streak.count + '. Ranked is always open.'); return; }
+  SESS = null;
+  const qs = rampQuestions(gateByRating(mixed(14), 10)).slice(0, 10);
+  SESS = { mode:'daily', qs, i:0, corrects:0, xpGain:0, ratingStart:S.rating, timed:false, boss:null, bossHP:0, youHP:0, log:[] };
+  show('scr-quiz'); renderQ();
+}
+function startRanked(){
+  const qs = rampQuestions(gateByRating(leastSeen(mixed(60), 14), 10));
+  beginSession({mode:'ranked', qs: qs.slice(0,10), timed:true});
+}
+function showCampaignPick(){
+  const present = new Set(catsPresent());
+  const cats = CAMPAIGN_ORDER.filter(c => present.has(c)).concat(catsPresent().filter(c => !CAMPAIGN_ORDER.includes(c)));
+  let html = '<h1 style="font-size:1.4rem">🗺️ Campaign — learning path</h1><p class="sub">Coach rule: study a track first, THEN play it. Clearing a stage unlocks the next. 🔒 = not studied yet.</p><div class="cats">';
+  let firstLocked = true;
+  cats.forEach(c => {
+    const nQ = ALL.filter(q => q.cat === c).length;
+    const done = S.campaign[c];
+    const open = !!S.unlocked[c];
+    const stageNum = CAMPAIGN_ORDER.indexOf(c) + 1;
+    if (open) {
+      html += '<div class="catcard" onclick="startCampaign(\'' + c + '\')"><b>Stage ' + stageNum + ' · ' + (CATMETA[c].label) + '</b><br><small>' + nQ + ' questions · ' + (done ? '✅ CLEARED — replay for XP' : 'play 10, clear at 80%') + '</small></div>';
+    } else {
+      const lesson = LESSONS[c];
+      const learnHtml = lesson ? '<a href="' + lesson + '" style="color:var(--teal)" onclick="event.stopPropagation()">📚 Learn first (notes + quiz)</a>' : '<span style="color:var(--amber)">📚 Lesson pack: ask ZCode to build it</span>';
+      html += '<div class="catcard" style="opacity:.75"><b>🔒 Stage ' + stageNum + ' · ' + (CATMETA[c].label) + '</b><br><small>' + nQ + ' questions · LOCKED</small><br><small style="margin-top:.4rem;display:block">' + learnHtml + ' · <a href="#" style="color:var(--muted)" onclick="event.stopPropagation(); markStudied(\'' + c + '\')">I studied this elsewhere — unlock</a></small></div>';
+    }
+  });
+  html += '</div><button class="homebtn" style="margin-top:14px" onclick="quitToHome()">← Home</button>';
+  $('scr-pick').innerHTML = html; show('scr-pick');
+}
+function startCampaign(cat){
+  const pool = ALL.filter(q => q.cat === cat);
+  const qs = rampQuestions(gateByRating(leastSeen(pool, 14), 10));
+  beginSession({mode:'campaign', qs: qs.slice(0,10), timed:false});
+  SESS.cat = cat;
+}
+function showBossPick(){
+  let html = '<h1 style="font-size:1.4rem">👾 Boss Battles</h1><p class="sub">5 rounds · correct answers deal 20 damage · 3 misses and you\u2019re down.</p><div class="bosses">';
+  BOSSES.forEach(b => {
+    const available = b.cats.some(c => catsPresent().includes(c) && S.unlocked[c]);
+    if (!available) return;
+    html += '<div class="bosscard" onclick="startBoss(\'' + b.name + '\')"><h3>' + b.icon + ' ' + b.name + '</h3><small>' + b.taunt + '</small>' + (S.bosses[b.name] ? '<span class="slain">☠️ SLAIN</span>' : '') + '</div>';
+  });
+  html += '</div><button class="homebtn" style="margin-top:14px" onclick="quitToHome()">← Home</button>';
+  $('scr-pick').innerHTML = html; show('scr-pick');
+}
+function startBoss(name){
+  const boss = BOSSES.find(b => b.name === name);
+  const pool = [];
+  boss.cats.forEach(c => ALL.forEach(q => { if (q.cat === c) pool.push(q); }));
+  const qs = rampQuestions(leastSeen(pool, 8).slice(0, 5));
+  beginSession({mode:'boss', qs, timed:false, boss});
+}
+function startHunter(){
+  const ids = S.wrong.filter(id => QMAP[id] && S.unlocked[QMAP[id].cat]);
+  if (!ids.length) { toast('🩸 Weakness queue is empty — go feed it in Ranked.'); return; }
+  const withTs = ids.map(id => ({id, ts: (S.hist[id] && S.hist[id].lw) || 0}));
+  withTs.sort((a,b) => a.ts - b.ts);
+  const qs = rampQuestions(withTs.slice(0, 12).map(x => QMAP[x.id])).slice(0, 10);
+  beginSession({mode:'hunter', qs, timed:false});
+}
+
+/* ============ BOOT ============ */
+load();
+renderHUD();
+if (!ALL.length) {
+  document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#E6EDF7">⚠️ No question banks loaded. Expected files at <code>data/bank_*.js</code>.</div>';
+}
+</script>
+</body></html>

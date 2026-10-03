@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practical Implementation Of Decision Tree Classifier — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=14964" target="_blank">▶ Watch this section</a></div>
+<h1>Practical Implementation Of Decision Tree Classifier</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 04:09:14 · approx 6 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_14"><b>DECISION TREE (PRACTICAL) — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — your notes above are still blank, so treat this as the pre-watch checklist: anything you couldn't have written from memory is your rewatch list.</p>
+<div class="missing"><b class="no">① Default criterion.</b> <code>DecisionTreeClassifier()</code> with NO arguments uses <code>gini</code>. Entropy must be set explicitly — learners love to claim entropy is the default.</div>
+<div class="missing"><b class="no">② splitter ≠ criterion.</b> <code>splitter</code> takes <code>'best'</code> or <code>'random'</code>; <code>criterion</code> takes <code>'gini'</code> or <code>'entropy'</code>. Two different knobs, often mixed up.</div>
+<div class="missing"><b class="no">③ Pre-pruning vs post-pruning.</b> <code>max_depth</code>, <code>min_samples_leaf</code>, <code>max_features</code> limit growth as it happens (pre); cutting back an already-grown tree after inspecting it is post-pruning — a different move at a different time.</div>
+<div class="missing"><b class="no">④ Reading a 1-sample leaf.</b> A 47-vs-1 branch is not 'a fine-grained rule' — it is the tree memorizing one odd row, and <code>plot_tree(filled=True)</code> exists precisely so you SEE it.</div>
+<div class="missing"><b class="no">⑤ Judging by train accuracy only.</b> An unpruned tree posts high train / lower test — the GAP is the overfitting signal, not the train score itself.</div>
+<div class="missing"><b class="no">⑥ fit() before predict().</b> Predict on an unfitted estimator → <code>NotFittedError</code>. Obvious, and it bites everyone once.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — Support-desk triage: 6 tickets, every gini number calculated</h2>
+<div class="card">
+<p><b>Business problem:</b> a MyOperator-style support desk wants a rule for auto-resolve vs escalate-to-human. Last week's tickets:</p>
+<table>
+<tr><th>Ticket</th><th>complaints/week</th><th>tenure (months)</th><th>escalated?</th></tr>
+<tr><td>T1</td><td>8</td><td>2</td><td>yes</td></tr>
+<tr><td>T2</td><td>6</td><td>3</td><td>yes</td></tr>
+<tr><td>T3</td><td>3</td><td>9</td><td>yes</td></tr>
+<tr><td>T4</td><td>2</td><td>4</td><td>no</td></tr>
+<tr><td>T5</td><td>1</td><td>8</td><td>no</td></tr>
+<tr><td>T6</td><td>4</td><td>12</td><td>no</td></tr>
+</table>
+<p><b>Step 1 — impurity at the root.</b> 3 yes, 3 no:</p>
+<div class="formula">gini = 1 − (3/6)² − (3/6)² = 1 − 0.25 − 0.25 = <b>0.5</b> (maximum disorder)</div>
+<p><b>Step 2 — try candidate splits, weight the children.</b> Node gini = 1 − Σ p². Example: complaints ≤ 5 → left {T3,T4,T5,T6} = 1 yes/3 no → gini = 1 − (1/4)² − (3/4)² = 0.375; right {T1,T2} = 2 yes/0 no → gini = 0. All four candidates (verified in the lab below):</p>
+<div class="formula">complaints ≤ 5&nbsp;&nbsp;&nbsp;: (4/6)(0.3750) + (2/6)(0) = <b>0.2500</b> → reduction 0.5 − 0.25 = <b>0.2500</b> ← WINNER<br>complaints ≤ 3.5 : (3/6)(0.4444) + (3/6)(0.4444) = 0.4444 → reduction 0.0556<br>tenure ≤ 5.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: (3/6)(0.4444) + (3/6)(0.4444) = 0.4444 → reduction 0.0556<br>tenure ≤ 8.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: (4/6)(0.5000) + (2/6)(0.5000) = 0.5000 → reduction 0.0000 (useless split)</div>
+<p><b>Step 3 — the tree picks complaints ≤ 5</b>, then repeats this exact computation at every child node until every leaf is pure — that is what <code>max_depth=None</code> means. The business rule it found: <b>'more than 5 complaints in a week → escalate'.</b></p>
+<p><b>Step 4 — but unlimited growth memorizes.</b> Real iris run (lab below): the unpruned tree hits <b>train 100% / test 93.3%</b> and grows <b>8 leaves, 5 of which hold a single sample</b> — the video's 47-vs-1 disease. Add mild noise to the features and it collapses to <b>57.8% test</b>, while a <code>max_depth=2</code> tree holds <b>73.3%</b>. The depth cap is cheap insurance against noise-chasing.</p>
+<p>💡 <b>Business reading:</b> a tree's value to an ops team is the AUDITABLE rule ('&gt;5 complaints → escalate'), not the train score. Inspect with <code>plot_tree(filled=True)</code>, cut the silly branches, then re-check both accuracies.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Cells 2–3 produce every accuracy quoted above; cell 1 verifies the hand gini math.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 6-ticket dataset + verify the hand gini math</div><pre>import pandas as pd
+df = pd.DataFrame({'complaints': [8, 6, 3, 2, 1, 4],
+                   'tenure':     [2, 3, 9, 4, 8, 12],
+                   'escalated':  ['yes', 'yes', 'yes', 'no', 'no', 'no']})
+
+def gini(s):
+    p = s.value_counts(normalize=True)
+    return 1 - (p ** 2).sum()
+
+print("root gini:", round(gini(df.escalated), 4))
+for col, thr in [('complaints', 5.0), ('complaints', 3.5), ('tenure', 5.5), ('tenure', 8.5)]:
+    L, R = df[df[col] &lt;= thr].escalated, df[df[col] &gt; thr].escalated
+    w = (len(L) * gini(L) + len(R) * gini(R)) / len(df)
+    print(f"{col} &lt;= {thr}: left n={len(L)} gini={gini(L):.4f} | right n={len(R)} gini={gini(R):.4f} | weighted={w:.4f} | reduction={gini(df.escalated)-w:.4f}")</pre><div class="nbout">root gini: 0.5
+complaints &lt;= 5.0: left n=4 gini=0.3750 | right n=2 gini=0.0000 | weighted=0.2500 | reduction=0.2500
+complaints &lt;= 3.5: left n=3 gini=0.4444 | right n=3 gini=0.4444 | weighted=0.4444 | reduction=0.0556
+tenure &lt;= 5.5: left n=3 gini=0.4444 | right n=3 gini=0.4444 | weighted=0.4444 | reduction=0.0556
+tenure &lt;= 8.5: left n=4 gini=0.5000 | right n=2 gini=0.5000 | weighted=0.5000 | reduction=0.0000</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — iris: unlimited growth vs max_depth=2 (clean data)</div><pre>from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+
+iris = load_iris()
+Xtr, Xte, ytr, yte = train_test_split(iris.data, iris.target, test_size=0.3,
+                                      random_state=42, stratify=iris.target)
+print("train/test sizes:", Xtr.shape[0], Xte.shape[0])
+
+full = DecisionTreeClassifier(criterion='gini', random_state=42).fit(Xtr, ytr)
+print("FULL tree: depth =", full.get_depth(), "leaves =", full.get_n_leaves(),
+      "train acc =", full.score(Xtr, ytr), "test acc =", full.score(Xte, yte))
+pruned = DecisionTreeClassifier(criterion='gini', max_depth=2, random_state=42).fit(Xtr, ytr)
+print("DEPTH-2  : depth =", pruned.get_depth(), "leaves =", pruned.get_n_leaves(),
+      "train acc =", pruned.score(Xtr, ytr), "test acc =", pruned.score(Xte, yte))</pre><div class="nbout">train/test sizes: 105 45
+FULL tree: depth = 5 leaves = 8 train acc = 1.0 test acc = 0.9333333333333333
+DEPTH-2  : depth = 2 leaves = 3 train acc = 0.9714285714285714 test acc = 0.8888888888888888</div></div>
+<p>On clean iris even the full tree tests well — but the overfit signatures are already there: train = 100% (memorized every row) and, as cell 5 shows, five leaves holding a single sample. Watch what noise does:</p>
+
+<div class="nbcell"><div class="nbhead">In [3] — same iris with feature noise: who chases the noise?</div><pre>import numpy as np
+rng = np.random.RandomState(0)
+Xn = iris.data + rng.normal(0, 1.0, iris.data.shape)
+Xtr, Xte, ytr, yte = train_test_split(Xn, iris.target, test_size=0.3,
+                                      random_state=42, stratify=iris.target)
+full = DecisionTreeClassifier(criterion='gini', random_state=42).fit(Xtr, ytr)
+pr = DecisionTreeClassifier(criterion='gini', max_depth=2, random_state=42).fit(Xtr, ytr)
+print("NOISY iris  FULL   : depth", full.get_depth(), "train", round(full.score(Xtr,ytr),4),
+      "test", round(full.score(Xte,yte),4))
+print("NOISY iris  DEPTH-2: train", round(pr.score(Xtr,ytr),4), "test", round(pr.score(Xte,yte),4))</pre><div class="nbout">NOISY iris  FULL   : depth 8 train 1.0 test 0.5778
+NOISY iris  DEPTH-2: train 0.8381 test 0.7333</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — read the unpruned tree's actual rules</div><pre>from sklearn.tree import export_text
+Xtr, Xte, ytr, yte = train_test_split(iris.data, iris.target, test_size=0.3,
+                                      random_state=42, stratify=iris.target)
+full = DecisionTreeClassifier(criterion='gini', random_state=42).fit(Xtr, ytr)
+print(export_text(full, feature_names=list(iris.feature_names)))</pre><div class="nbout">|--- petal length (cm) &lt;= 2.45
+|   |--- class: 0
+|--- petal length (cm) &gt;  2.45
+|   |--- petal width (cm) &lt;= 1.55
+|   |   |--- petal length (cm) &lt;= 4.95
+|   |   |   |--- class: 1
+|   |   |--- petal length (cm) &gt;  4.95
+|   |   |   |--- class: 2
+|   |--- petal width (cm) &gt;  1.55
+|   |   |--- petal width (cm) &lt;= 1.70
+|   |   |   |--- sepal width (cm) &lt;= 2.85
+|   |   |   |   |--- class: 1
+|   |   |   |--- sepal width (cm) &gt;  2.85
+|   |   |   |   |--- class: 2
+|   |   |--- petal width (cm) &gt;  1.70
+|   |   |   |--- petal length (cm) &lt;= 4.85
+|   |   |   |   |--- sepal width (cm) &lt;= 3.00
+|   |   |   |   |   |--- class: 2
+|   |   |   |   |--- sepal width (cm) &gt;  3.00
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- petal length (cm) &gt;  4.85
+|   |   |   |   |--- class: 2</div></div>
+<p>Those deep <code>sepal width</code> re-splits near the bottom are pure memorization — petal measurements had already separated the classes.</p>
+
+<div class="nbcell"><div class="nbhead">In [5] — count the silly leaves (the plot_tree hunt, in numbers)</div><pre>t = full.tree_
+leaves = [i for i in range(t.node_count) if t.children_left[i] == -1]
+tiny = [i for i in leaves if t.n_node_samples[i] &lt;= 3]
+print("total leaves:", len(leaves), "| leaves holding &lt;=3 samples:", len(tiny),
+      "sizes", t.n_node_samples[tiny].tolist())
+# plot_tree(full, figsize=(15, 10), filled=True) draws this as a picture:
+# the tiny, impure leaves jump out — exactly the video's 47-vs-1 hunt.</pre><div class="nbout">total leaves: 8 | leaves holding &lt;=3 samples: 5 sizes [1, 1, 1, 1, 1]</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The setup</b>
+<p>This section is hands-on: load the classic <code>iris</code> dataset, split it into train/test, and fit sklearn's <code>DecisionTreeClassifier</code>. The real lesson is not the dataset — it is learning to SEE a tree overfit, and then cut it back.</p>
+<b>The constructor knobs</b>
+<ul>
+<li><code>DecisionTreeClassifier()</code> with no arguments uses <code>criterion='gini'</code>. The options are <code>'gini'</code> and <code>'entropy'</code> — both measure the impurity of a split.</li>
+<li><code>splitter</code> is <code>'best'</code> by default (always take the best split found at a node); the alternative is <code>'random'</code>.</li>
+<li>Growth controls (pre-pruning): <code>max_depth</code>, <code>min_samples_leaf</code>, <code>max_features</code>. Leave them unset and the tree keeps splitting until every leaf is pure.</li>
+</ul>
+<b>A fully grown tree overfits — and you can see it</b>
+<p>With no limits the tree memorizes noise. In the video, the fitted tree shows a silly split: one branch holds 47 samples while the other holds just 1. A 1-sample leaf is the tree memorizing one odd row — that branch should be cut. Cutting back an already-grown tree is POST-PRUNING.</p>
+<b>Seeing it: plot_tree</b>
+<div class="formula">plot_tree(model, figsize=(15,10), filled=True)</div>
+<p><code>filled=True</code> colours every node by its majority class, so tiny, impure, pointless leaves jump out of the picture. You eyeball the plot, spot the silly branches, then re-fit with limits.</p>
+<b>fit() before predict() — always</b>
+<p><code>model.fit(X_train, y_train)</code> must run before <code>model.predict(...)</code>. Call predict on an unfitted estimator and sklearn raises a <code>NotFittedError</code>. Obvious — but it bites everyone once.</p>
+<b>Judge it on train AND test accuracy</b>
+<p>Score the model on both sets. A fully grown tree: very high train accuracy, clearly lower test accuracy — that gap IS the overfitting. Prune or cap the depth and the gap narrows while the test score rises.</p>
+<p>💡 Interview angle: 'Train accuracy 99%, test accuracy 78% — what do you do?' → the tree memorized the train set; restrict growth (<code>max_depth</code>, <code>min_samples_leaf</code>) or post-prune the tiny leaves you can see in <code>plot_tree</code>, then re-check both scores.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Post-pruning is my validation-tuning discipline in miniature: for the reco engine I grid-searched SVD rank + α on VALIDATION only and touched the test set exactly once — the same rule as cutting tree branches based on inspected evidence instead of test-set peeking.</li>
+<li>Action item: the next tree I fit gets a <code>plot_tree(..., filled=True)</code> pass first — I hunt for 47-vs-1 style leaves before trusting any score.</li>
+<li>The train-vs-test accuracy gap is the same overfit tripwire I check on the MyOperator churn model before anything ships.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'What is the DEFAULT criterion used by sklearn DecisionTreeClassifier() when you pass no arguments?',options:['entropy','gini','mean_squared_error','it depends on the dataset'],a:1,expl:'No arguments means criterion=gini. Entropy is the other supported option and must be set explicitly.'},
+{q:'Which values are valid options for the criterion parameter of DecisionTreeClassifier?',options:['gini and entropy','gini and mean_squared_error','entropy and f1_score','squared_error and absolute_error'],a:0,expl:'The video names exactly two options: gini and entropy.'},
+{q:'What are the two possible values of the splitter parameter?',options:['auto and full','greedy and lazy','best and random','gini and entropy'],a:2,expl:'splitter=best (the default) takes the best split found at each node; splitter=random takes a random one.'},
+{q:'Which set of parameters limits tree growth (pre-pruning), as shown in the video?',options:['n_estimators, learning_rate, max_features','max_depth, min_samples_leaf, max_features','max_depth, n_neighbors, C','min_samples_leaf, gamma, kernel'],a:1,expl:'max_depth, min_samples_leaf and max_features cap how far the tree grows. n_estimators and learning_rate belong to ensembles; C, gamma, kernel to SVMs; n_neighbors to KNN.'},
+{q:'The fitted tree shows one branch with 47 samples and another with just 1. What is the correct interpretation and action?',options:['The tree is underfitting — grow it deeper','The 1-sample branch is memorized noise; cut that branch back (post-pruning)','A 47-vs-1 split means the dataset must be rebalanced with SMOTE','The 1-sample branch holds the most important rule in the tree'],a:1,expl:'A leaf holding a single sample is the tree memorizing one odd row. Cutting already-grown branches back is post-pruning.'},
+{q:'How does the video visually inspect the trained tree to spot silly branches?',options:['model.print_tree(depth=50)','a seaborn heatmap of the confusion matrix','plot_tree(model, figsize=(15,10), filled=True)','only a feature_importances_ bar chart'],a:2,expl:'plot_tree with filled=True colours nodes by majority class, so tiny impure leaves stand out immediately.'},
+{q:'You call model.predict(X_test) but forgot to run model.fit(X_train, y_train) first. What happens?',options:['sklearn raises a NotFittedError','sklearn fits silently and then returns predictions','you get predictions that are all zeros','you get an accuracy of 0 but no exception'],a:0,expl:'predict on an unfitted estimator raises NotFittedError — fit must always run first.'},
+{q:'A fully grown (unpruned) decision tree is scored on both train and test sets. Which pattern do you expect?',options:['Low accuracy on both train and test','High test accuracy but low train accuracy','Identical accuracy on train and test','Very high train accuracy but lower test accuracy — overfitting'],a:3,expl:'Unlimited growth memorizes the training set: train score very high, test score drops. The gap is the overfitting.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_14',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logistic Regression Algorithm — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=5588" target="_blank">▶ Watch this section</a></div>
+<h1>Logistic Regression Algorithm</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 01:33:08 · approx 40 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_7"><b>Logistic regression — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>
+<ul>
+<li><b>Reaching for it on regression tasks.</b> Despite the name, logistic regression is classification: spam / not spam, churn / no churn. It outputs a probability; a threshold turns it into a class.</li>
+<li><b>Reading h as accuracy, or as a class label.</b> h = 0.9 means P(class = 1) = 90% — a degree of belief, not a correctness score.</li>
+<li><b>Missing that the two decision rules are one rule.</b> g(0) = 0.5, so 'predict 1 when g(z) ≥ 0.5' and 'predict 1 when z ≥ 0' describe the same boundary.</li>
+<li><b>Training a sigmoid with MSE.</b> That cost surface is non-convex — local minima can trap gradient descent. Log loss stays convex with a well-behaved gradient.</li>
+<li><b>Mixing the log-loss branches.</b> y = 1 → cost = −log(h) (punishes a low h); y = 0 → cost = −log(1−h) (punishes a high h).</li>
+<li><b>Thinking the sigmoid replaces the linear part.</b> You still compute z = θᵀx first — the sigmoid only squashes z into (0, 1).</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Spam filter with one feature: links clicked</h2>
+<div class="card">
+<p><b>Business problem:</b> the mail team wants a spam flag. One signal is available: how many links the email contains — spam loves links. Eight labeled emails, including one outlier promo email with 12 links:</p>
+<table>
+<tr><th>Email</th><th>links_clicked x</th><th>spam y</th></tr>
+<tr><td>e1</td><td>0</td><td>0</td></tr>
+<tr><td>e2</td><td>1</td><td>0</td></tr>
+<tr><td>e3</td><td>2</td><td>0</td></tr>
+<tr><td>e4</td><td>3</td><td>0</td></tr>
+<tr><td>e5</td><td>4</td><td>1</td></tr>
+<tr><td>e6</td><td>5</td><td>1</td></tr>
+<tr><td>e7</td><td>6</td><td>1</td></tr>
+<tr><td>e8 (outlier)</td><td>12</td><td>1</td></tr>
+</table>
+<p><b>Step 1 — linear regression fails, visibly:</b></p>
+<div class="formula">p̂ = 0.1062·links + 0.0619<br>links = 6 → 0.699 (passable) &nbsp;·&nbsp; links = 12 (the outlier) → <b>1.3363</b> = a 133.6% spam probability ?!<br>and the line has no floor: links = −10 → −1.0 — a straight line will not stay inside [0, 1]</div>
+<p>The outlier drags the whole line up and pushes predictions outside probability range — the video's exact objection to linear regression on 0/1 labels.</p>
+<p><b>Step 2 — the sigmoid, computed by hand:</b></p>
+<div class="formula">g(z) = 1 / (1 + e^(−z))<br>g(0) = 1/(1+1) = <b>0.5</b> ← the tipping point<br>g(2) = 1/(1+e⁻²) = 1/(1+0.1353) = <b>0.881</b><br>g(−2) = 1/(1+e²) = 1/(1+7.389) = <b>0.119</b></div>
+<p><b>Step 3 — fit logistic regression on the same 8 emails:</b></p>
+<div class="formula">z = −4.0348 + 1.1468·links</div>
+<table>
+<tr><th>links</th><th>z</th><th>g(z) = probability</th><th>verdict at 0.5</th></tr>
+<tr><td>2</td><td>−1.74</td><td>0.149</td><td>not spam</td></tr>
+<tr><td>3</td><td>−0.59</td><td>0.356</td><td>not spam</td></tr>
+<tr><td>4</td><td>+0.55</td><td>0.635</td><td><b>SPAM</b> — first over the line</td></tr>
+<tr><td>5</td><td>+1.70</td><td>0.845</td><td>SPAM</td></tr>
+<tr><td>12</td><td>+9.73</td><td>0.9999</td><td>SPAM — squeezed, not exploded</td></tr>
+</table>
+<p><b>Step 4 — the boundary as a business rule:</b> g(z) = 0.5 exactly when z = 0, i.e. links = 4.0348 / 1.1468 = <b>3.52</b>. So: <b>flag anything with ≥ 4 links.</b> Accuracy on these 8 emails: 8/8 — and the 12-link outlier now lands at 0.9999 instead of 133%.</p>
+<p>💡 <b>Interview angle:</b> 'walk me through logistic regression' → linear fails (outputs leave [0,1]) → sigmoid squashes (by hand: 0.5 / 0.881 / 0.119) → threshold 0.5 ⇔ z = 0 → boundary becomes a one-line business rule anyone can act on.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 8-email table</div><pre>import pandas as pd, numpy as np
+df = pd.DataFrame({'links_clicked': [0, 1, 2, 3, 4, 5, 6, 12],
+                   'spam':          [0, 0, 0, 0, 1, 1, 1, 1]})
+X, y = df[['links_clicked']], df['spam']
+df</pre><div class="nbout">   links_clicked  spam
+0              0     0
+1              1     0
+2              2     0
+3              3     0
+4              4     1
+5              5     1
+6              6     1
+7             12     1</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — linear regression fails on 0/1 labels</div><pre>from sklearn.linear_model import LinearRegression
+lin = LinearRegression().fit(X, y)
+print('slope', lin.coef_[0].round(4), 'intercept', lin.intercept_.round(4))
+for k in [6, 12]:
+    print(f"links={k}: linear 'probability' = {lin.predict(pd.DataFrame({'links_clicked':[k]}))[0]:.4f}")</pre><div class="nbout">slope 0.1062 intercept 0.0619
+links=6: linear 'probability' = 0.6991
+links=12: linear 'probability' = 1.3363   <- above 1: not a probability</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — the sigmoid by hand</div><pre>sig = lambda z: 1 / (1 + np.exp(-z))
+for z in [-2, 0, 2]:
+    print(f"sigmoid({z}) = {sig(z):.4f}")</pre><div class="nbout">sigmoid(-2) = 0.1192
+sigmoid(0) = 0.5000
+sigmoid(2) = 0.8808</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — logistic regression: z, probability, verdict</div><pre>from sklearn.linear_model import LogisticRegression
+logi = LogisticRegression().fit(X, y)
+b1, b0 = logi.coef_[0][0], logi.intercept_[0]
+print('z =', b0.round(4), '+', b1.round(4), '* links')
+out = pd.DataFrame({'links': [2, 3, 4, 5, 12]})
+out['z'] = (b0 + b1 * out['links']).round(2)
+out['probability'] = sig(b0 + b1 * out['links']).round(4)
+out['verdict'] = np.where(out['probability'] &gt;= 0.5, 'SPAM', 'not spam')
+print(out.to_string(index=False))</pre><div class="nbout">z = -4.0348 + 1.1468 * links
+ links     z  probability  verdict
+     2 -1.74       0.1492 not spam
+     3 -0.59       0.3556 not spam
+     4  0.55       0.6347     SPAM
+     5  1.70       0.8454     SPAM
+    12  9.73       0.9999     SPAM</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — decision boundary and accuracy</div><pre>print('boundary: links =', (-b0 / b1).round(4), '-> flag anything with >= 4 links')
+print('accuracy on the 8 emails:', logi.score(X, y))</pre><div class="nbout">boundary: links = 3.5184 -> flag anything with >= 4 links
+accuracy on the 8 emails: 1.0</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>What it is</b>
+<ul>
+<li>Logistic regression is a <b>classification</b> algorithm. The name is historical — despite saying regression, it predicts discrete classes (spam / not spam, churn / no churn).</li>
+<li>It first outputs a <b>probability</b>, then a threshold turns that probability into a class label.</li>
+</ul>
+<b>Why not just use linear regression?</b>
+<ul>
+<li>Fit a straight line to 0/1 labels and one <b>outlier drags the best-fit line</b> toward itself, shifting every single prediction.</li>
+<li>Worse, a line keeps going forever: outputs fall <b>below 0 and above 1</b> — numbers that cannot be probabilities.</li>
+</ul>
+<b>The sigmoid fixes it</b>
+<div class="formula">z = θᵀx</div>
+<div class="formula">g(z) = 1 / (1 + e^(−z))</div>
+<ul>
+<li>The sigmoid <b>squashes any real number into the range (0, 1)</b>: very negative z → close to 0, very positive z → close to 1.</li>
+<li><b>h = g(z) is the probability that the class is 1.</b> h = 0.9 means the model believes there is a 90% chance of class 1.</li>
+</ul>
+<b>The decision rule</b>
+<div class="formula">predict 1 when g(z) ≥ 0.5  ⇔  z ≥ 0</div>
+<ul><li>g(0) = 0.5 exactly, so the probability threshold 0.5 is the same boundary as the weighted sum z crossing 0.</li>
+<li>z = 0 is the tipping point: anything on the positive side of the boundary gets a prediction of 1, anything negative gets 0.</li></ul>
+<b>Why not MSE? Enter log loss</b>
+<ul>
+<li>Feed a sigmoid into MSE and the cost surface becomes <b>non-convex</b> — a bumpy landscape with local minima that can <b>trap gradient descent</b> in a bad spot.</li>
+<li><b>Log loss</b> is convex — one clean bowl with a single global minimum — and its <b>gradient is well-behaved</b>, so gradient descent works reliably.</li>
+</ul>
+<div class="formula">cost(h, y) = −[ y·log(h) + (1−y)·log(1−h) ]</div>
+<div class="formula">J = (1/m) · Σᵢ cost( h(x⁽ⁱ⁾), y⁽ⁱ⁾ )   — averaged over all m examples</div>
+<ul>
+<li>If y = 1: cost = −log(h). Confident and right (h → 1) → cost → 0. Confident and wrong (h → 0) → cost explodes.</li>
+<li>If y = 0: cost = −log(1−h) — the mirror image, punishing a high h.</li>
+</ul>
+<b>ELI10</b>
+<p>The sigmoid is a squeeze-machine: any number goes in, a probability between 0 and 1 comes out. Log loss is the referee who punishes confident wrong answers brutally and charges almost nothing for confident right ones. MSE only asks are you close? — log loss asks are you confidently right?</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li><b>Churn model framing:</b> my MyOperator churn model is binary classification — logistic regression is the baseline I name when explaining the 0.5 probability threshold and why precision (+18% QoQ) was the metric, not MSE.</li>
+<li><b>Loss function story:</b> the non-convexity argument is exactly why I never train probabilistic classifiers with squared error — log loss keeps the surface convex so gradient descent behaves.</li>
+<li><b>Probability intuition:</b> treating churn scores as probabilities (h = 0.8 means 80% churn risk) is what made the 3x high-risk cohort intervention actionable.</li>
+</ul></div>
+<h2>🧪 Quiz — 10 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'Despite its name, logistic regression is really used for...',options:['Regression with logistic constraints','Clustering','Classification — predicting discrete classes','Dimensionality reduction'],a:2,expl:'The name is historical. Logistic regression predicts categories: spam or not, churn or no churn.'},
+{q:'Which function squashes any real number into the range (0, 1)?',options:['ReLU','The sigmoid: g(z) = 1/(1+e^(−z))','z squared','The identity function'],a:1,expl:'Big negative z → near 0, big positive z → near 1, and it never actually reaches 0 or 1.'},
+{q:'Why is plain linear regression a poor choice for a 0/1 classification problem?',options:['It is too slow on big data','Outliers drag the best-fit line, and outputs go below 0 or above 1 — invalid probabilities','It cannot handle numeric features','It always finds the global minimum'],a:1,expl:'One outlier shifts the whole line, and a line happily predicts −0.3 or 1.4 — numbers that cannot be probabilities.'},
+{q:'The model outputs h = 0.9 for an email. What does that mean?',options:['The model is 90% accurate','90% probability that the class is 1','The email is 10% spam','The error is 0.9'],a:1,expl:'h = g(θᵀx) is read as the probability that the class is 1 — here, a strong lean toward class 1.'},
+{q:'What goes wrong if you use MSE on top of a sigmoid output?',options:['The cost becomes convex but slow to compute','The cost becomes non-convex — local minima can trap gradient descent','MSE outputs values above 1','Nothing, MSE always works'],a:1,expl:'Sigmoid + MSE gives a bumpy, non-convex surface; gradient descent can settle in a local minimum instead of the global one.'},
+{q:'When does the model predict class 1?',options:['Whenever z is negative','When g(z) ≥ 0.5, which is the same as z ≥ 0','When h equals exactly 0','When the cost is maximal'],a:1,expl:'g(0) = 0.5, so the probability threshold 0.5 is the same boundary as the weighted sum z crossing 0.'},
+{q:'What is g(0), the sigmoid evaluated at z = 0?',options:['0','1','0.5','Undefined'],a:2,expl:'g(0) = 1/(1 + e⁰) = 1/2 = 0.5 — exactly the decision boundary.'},
+{q:'True class y = 1 and the model outputs h = 0.7. What is the log-loss cost?',options:['−log(0.3) ≈ 1.20','−log(0.7) ≈ 0.36','(1 − 0.7)² = 0.09','0.7'],a:1,expl:'For y = 1 the cost is −log(h) = −log(0.7) ≈ 0.36. The −log(0.3) branch applies when y = 0.'},
+{q:'Interview check: why does log loss train better than MSE for logistic regression?',options:['Log loss is convex with a well-behaved gradient, so gradient descent reaches the global minimum','Log loss needs fewer training examples','MSE has no derivative','Log loss removes the need for the sigmoid'],a:0,expl:'Convexity is the whole story: one clean bowl, one global minimum, well-behaved gradients — unlike the bumpy MSE-on-sigmoid surface.'},
+{q:'In z = θᵀx, what is z?',options:['The final probability','The weighted sum of the input features using parameters θ','The number of training examples','The learning rate'],a:1,expl:'z is the linear part — features weighted by θ — and the sigmoid then maps that z to a probability.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_7',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

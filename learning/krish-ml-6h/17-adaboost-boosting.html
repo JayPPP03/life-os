@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boosting, AdaBoost ML Algorithms — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=17280" target="_blank">▶ Watch this section</a></div>
+<h1>Boosting, AdaBoost ML Algorithms</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 04:47:30 · approx 14.5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_17"><b>ADABOOST — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — your notes above are still blank, so treat this as the pre-watch checklist: anything you couldn't have written from memory is your rewatch list.</p>
+<div class="missing"><b class="no">① TE is a sum of WEIGHTS, not a count of errors.</b> It only coincides with 'errors/n' at round 1 when all weights are equal; from round 2 on, TE = Σ weights of the misclassified.</div>
+<div class="missing"><b class="no">② The α formula's details.</b> α = ½·ln((1−TE)/TE): the ½ gets dropped, or the ratio flipped to TE/(1−TE) — both change every downstream number.</div>
+<div class="missing"><b class="no">③ Direction of the update.</b> CORRECT samples SHRINK (× e^−α); misclassified ones GROW (× e^+α). Learners often remember 'weights change' but swap the directions.</div>
+<div class="missing"><b class="no">④ Normalization.</b> After multiplying, every weight is divided by the new TOTAL so they sum back to 1 — skipping this breaks the bucket redraw.</div>
+<div class="missing"><b class="no">⑤ How the next stump 'sees' the weights.</b> Classic AdaBoost redraws the dataset WITH replacement through weight-proportional buckets — the hard points literally appear more often, rather than the stump reading weights directly.</div>
+<div class="missing"><b class="no">⑥ The final vote is weighted.</b> Stumps vote with strength α each (regression: weighted average) — not one-stump-one-vote. And TE &gt; 0.5 makes α negative: the vote counts AGAINST the stump.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — Churn desk, round 1 of AdaBoost by hand: 5 customers, every number computed</h2>
+<div class="card">
+<p><b>Business problem:</b> last week's churn outcomes for 5 customers. The silent-churner problem: customers who churn WITHOUT calling support are exactly the ones a save-desk never sees. Watch AdaBoost force the next model to study them.</p>
+<table>
+<tr><th>Customer</th><th>support_calls (last week)</th><th>churned?</th></tr>
+<tr><td>A</td><td>5</td><td>Yes</td></tr>
+<tr><td>B</td><td>6</td><td>Yes</td></tr>
+<tr><td>C</td><td>3</td><td>Yes</td></tr>
+<tr><td>D</td><td>2</td><td>No</td></tr>
+<tr><td>E</td><td>4</td><td>No</td></tr>
+</table>
+<p><b>Step 1 — initialize weights:</b> everyone equal — w = 1/5 = 0.2 for A, B, C, D, E.</p>
+<p><b>Step 2 — stump 1</b> (the depth-1 tree from the split search): <b>'support_calls ≥ 4 → predict churn'.</b> It gets A ✓, B ✓, D ✓ — and misses C ✗ (3 &lt; 4 → predicted stay, actually churned) and E ✗ (4 ≥ 4 → predicted churn, actually stayed).</p>
+<p><b>Step 3 — Total Error = sum of the MISCLASSIFIED weights:</b></p>
+<div class="formula">TE = w(C) + w(E) = 0.2 + 0.2 = <b>2/5 = 0.4</b></div>
+<p><b>Step 4 — performance of the stump:</b></p>
+<div class="formula">α = ½ · ln((1 − 0.4) / 0.4) = ½ · ln(1.5) = ½ × 0.4055 = <b>0.2027</b></div>
+<p><b>Step 5 — update weights:</b> correct samples × e^(−α) (shrink), misclassified × e^(+α) (grow):</p>
+<div class="formula">correct (A, B, D): 0.2 × e^(−0.2027) = 0.2 × 0.8165 = <b>0.1633</b> each<br>wrong&nbsp;&nbsp;&nbsp;(C, E):&nbsp;&nbsp;&nbsp;0.2 × e^(+0.2027) = 0.2 × 1.2247 = <b>0.2449</b> each</div>
+<p><b>Step 6 — normalize</b> (weights must sum to 1). New total = 3 × 0.1633 + 2 × 0.2449 = 0.9798:</p>
+<div class="formula">A, B, D: 0.1633 / 0.9798 = <b>0.1667 (= 1/6)</b> each&nbsp;&nbsp;·&nbsp;&nbsp;C, E: 0.2449 / 0.9798 = <b>0.25 (= 1/4)</b> each<br>check: 3 × (1/6) + 2 × (1/4) = 0.5 + 0.5 = 1 ✓</div>
+<p><b>Step 7 — buckets + redraw WITH replacement.</b> Lay the 0→1 number line out in weight-sized buckets:</p>
+<div class="formula">A [0.0000, 0.1667) · B [0.1667, 0.3333) · C [0.3333, 0.5833) · D [0.5833, 0.7500) · E [0.7500, 1.0000)<br>C and E now own 50% of the line (was 40%). Real redraw (seed 7): uniform draws 0.0763, 0.7799, 0.4384, 0.7235, 0.978<br>→ new dataset <b>A, E, C, D, E</b> — the churners AdaBoost cares about (C, E) take 2 of the 5 slots, E twice.</div>
+<p><b>Business interpretation:</b> the redrawn batch over-represents the two mistakes, so stump 2 is FORCED to study the silent-churner segment — low support calls but churned anyway; the exact customers a save-desk never flags. Repeat for T rounds, then predict with the α-weighted vote of all stumps.</p>
+<p>💡 <b>Interview angle:</b> why α = ½·ln((1−TE)/TE) makes sense — TE small → α large (an accurate stump gets a loud vote); TE = 0.5 → α = 0 (a coin-flip stump is silenced); TE &gt; 0.5 → α negative (the vote counts against it).</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Every number below is a real numpy run — the same round-1 hand calculation, cell by cell.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 5 customers and the stump's misses</div><pre>import numpy as np
+names = ['A', 'B', 'C', 'D', 'E']
+y = np.array([1, 1, 1, 0, 0])            # churned: A,B,C yes; D,E no
+calls = np.array([5, 6, 3, 2, 4])
+pred = (calls &gt;= 4).astype(int)           # stump: calls &gt;= 4 -&gt; churn
+print("stump predictions:", pred, "| actual:", y)
+wrong = np.where(pred != y)[0]
+print("misclassified rows:", [names[i] for i in wrong])</pre><div class="nbout">stump predictions: [1 1 0 0 1] | actual: [1 1 1 0 0]
+misclassified rows: ['C', 'E']</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — Total Error and α</div><pre>w = np.full(5, 1/5)
+TE = w[wrong].sum()
+alpha = 0.5 * np.log((1 - TE) / TE)
+print("TE =", TE)
+print("alpha = 0.5*ln(0.6/0.4) =", round(alpha, 4))</pre><div class="nbout">TE = 0.4
+alpha = 0.5*ln(0.6/0.4) = 0.2027</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — weight updates</div><pre>mult_ok, mult_bad = np.exp(-alpha), np.exp(alpha)
+print("correct multiplier e^-alpha =", round(mult_ok, 4),
+      "| wrong multiplier e^alpha =", round(mult_bad, 4))
+new = w.copy()
+for i in np.where(pred == y)[0]: new[i] *= mult_ok
+for i in wrong:                  new[i] *= mult_bad
+print("updated weights:", np.round(new, 4), "| total =", round(new.sum(), 4))</pre><div class="nbout">correct multiplier e^-alpha = 0.8165 | wrong multiplier e^alpha = 1.2247
+updated weights: [0.1633 0.1633 0.2449 0.1633 0.2449] | total = 0.9798</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — normalize</div><pre>norm = new / new.sum()
+print("normalized:", {k: round(float(v), 4) for k, v in zip(names, norm)})</pre><div class="nbout">normalized: {'A': 0.1667, 'B': 0.1667, 'C': 0.25, 'D': 0.1667, 'E': 0.25}</div></div>
+<p>Exactly the hand result: correct rows → 1/6 each, wrong rows → 1/4 each.</p>
+
+<div class="nbcell"><div class="nbhead">In [5] — the weight-proportional buckets</div><pre>edges = np.cumsum(norm); edges[-1] = 1.0
+starts = np.concatenate([[0], edges[:-1]])
+print("buckets:", [f"{names[i]} [{s:.4f}, {e:.4f})" for i, (s, e) in enumerate(zip(starts, edges))])</pre><div class="nbout">buckets: ['A [0.0000, 0.1667)', 'B [0.1667, 0.3333)', 'C [0.3333, 0.5833)', 'D [0.5833, 0.7500)', 'E [0.7500, 1.0000)']</div></div>
+
+<div class="nbcell"><div class="nbhead">In [6] — redraw the dataset through the buckets</div><pre>r = np.random.RandomState(7)
+u = r.rand(5)
+picks = np.searchsorted(edges, u)
+print("uniform draws:", np.round(u, 4))
+print("redrawn dataset:", [names[p] for p in picks])</pre><div class="nbout">uniform draws: [0.0763 0.7799 0.4384 0.7235 0.978 ]
+redrawn dataset: ['A', 'E', 'C', 'D', 'E']</div></div>
+<p>C and E — the silent churners — land 2 of the 5 redraw slots. Round 2 begins with stump 2 trained on this dataset.</p>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>AdaBoost = Adaptive Boosting</b>
+<p>A sequential ensemble whose members are STUMPS. A stump is a decision tree of depth 1 — ONE feature, ONE split. That is a WEAK LEARNER: barely better than random guessing. AdaBoost chains many stumps into a STRONG LEARNER, and the 'adaptive' part is how it forces each new stump to focus on the samples the previous ones got wrong.</p>
+<b>The pipeline, step by step</b>
+<ol>
+<li><b>Initialize:</b> every sample gets the same weight = 1/n.</li>
+<li><b>First stump:</b> choose the feature + split with the best information gain (lowest Gini).</li>
+<li><b>Total Error (TE):</b> the sum of the weights of the MISCLASSIFIED samples — always between 0 and 1.</li>
+<li><b>Performance α (alpha) of the stump:</b> computed from TE with the formula below.</li>
+<li><b>Update weights:</b> correctly classified samples get multiplied by e^(−α) — they shrink; misclassified ones by e^(+α) — they grow.</li>
+<li><b>Normalize:</b> divide every weight by the new total so all weights sum to 1.</li>
+<li><b>Buckets + resample:</b> build weight-proportional buckets and redraw the dataset WITH replacement — previously MISCLASSIFIED points now sit in bigger buckets, so the next stump sees them more often and focuses on them.</li>
+</ol>
+<div class="formula">TE = Σ (weights of misclassified samples) · 0 ≤ TE ≤ 1</div>
+<div class="formula">α = ½ · ln((1 − TE) / TE)   →   video example: TE = 1/7 ⇒ α = ½·ln(6) ≈ 0.895</div>
+<div class="formula">correct: w × e^(−α) ⇒ 1/7 · e^(−0.895) ≈ 0.05 · wrong: w × e^(+α) ⇒ ≈ 0.349 · then normalize (new total ≈ 0.649)</div>
+<b>Final prediction</b>
+<p>A weighted vote of ALL stumps. Classification: each stump votes with its α — sum the α per class; the biggest sum wins. Regression: weighted average. Not just the single best stump.</p>
+<p>💡 Interview angle: why keep every stump instead of only the best one? Because each vote is weighted by its own α and the stumps specialize on different hard regions of the data — remove one and you lose the region it mastered.</p>
+<b>Edge cases worth memorizing</b>
+<ul>
+<li>TE = 0 → α → ∞: a perfect stump gets infinite say.</li>
+<li>TE &gt; 0.5 → α goes NEGATIVE: the stump is worse than a coin flip, so its vote effectively counts against it — better to flip its predictions.</li>
+</ul>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>MyOperator churn model is productionized on XGBoost (100K+ users) — a boosted-tree family member; these stump/α mechanics are exactly what I would whiteboard when defending that model in a design review.</li>
+<li>The recommender story — weak views, each strong somewhere, combined into +100.8% over popularity — is AdaBoost's thesis at system scale; I will tell it that way in interviews.</li>
+<li>Confidence check: I can now derive α = ½·ln((1−TE)/TE) and the full weight-update loop from memory — no more hand-waving boosting.</li>
+</ul></div>
+<h2>🧪 Quiz — 10 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'What exactly is a STUMP in AdaBoost?',options:['A decision tree limited to depth 1 — one feature, one split','A decision tree with unlimited depth','The root node of a random forest','A tree ensemble with 100 members'],a:0,expl:'A stump = a depth-1 tree = a weak learner. AdaBoost chains many of them sequentially.'},
+{q:'How are sample weights initialized at the start of AdaBoost?',options:['Random values between 0 and 1','All equal to 1/n for n samples','All equal to 1','Proportional to the target value of each sample'],a:1,expl:'Step 1: every sample starts equal — weight = 1/n.'},
+{q:'The Total Error (TE) of a stump is...',options:['The number of misclassified samples divided by the number of features','The sum of the weights of the misclassified samples, always between 0 and 1','The training accuracy of the stump','The sum of all weights before normalization'],a:1,expl:'TE adds up the weights of the samples the stump got wrong — so TE always lies between 0 and 1.'},
+{q:'A stump has Total Error TE = 1/7. Compute its performance α = ½·ln((1−TE)/TE).',options:['≈ 0.895','≈ 0.349','≈ 0.500','≈ 1.792'],a:0,expl:'α = ½·ln((6/7)/(1/7)) = ½·ln(6) ≈ 0.5 × 1.792 ≈ 0.895 — the worked example from the video.'},
+{q:'A correctly classified sample starts with weight 1/7 and the stump has α ≈ 0.895. Its updated weight is approximately...',options:['0.349 — weights of correct samples grow','0.05 — multiplied by e^(−α), correct samples shrink','1 — correct samples keep full weight','0.895 — the weight becomes α'],a:1,expl:'Correct: w × e^(−α) = 1/7 × e^(−0.895) ≈ 0.05. Misclassified samples grow instead (≈ 0.349).'},
+{q:'What happens to the α of a stump whose Total Error is greater than 0.5?',options:['α becomes negative — the stump is worse than a coin flip, so effectively flip its predictions','α becomes 1 by definition','α becomes infinite','Training stops immediately'],a:0,expl:'TE > 0.5 makes (1−TE)/TE less than 1, so the log is negative: the vote counts against the stump.'},
+{q:'A stump achieves TE = 0 on the data. What is its α?',options:['α = 0','α = 0.5','α → ∞ — a perfect stump gets infinite say','α = −1'],a:2,expl:'α = ½·ln((1−0)/0) divides by zero, so α → infinity: the perfect stump dominates the vote.'},
+{q:'Why does AdaBoost create weight-proportional BUCKETS before resampling the data?',options:['To store model checkpoints','So redraws with replacement pick previously misclassified points more often — the next stump focuses on them','To sort features by importance','To convert continuous features into categories'],a:1,expl:'Bigger weight = bigger bucket = higher chance of being drawn, so the next stump trains on more of the hard points.'},
+{q:'How does a trained AdaBoost model make its FINAL prediction?',options:['Only the first stump decides','Only the stump with the lowest TE decides','A weighted vote of ALL stumps — sum of α per class (regression: weighted average)','The average of all stump depths'],a:2,expl:'Every stump votes, weighted by its own α; the class with the biggest α-sum wins.'},
+{q:'Interview question: why does AdaBoost keep ALL stumps instead of only the best-performing one?',options:['Because sklearn does not allow deleting stumps','Because each vote is weighted by its α and the stumps specialize on different hard regions — dropping one loses the region it mastered','Because more stumps always guarantee TE = 0','Because the best stump alone would already be a strong learner'],a:1,expl:'Each stump covers the hard region it was resampled to learn; the α-weighted vote of all of them is what makes the weak ensemble strong.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_17',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

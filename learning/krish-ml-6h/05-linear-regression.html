@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linear Regression Algorithm — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=1094" target="_blank">▶ Watch this section</a></div>
+<h1>Linear Regression Algorithm</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 00:18:14 · approx 49 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_5"><b>1) y = mx + c</b><br><br>M = slope , c = intercept on y axis<br><br><b>2)</b> to minimize the predicted yi with original y we do it by minimizing the distance between predicting yi and original y<br><br>For this we use the cost function – if we minimize this function means that we have minimize the errors – it's nothing but Mean Square Error<br><br>Cost/Loss function (J) = 1/(2m) * (yi - y)^2<br><br>Here ½ is only for when we do the derivation of cost function to get the global minima the ½ gets cancel out with square. Here we have to do the square to avoid the negative numbers — we can't do it with modulus only because we also have to punish if the error is big<br><br><b>3)</b> let's say (1,1) , (2,2) , (3,3)<br><br>Independent variable M = 1, x= 1, c = -1<br>Dependent variable yi = 1<br><br>J = ½(1/1?) * (1-1)^2 = 0 means we got 0 error yi = y perfect prediction<br><br>If m = 0.5 , and x = 1 , c = -1<br>Then yi = -0.5<br><br>J = ½ * 2 * (-0.5-1)^2 = 2.25 error got increased<br><br>So this way we get the Cost value against the different different x values<br><br>So we plot the graph<br><br>J vs x<br><br>This comes as convex parabola<br><br>We choose the x in which we get the most lowest value for J means global minima. For that we have to do derivation</div>
+</div>
+
+<h2>📋 Coach's Review of My Notes</h2>
+<div class="card">
+<p><b class="ok">✅ What you got RIGHT (honestly, most of it):</b></p>
+<ul>
+<li>The hypothesis, slope vs intercept meaning, squared-error cost, the reason for squaring (negatives) AND punishing big errors — all correct.</li>
+<li>The ½ explanation is exactly right: it cancels with the 2 from the square's derivative.</li>
+<li>Convex parabola → global minima: correct, and it's the key difference from deep learning.</li>
+<li>Writing worked numbers from memory — this is exactly how you lock a concept.</li>
+</ul>
+<p><b class="no">❌ What's missing or slipped — 6 gaps:</b></p>
+<div class="missing"><b class="no">① THE BIG ONE — your J = 2.25 calculation used only ONE point.</b><br>
+J must AVERAGE the squared error over ALL m points. With m = 0.5, c = −1 on points (1,1),(2,2),(3,3): predictions are −0.5, 0, 0.5 → errors are 1.5, 2, 2.5 → J = (2.25 + 4 + 6.25)/(2×3) = 12.5/6 ≈ <b>2.083</b>, not 2.25. Same idea, but the full formula matters — that's what the worked example below fixes.</div>
+<div class="missing"><b class="no">② Gradient descent itself is missing.</b></div>
+<div class="missing"><b class="no">③ The learning rate α is missing.</b></div>
+<div class="missing"><b class="no">④ R² and Adjusted R² are missing.</b></div>
+<div class="missing"><b class="no">⑤ Multiple features (y = θ0 + θ1x1 + θ2x2 + …).</b></div>
+<div class="missing"><b class="no">⑥ When to STOP iterating.</b></div>
+<p style="margin-top:.6rem">All six are fixed in the worked project + python lab below.</p>
+</div>
+
+<h2>🧮 Worked Mini-Project — Adani-style: ad spend → revenue, every number calculated</h2>
+<div class="card">
+<p><b>Business problem:</b> A marketing team spends different amounts on ads (₹ lakh) and records the revenue generated (₹ lakh). Question: <b>if we spend 5 next month, what revenue should we expect — and is spending even worth it?</b></p>
+<table>
+<tr><th>Month</th><th>Ad spend x (₹L)</th><th>Revenue y (₹L)</th></tr>
+<tr><td>Jan</td><td>1</td><td>2</td></tr>
+<tr><td>Feb</td><td>2</td><td>4</td></tr>
+<tr><td>Mar</td><td>3</td><td>5</td></tr>
+<tr><td>Apr</td><td>4</td><td>8</td></tr>
+</table>
+<p><b>Step 1 — hypothesis:</b> h(x) = θ0 + θ1·x &nbsp;(your y = mx + c, m = θ1, c = θ0)</p>
+<p><b>Step 2 — best fit by least squares (the closed form):</b> means: x̄ = 2.5, ȳ = 4.75</p>
+<div class="formula">θ1 = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)² = (4.125+0.375+0.125+4.875) / (2.25+0.25+0.25+2.25) = 9.5/5 = <b>1.9</b><br>θ0 = ȳ − θ1·x̄ = 4.75 − 1.9×2.5 = <b>0</b></div>
+<p>Best line: <b>y = 1.9x</b>. Business reading: every extra ₹1L of ad spend returns ≈ ₹1.9L revenue → positive ROI.</p>
+<p><b>Step 3 — cost at different θ1</b> (your J vs x parabola, now with real numbers): J(θ1=0.5) = 7.44, J(θ1=1) = 3.13, J(θ1=1.9) = <b>0.0875</b> ← the parabola's bottom.</p>
+<p><b>Step 4 — R²: how good is the line? (the full math)</b></p>
+<div class="formula">R² = 1 − SSres / SStot<br><br>SSres = Σ(yᵢ − ŷᵢ)² &nbsp;← what my line FAILED to explain (residuals)<br>SStot = Σ(yᵢ − ȳ)² &nbsp;← total variation in the data (vs just guessing the mean)<br><br>ŷᵢ = my prediction &nbsp;·&nbsp; ȳ = mean of actual y (= 4.75)</div>
+<p>Every row, calculated (predictions from y = 1.9x):</p>
+<table>
+<tr><th>Month</th><th>y actual</th><th>ŷ predicted</th><th>y − ŷ</th><th>(y−ŷ)²</th><th>y − ȳ</th><th>(y−ȳ)²</th></tr>
+<tr><td>Jan</td><td>2</td><td>1.9</td><td>0.1</td><td>0.01</td><td>−2.75</td><td>7.5625</td></tr>
+<tr><td>Feb</td><td>4</td><td>3.8</td><td>0.2</td><td>0.04</td><td>−0.75</td><td>0.5625</td></tr>
+<tr><td>Mar</td><td>5</td><td>5.7</td><td>−0.7</td><td>0.49</td><td>0.25</td><td>0.0625</td></tr>
+<tr><td>Apr</td><td>8</td><td>7.6</td><td>0.4</td><td>0.16</td><td>3.25</td><td>10.5625</td></tr>
+<tr><td><b>SUM</b></td><td></td><td></td><td></td><td><b>SSres = 0.70</b></td><td></td><td><b>SStot = 18.75</b></td></tr>
+</table>
+<div class="formula">R² = 1 − 0.70/18.75 = 1 − 0.0373 = <b>0.963</b></div>
+<p><b>Plain words:</b> my line explains <b>96.3%</b> of the variation in revenue. The remaining 3.7% is noise. If R² were 0, my line is no better than guessing the average. If R² is <b>NEGATIVE</b> — my line is worse than guessing the mean (possible when the fit is garbage).</p>
+<p>💡 <b>Interview angle:</b> 'Which is bigger, R² or adjusted R²?' → <b>R² is always ≥ adjusted R²</b>, because adjusted R² punishes useless features: Adjusted R² = 1 − (1−R²)(n−1)/(n−p−1). Video example: adding bedrooms/location/gender pushed R² 85→90→91 but adjusted FELL 86→82 → the features were noise.</p>
+<p><b>Step 5 — business answers:</b> spend 5 → predicted revenue 1.9×5 = <b>₹9.5L</b>. Margin per ₹1L spend ≈ ₹0.9L → keep spending while ROI &gt; 1.</p>
+<p>💡 <b>Interview angle:</b> 'Walk me through linear regression' — do exactly this arc: hypothesis → cost → fit → R² → business decision.</p>
+</div>
+
+<h2>⚡ Learning Rate (α) — the step size of gradient descent</h2>
+<div class="card">
+<p><b>The intuition:</b> gradient descent is a blindfolded man walking downhill on the cost parabola. He can FEEL the slope under his feet (∂J/∂θ), but not see the valley. The learning rate <b>α is his step size</b>.</p>
+<div class="formula">update rule: θj := θj − α · ∂J/∂θj &nbsp;&nbsp;← α decides HOW BIG each step is</div>
+<p><b>The three outcomes (tested on OUR ad-spend dataset — real numbers):</b></p>
+<pre style="background:var(--bg2);border-radius:10px;padding:12px;font-size:.78rem;overflow-x:auto">
+   J
+   | \                      /
+   |  \   alpha=0.1:      /
+   |   \  5 smooth      /
+   |    \  steps down  /
+   |     \            /     <- alpha=0.9:
+   |      \         /   573 -> 24,342 -> 1,033,320
+   |       \       /      (BOOM — exploded)
+   |        \     /
+   |         \   /
+   |          \ /
+   |           *  <- minimum (theta1 = 1.9)
+   +----------------------------> theta1</pre>
+<table>
+<tr><th>α</th><th>θ1 after 10 iters</th><th>J after 10 iters</th><th>Verdict</th></tr>
+<tr><td>0.01</td><td>0.994</td><td>2.477</td><td>🐢 TOO SMALL — baby steps; needs 1000+ iters to reach 1.856</td></tr>
+<tr><td>0.05</td><td>1.710</td><td>0.112</td><td>✅ good</td></tr>
+<tr><td><b>0.1</b></td><td><b>1.731</b></td><td><b>0.108</b></td><td>✅ JUST RIGHT — converged in 5 iters</td></tr>
+<tr><td>0.2</td><td>1.724</td><td>0.107</td><td>✅ fine</td></tr>
+<tr><td><b>0.3</b></td><td><b>−99.8</b></td><td><b>48,072</b></td><td>💥 DIVERGED — exploded off the parabola</td></tr>
+<tr><td>0.9</td><td>12.8 → −70.5 → 472.8</td><td>J: 573 → 24,342 → 1,033,320</td><td>💥 BOUNCING side to side, each jump bigger — never converges</td></tr>
+</table>
+<p><b>Why α=0.3 explodes here:</b> each step is α × slope. On the steep part of the parabola the slope is big, so α=0.3 takes a huge jump PAST the minimum — landing even higher on the other side. Next step is even bigger. Death spiral.</p>
+<p><b>How to choose α in practice:</b></p>
+<ul>
+<li>Try a log-scale range: 0.001, 0.01, 0.1, 1 — and plot J vs iteration</li>
+<li><b>Loss curve smooth and falling</b> → α is fine</li>
+<li><b>Loss spikes/jumps around</b> → α too big — cut it 10×</li>
+<li><b>Loss barely moves</b> → α too small — raise it 10×</li>
+<li>In deep learning, optimizers like <b>Adam</b> auto-adjust the step size per parameter — that's exactly why they exist</li>
+</ul>
+<p>💡 <b>Interview angle:</b> 'How do you choose the learning rate?' → 'Log-scale search + loss-curve check: smooth descent = good, oscillation = too big, flatline = too small. In deep learning I'd let Adam handle per-parameter scaling.' Bonus point: 'the divergence boundary also depends on feature scaling — that's WHY we standardize features before gradient descent.'</p>
+<p>🎙️ <b>Mini-check:</b> your loss curve after 5 iterations: 100 → 90 → 110 → 60 → 130. What do you do to α?</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Same numbers as above, executable. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the data</div><pre>import pandas as pd
+df = pd.DataFrame({'spend': [1, 2, 3, 4], 'revenue': [2, 4, 5, 8]})
+df</pre><div class="nbout">   spend  revenue
+0      1        2
+1      2        4
+2      3        5
+3      4        8</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — least-squares best fit by formula</div><pre>xbar, ybar = df.spend.mean(), df.revenue.mean()
+theta1 = ((df.spend - xbar) * (df.revenue - ybar)).sum() / ((df.spend - xbar) ** 2).sum()
+theta0 = ybar - theta1 * xbar
+print(f"best fit: revenue = {theta1} * spend + {theta0}")</pre><div class="nbout">best fit: revenue = 1.9 * spend + 0.0</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — cost J(θ0, θ1) and the parabola</div><pre>def J(th0, th1):
+    pred = th0 + th1 * df.spend
+    return ((pred - df.revenue) ** 2).sum() / (2 * len(df))
+
+for th1 in [0.5, 1.0, 1.5, 1.9]:
+    print(f"J(theta1={th1}) = {J(0, th1):.4f}")</pre><div class="nbout">J(theta1=0.5) = 7.4375
+J(theta1=1.0) = 3.1250
+J(theta1=1.5) = 0.8125
+J(theta1=1.9) = 0.0875   <- the bottom of the parabola</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — gradient descent from scratch</div><pre>th0, th1, alpha = 0.0, 0.0, 0.1
+for it in range(1, 1001):
+    pred = th0 + th1 * df.spend
+    err = pred - df.revenue
+    th0 -= alpha * err.sum() / len(df)
+    th1 -= alpha * (err * df.spend).sum() / len(df)
+    if it in (1, 2, 10, 100, 1000):
+        print(f"iter {it:4d}  th0={th0:.3f}  th1={th1:.3f}  J={J(th0, th1):.4f}")</pre><div class="nbout">iter    1  th0=0.475  th1=1.425  J=0.4823
+iter    2  th0=0.546  th1=1.662  J=0.1239
+iter   10  th0=0.498  th1=1.731  J=0.1082
+iter  100  th0=0.128  th1=1.856  J=0.0889
+iter 1000  th0=0.000  th1=1.900  J=0.0875   <- converged to the closed form!</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — R-squared</div><pre>pred = th0 + th1 * df.spend
+ss_res = ((df.revenue - pred) ** 2).sum()
+ss_tot = ((df.revenue - df.revenue.mean()) ** 2).sum()
+print("R2 =", 1 - ss_res / ss_tot)</pre><div class="nbout">R2 = 0.9627</div></div>
+
+<div class="nbcell"><div class="nbhead">In [6] — scikit-learn confirms it</div><pre>from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit(df[['spend']], df['revenue'])
+print(model.coef_[0], model.intercept_, model.score(df[['spend']], df['revenue']))</pre><div class="nbout">1.9 0.0 0.9626666666666666   <- identical to our from-scratch answer</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p><b>The idea:</b> draw the best straight line through points so predictions are as close as possible to reality. Everything below is just making 'best' precise.</p>
+<ul>
+<li><b>Hypothesis (the line):</b> hθ(x) = θ0 + θ1·x. <b>θ0</b> = intercept (where the line meets the y-axis), <b>θ1</b> = slope/coefficient.</li>
+<li><b>'Best line' = the one minimizing the distances</b> between predicted points and actual points.</li>
+</ul>
+<div class="formula">Cost: J(θ0, θ1) = (1/2m) · Σᵢ (hθ(xᵢ) − yᵢ)²</div>
+<ul>
+<li><b>Squared error cost:</b> square each vertical error (kills negatives), sum, average over m points. The extra ÷2 exists purely to cancel the power-2 in the derivative later.</li>
+<li><b>Worked example</b> (points (1,1), (2,2), (3,3)): with θ1=1 → J=0 (perfect fit); θ1=0.5 → J≈0.58; θ1=0 → J≈2.3. Plotting J against θ1 gives a <b>convex parabola</b>.</li>
+<li><b>Convexity → one global minimum</b>: linear regression's cost surface has NO local minima. (Deep learning nets DO have local minima — that's why optimizers like Adam/RMSprop exist there.)</li>
+<li><b>Gradient descent:</b> walk downhill on the cost parabola: θⱼ := θⱼ − α·∂J/∂θⱼ, with derivatives ∂J/∂θ0 = (1/m)·Σ(h−y) and ∂J/∂θ1 = (1/m)·Σ(h−y)·x.</li>
+<li><b>Learning rate α:</b> too big → you overshoot the minimum and may diverge; too small → painfully slow convergence.</li>
+</ul>
+<div class="formula">R² = 1 − SSres / SStot &nbsp;&nbsp;·&nbsp;&nbsp; Adjusted R² = 1 − (1−R²)(n−1)/(n−p−1)</div>
+<ul>
+<li><b>R²</b>: share of variance explained. <b>Can be NEGATIVE</b> if your line is worse than just predicting the mean.</li>
+<li><b>Adjusted R²:</b> punishes useless features. Video example: predicting salary — adding bedrooms raised R² 85→90, adding location 90→91, adding gender 91→… but <b>adjusted R² fell 86→82</b>: the features added noise, not signal.</li>
+<li>💡 <b>Interview angle:</b> 'Which is bigger, R² or adjusted R²?' → R² is always ≥ adjusted R² (adding features can never lower raw R²; adjusted R² can fall). Also be ready to compute R² from SSres/SStot and to explain why we divide by 2m.</li>
+</ul>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li><b>Adani demand forecasts</b> (ARIMA/XGBoost, ~20% planning-accuracy lift): regression on time series — the same 'minimize error against reality' discipline.</li>
+<li>Project-01's MF arm is regression in disguise: r̂ = μ + bᵤ + bᵢ + qᵢᵀpᵤ — biases and factors fitted by gradient descent with a learning rate, exactly this section's machinery.</li>
+<li>Your α story: learning rate too big/small = convergence risk → the same care shows up in your SVD lr_all grid {0.005, 0.01}.</li>
+</ul></div>
+<h2>🧪 Quiz — 10 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'In hθ(x) = θ0 + θ1·x, what does θ0 represent?',options:['The slope of the line','The intercept — where the line crosses the y-axis','The number of features','The learning rate'],a:1,expl:'θ0 is the intercept (y-axis crossing), θ1 is the slope/coefficient.'},
+{q:'Why is the cost divided by 2m instead of m?',options:['To make the cost smaller','It cancels the exponent 2 when the derivative is taken','To handle negative errors','Tradition only'],a:1,expl:'The ½ is cosmetic for calculus: the derivative of (… )² brings a 2, which the ½ cancels.'},
+{q:'For points (1,1), (2,2), (3,3), the line θ1 = 1 (θ0 = 0) gives cost J =',options:['0.58','2.3','0','1'],a:2,expl:'Predictions match the points exactly, so every error is 0 → J = 0 (the video\u2019s worked example).'},
+{q:'The cost surface of linear regression is special because…',options:['It has many local minima','It is a convex parabola with a single global minimum','It is random','It has no minimum'],a:1,expl:'Convexity guarantees ONE global minimum — gradient descent cannot get trapped locally (unlike deep nets).'},
+{q:'If the learning rate α is too large, gradient descent will…',options:['Converge instantly','Overshoot the minimum and possibly never converge','Always find a better minimum','Ignore the data'],a:1,expl:'Too-big steps jump across the valley; too-small steps just converge slowly.'},
+{q:'The gradient-descent update rule for each parameter is…',options:['θj := θj + α · J','θj := θj − α · ∂J/∂θj','θj := J − α','θj := θj × ∂J/∂θj'],a:1,expl:'Step AGAINST the gradient (downhill) scaled by the learning rate α.'},
+{q:'R² can be negative when…',options:['There are many features','The fitted line is WORSE than simply predicting the mean','The data is too clean','α is too small'],a:1,expl:'R² = 1 − SSres/SStot; if SSres > SStot, R² goes negative — the model is worse than the mean-line.'},
+{q:'Adding useless features (bedrooms, location, gender to a salary model) will…',options:['Always improve adjusted R²','Never change R²','Raise raw R² but can LOWER adjusted R²','Make R² negative by definition'],a:2,expl:'Raw R² never falls when you add features; adjusted R² penalizes useless ones — the video showed 86→82.'},
+{q:'Which is always ≥ the other?',options:['Adjusted R² ≥ R²','R² ≥ adjusted R²','They are always equal','Neither is comparable'],a:1,expl:'Adjusted R² subtracts a correction for feature count, so it can only be ≤ raw R².'},
+{q:'Deep learning costs differ from linear regression costs because…',options:['DL costs are convex','DL surfaces have local minima — hence optimizers like Adam/RMSprop','DL never uses gradient descent','There is no cost in DL'],a:1,expl:'Linear regression = convex parabola (one minimum); neural nets create non-convex surfaces with local minima.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_5',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

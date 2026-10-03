@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ridge And Lasso Regression Practical Implementation — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=8910" target="_blank">▶ Watch this section</a></div>
+<h1>Ridge And Lasso Regression Practical Implementation</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 02:28:30 · approx 26 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_9"><b>Ridge &amp; Lasso practical — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>
+<ul>
+<li><b>Calling it lambda in code.</b> Theory says λ; scikit-learn's knob is named <code>alpha</code>. Same concept, different label — mix this up in an interview and it shows you haven't run it.</li>
+<li><b>Reading neg MSE wrong.</b> These are negated errors: <b>closer to 0 is better</b>, not 'more negative is better'. Ridge −25.47 beats linear −25.8 precisely because it is nearer zero.</li>
+<li><b>Hand-rolling alpha loops.</b> The tool exists: GridSearchCV tries every grid value with CV and hands you <code>.best_params_</code> / <code>.best_score_</code>. Loop it yourself and you'll misjudge folds.</li>
+<li><b>Expecting GridSearchCV to change the model class.</b> It only tunes the grid you hand the estimator you hand it — Ridge stays Ridge.</li>
+<li><b>Assuming regularization always lifts the score.</b> On a small, clean dataset the winning alpha can be ≈ 0 (our grid below picked 1e-05, basically plain linear) — there must be overfitting for the penalty to pay rent.</li>
+<li><b>Treating a tuned linear model as the finish line.</b> The video's own takeaway: a straight line caps out — real gains come from non-linear models like XGBoost.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Same 5-house colony, now with a grid search over alpha</h2>
+<div class="card">
+<p><b>Business problem:</b> same housing team, same 5 houses as the linear practical — but now they want the regularization strength <b>tuned, not guessed</b>, exactly like the video's Boston grid search:</p>
+<table>
+<tr><th>House</th><th>rooms</th><th>age_years</th><th>price_lakh y</th></tr>
+<tr><td>H1</td><td>3</td><td>40</td><td>50</td></tr>
+<tr><td>H2</td><td>4</td><td>25</td><td>65</td></tr>
+<tr><td>H3</td><td>5</td><td>15</td><td>85</td></tr>
+<tr><td>H4</td><td>6</td><td>10</td><td>100</td></tr>
+<tr><td>H5</td><td>7</td><td>5</td><td>120</td></tr>
+</table>
+<p><b>Step 1 — the grid search (real run):</b></p>
+<div class="formula">GridSearchCV(Ridge(), param_grid={'alpha': [1e-05, 0.001, 0.1, 1, 10, 100]},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;scoring='neg_mean_squared_error', cv=5)<br>.best_params_ → <b>{'alpha': 1e-05}</b> &nbsp;&nbsp; .best_score_ → <b>−12.1337</b></div>
+<p><b>Step 2 — the full sweep</b> (every alpha's 5-fold CV mean, straight from <code>grid.cv_results_</code>):</p>
+<table>
+<tr><th>alpha</th><td>1e-05</td><td>0.001</td><td>0.1</td><td>1</td><td>10</td><td>100</td></tr>
+<tr><th>CV neg MSE</th><td><b>−12.13</b></td><td>−12.46</td><td>−50.77</td><td>−171.68</td><td>−204.28</td><td>−132.16</td></tr>
+</table>
+<p><b>Step 3 — head-to-head, same folds:</b></p>
+<table>
+<tr><th>Model</th><th>CV neg MSE</th><th>as positive MSE</th></tr>
+<tr><td>LinearRegression (α = 0)</td><td><b>−12.1304</b></td><td>12.13</td></tr>
+<tr><td>Ridge, α = 1e-05 (grid winner)</td><td>−12.1337</td><td>12.13</td></tr>
+<tr><td>Ridge, α = 1</td><td>−171.6792</td><td>171.68</td></tr>
+<tr><td>Lasso, α = 1</td><td>−205.6149</td><td>205.61</td></tr>
+</table>
+<p><b>Step 4 — the twist, and what it teaches:</b> on Boston the video's grid picked α ≈ 100 and improved −37 → −29. Here the grid picks <b>α ≈ 0</b> — this colony is small and clean, there is no overfitting to cure, so any penalty only <b>taxes</b> the fit (watch Lasso α=1 warp the coefficients: rooms 18.84 → 11.65, age flips to −0.63, intercept −13.21 → +37.72). Compare with file 06, where a junk customer_id column made Lasso the hero: <b>regularization is insurance — buy it when data is noisy or junk features lurk, and let cross-validation set the premium.</b></p>
+<p>💡 <b>Keep the video's closing line too:</b> even tuned, the linear model stays capped — the next real gain comes from non-linear models (XGBoost), which is exactly where my churn and forecasting projects went.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the same 5-house colony</div><pre>import pandas as pd
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.model_selection import GridSearchCV, cross_val_score
+df = pd.DataFrame({'rooms':      [3, 4, 5, 6, 7],
+                   'age_years':  [40, 25, 15, 10, 5],
+                   'price_lakh': [50, 65, 85, 100, 120]})
+X, y = df.iloc[:, :-1], df.iloc[:, -1]</pre><div class="nbout">(no output — data loaded)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — GridSearchCV over alphas, cv=5</div><pre>grid = GridSearchCV(Ridge(), param_grid={'alpha': [1e-05, 0.001, 0.1, 1, 10, 100]},
+                    scoring='neg_mean_squared_error', cv=5)
+grid.fit(X, y)
+print(grid.best_params_, round(grid.best_score_, 4))</pre><div class="nbout">{'alpha': 1e-05} -12.1337</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — the full alpha sweep</div><pre>for a, s in zip(grid.cv_results_['param_alpha'], grid.cv_results_['mean_test_score']):
+    print(f"alpha={a}: negMSE {round(s, 4)}")</pre><div class="nbout">alpha=1e-05: negMSE -12.1337
+alpha=0.001: negMSE -12.4594
+alpha=0.1: negMSE -50.7736
+alpha=1.0: negMSE -171.6792
+alpha=10.0: negMSE -204.2779
+alpha=100.0: negMSE -132.1611</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — linear vs Ridge vs Lasso, same folds</div><pre>models = {'linear': LinearRegression(),
+          f"ridge a={grid.best_params_['alpha']}": Ridge(alpha=grid.best_params_['alpha']),
+          'ridge a=1': Ridge(alpha=1), 'lasso a=1': Lasso(alpha=1)}
+for name, m in models.items():
+    s = cross_val_score(m, X, y, scoring='neg_mean_squared_error', cv=5).mean()
+    print(f"{name:16s} negMSE {round(s, 4)}  (MSE {-s:.2f})")</pre><div class="nbout">linear           negMSE -12.1304  (MSE 12.13)
+ridge a=1e-05    negMSE -12.1337  (MSE 12.13)
+ridge a=1        negMSE -171.6792  (MSE 171.68)
+lasso a=1        negMSE -205.6149  (MSE 205.61)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — what the penalties do to the coefficients</div><pre>for name, m in models.items():
+    m.fit(X, y)
+    print(f"{name:16s} coefs {[round(float(c), 3) for c in m.coef_]}  b0 {m.intercept_:.2f}")</pre><div class="nbout">linear           coefs [18.842, 0.158]  b0 -13.21
+ridge a=1e-05    coefs [18.842, 0.158]  b0 -13.21
+ridge a=1        coefs [7.265, -1.119]  b0 68.93
+lasso a=1        coefs [11.649, -0.63]  b0 37.72</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>Setup: same Boston data</b>
+<ul>
+<li>Same Boston housing dataset and X/y split as the linear regression practical — only the model and the tuning loop change.</li>
+<li>The workflow: keep the model fixed, sweep the regularization strength, and let cross-validation decide — no manual trial and error.</li>
+</ul>
+<b>Ridge + GridSearchCV</b>
+<div class="formula">ridge = Ridge()
+grid = GridSearchCV(estimator=ridge,
+                    param_grid={'alpha': [1e-5 ... 100]},
+                    scoring='neg_mean_squared_error',
+                    cv=5)</div>
+<ul>
+<li>In scikit-learn, the theoretical λ is called <b>alpha</b>. The grid stretches over a wide range — alpha values from 1e-5 all the way up to 100 — so both very weak and very strong regularization get a hearing.</li>
+<li>GridSearchCV tries <b>every alpha in the grid</b>, scoring each with 5-fold CV under neg_mean_squared_error, and keeps the winner.</li>
+<li>Read it back with <code>.best_params_</code> (the winning hyperparameters) and <code>.best_score_</code> (its CV score).</li>
+<li>Result in the video: <b>best alpha ≈ 100</b>, and the CV score improves from about <b>−37 to about −29</b>.</li>
+</ul>
+<b>Head-to-head on train_test_split(test_size=0.33)</b>
+<table>
+<tr><th>Model</th><th>Score (neg MSE)</th></tr>
+<tr><td>Linear regression</td><td>≈ −25.8</td></tr>
+<tr><td>Ridge, alpha = 100</td><td>≈ −25.47</td></tr>
+<tr><td>Lasso, alpha = 1</td><td>≈ −35</td></tr>
+</table>
+<ul>
+<li>These are negated errors — <b>closer to 0 is better</b>.</li>
+<li>Ridge edges out plain linear regression; Lasso at alpha = 1 lags here — the L1 penalty costs accuracy on this dataset.</li>
+<li>Read the three numbers as one story: Ridge buys a small win over linear, Lasso pays for its penalty, and all three stay in the same ballpark — the model, not the tuning, is the bottleneck.</li>
+<li>R² of the predictions vs test ≈ <b>0.67–0.68</b> — the linear model explains roughly two-thirds of the variance.</li>
+</ul>
+<b>Quote it like this</b>
+<p>Grid search over alpha with 5-fold CV picked alpha = 100 and cut the CV error from about 37 to about 29 — yet the R² still sits near 0.67, which is exactly why the next step is a non-linear model.</p>
+<b>Takeaway (spoken in the video)</b>
+<ul><li>A straight line <b>caps out</b> — keep tuning Ridge/Lasso and you only get marginal gains. For meaningfully better scores, move to <b>non-linear models such as XGBoost</b>.</li></ul>
+<b>Key API</b>
+<div class="formula">GridSearchCV(estimator, param_grid, scoring, cv)  →  .best_params_, .best_score_</div>
+<b>ELI10</b>
+<p>Grid search = try every dial setting, keep the winner — with cross-validation as the honest judge of each try.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li><b>Grid tuning habit:</b> GridSearchCV over an alpha grid with cv=5 is the same loop I run tuning reg_all in the reco engine SVD — grid + validation-only scoring, then report best_params_.</li>
+<li><b>Knowing the ceiling:</b> the video takeaway that a straight line caps out is why Project-01 went hybrid — non-linear ensembles delivered the +100.8% lift that linear baselines could not.</li>
+<li><b>Honest reporting:</b> quoting an R² around 0.67-0.68 for a linear model is the tone I keep — state what the simple model explains, then reach for stronger models.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'What does GridSearchCV actually do in this practical?',options:['Performs feature selection automatically','Tries every alpha in the param_grid with cross-validation and keeps the best one','Trains a single model with alpha = 1','Splits the data 33/67'],a:1,expl:'It is a brute-force tuner: every grid value gets a full 5-fold CV evaluation under the chosen scoring metric.'},
+{q:'In scikit-learn Ridge and Lasso, the theoretical lambda shows up under which name?',options:['lambda','alpha','reg','penalty'],a:1,expl:'Same concept, different label: scikit-learn calls the regularization strength alpha.'},
+{q:'Which alpha won the grid search, and how much did the score improve?',options:['alpha = 1e-5, from −37 to −10','alpha ≈ 100, from about −37 to about −29','alpha = 1, from −29 back to −37','alpha = 50, with no improvement'],a:1,expl:'The largest grid value, alpha ≈ 100, won, lifting the CV score from about −37 to about −29.'},
+{q:'Which attributes read the grid search results back?',options:['.best_model and .best_loss','.best_params_ and .best_score_','.coef_ and .intercept_','.grid_results and .cv_scores'],a:1,expl:'best_params_ gives the winning hyperparameters (alpha ≈ 100 here); best_score_ gives its CV score.'},
+{q:'On train_test_split(test_size=0.33), which model scored best?',options:['Linear regression at ≈ −25.8','Ridge with alpha = 100 at ≈ −25.47','Lasso with alpha = 1 at ≈ −35','All three tied'],a:1,expl:'Remember: closer to 0 is better. Ridge (−25.47) edges linear (−25.8); Lasso at alpha = 1 lags at ≈ −35.'},
+{q:'The R² score lands at ≈ 0.67-0.68. What does that tell you?',options:['The model classifies 67% of rows correctly','The model explains roughly 67-68% of the variance in the target','67% of predictions are exactly right','The MSE is 0.67'],a:1,expl:'R² near 0.67 means the linear model captures about two-thirds of the variance — decent, but clearly capped.'},
+{q:'Video takeaway: why stop squeezing these linear models for score?',options:['Linear regression cannot handle large datasets','A straight line caps out — meaningfully better scores need non-linear models such as XGBoost','Ridge and Lasso are deprecated','The Boston dataset is too small for Ridge'],a:1,expl:'Tuning Ridge/Lasso further yields marginal gains; the video points to non-linear models like XGBoost for real improvements.'},
+{q:'Interview check: which four ingredients go into a GridSearchCV call?',options:['estimator, param_grid, scoring, cv','X, y, test_size, random_state','alpha, lambda, beta, gamma','model, optimizer, loss, epochs'],a:0,expl:'GridSearchCV(estimator, param_grid, scoring, cv) — here Ridge, the alpha grid, neg_mean_squared_error, cv=5.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_9',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI vs ML vs DL vs Data Science — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=85" target="_blank">▶ Watch this section</a></div>
+<h1>AI vs ML vs DL vs Data Science</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 00:01:25 · approx 6.5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_2"><b>AI vs ML vs DL vs DS — my own words:</b><br><br>(watch the section, then write what YOU remember — draw the containment in symbols like DL ⊂ ML ⊂ AI and give one example per layer — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review — common learner gaps in this topic</h2>
+<div class="card">
+<p>You haven't written notes for this topic yet. When you do, the coach checks them against this list — the things learners most often miss or get wrong here:</p>
+<div class="missing"><b class="no">① Using AI and ML as synonyms.</b><br>The expected answer is containment — <b>DL ⊂ ML ⊂ AI</b>, said in symbols first, then one example per layer. Interchangeable terms = instant credibility hit in interviews.</div>
+<div class="missing"><b class="no">② Calling an XGBoost/boosted-trees model 'deep learning'.</b><br>No neural network → not DL. Boosted trees are classical ML. (Your MyOperator churn model is ML in production — say it at the right level.)</div>
+<div class="missing"><b class="no">③ Defining DL by 'it's the new/advanced stuff'.</b><br>The definition is by MECHANISM: multi-layered neural networks mimicking the brain, happiest on big data + GPUs. 'Advanced' is not a mechanism.</div>
+<div class="missing"><b class="no">④ Assuming DL is always the better choice.</b><br>On tabular business data (churn, forecasts, recommenders), classical ML usually wins and is explainable. DL earns its keep on perception: faces, voice, images.</div>
+<div class="missing"><b class="no">⑤ Putting Data Science inside the Venn as a fourth subset.</b><br>DS is the practitioner discipline working ACROSS the stack — collection, cleaning, EDA, modeling (ML or DL), business communication — not a sibling box.</div>
+<div class="missing"><b class="no">⑥ Mixing levels mid-answer.</b><br>'Tesla is AI, my recommender is ML, face unlock is DL…' without the containment sentence first leaves the interviewer doing the organizing for you. Symbols → examples, in that order.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — interview drill: sort 6 real products into the right layer</h2>
+<div class="card">
+<p><b>Exercise:</b> you WILL be asked 'is that AI?' about your own work. Classify each product by asking the three questions in order — <b>acts without human intervention?</b> (AI umbrella) → <b>learns statistical patterns from data?</b> (ML) → <b>multi-layered neural network?</b> (DL).</p>
+<table>
+<tr><th>Product</th><th>Layer</th><th>Why (the containment proof)</th><th>Business one-liner</th></tr>
+<tr><td>Tesla self-driving</td><td><b>AI</b></td><td>acts with no human driver — umbrella application</td><td>'AI application; its perception stack is DL inside.'</td></tr>
+<tr><td>Online ads targeting</td><td><b>AI</b></td><td>decides what to show, no human in the loop</td><td>'AI umbrella; the click-prediction underneath is ML.'</td></tr>
+<tr><td>Netflix recommender</td><td><b>ML</b></td><td>statistical tools on viewing data, no neural net</td><td>'ML — predicts taste, keeps watch-time up.'</td></tr>
+<tr><td>Churn XGBoost (MyOperator, 100K+ users)</td><td><b>ML</b></td><td>boosted trees = classical ML, not DL</td><td>'ML in production — precision +18% QoQ on churn.'</td></tr>
+<tr><td>Sales forecast (Adani)</td><td><b>ML</b></td><td>statistical forecasting (ARIMA/XGBoost), no DL</td><td>'ML forecasting — ~20% planning-accuracy lift.'</td></tr>
+<tr><td>Face unlock</td><td><b>DL</b></td><td>multi-layered network on raw pixels, big data + GPU</td><td>'DL ⊂ ML ⊂ AI — perception is DL's home turf.'</td></tr>
+</table>
+<div class="formula">Tally: AI = 2 · ML = 3 · DL = 1 &nbsp;→&nbsp; most everyday systems are ML wearing the AI badge</div>
+<p><b>Business reading:</b> when a stakeholder says 'we need AI', translate it: they almost always need the ML layer — regression, classification, forecasting — exactly the layer you already ship.</p>
+<p>💡 <b>Interview angle:</b> answer levels with symbols first, examples second: 'DL ⊂ ML ⊂ AI. My churn model sits in ML; face unlock sits in DL inside ML; the self-driving product is the AI umbrella around both.'</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Same 6 products, executable. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the products as a DataFrame</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'product': ['Tesla self-driving', 'Online ads targeting', 'Netflix recommender',
+                'Churn XGBoost (MyOperator)', 'Sales forecast (Adani)', 'Face unlock'],
+    'layer':   ['AI', 'AI', 'ML', 'ML', 'ML', 'DL']
+})
+df</pre><div class="nbout">                      product layer
+0          Tesla self-driving    AI
+1        Online ads targeting    AI
+2         Netflix recommender    ML
+3  Churn XGBoost (MyOperator)    ML
+4      Sales forecast (Adani)    ML
+5                 Face unlock    DL</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — one-liner groupby: products per layer</div><pre>df.groupby('layer').size().sort_values(ascending=False)</pre><div class="nbout">layer
+ML    3
+AI    2
+DL    1
+dtype: int64</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — justify each layer assignment</div><pre>why = {
+    'AI': 'acts without human intervention - the umbrella layer',
+    'ML': 'statistical tools learning from data (no neural net)',
+    'DL': 'multi-layered neural network on raw inputs'
+}
+df['why_this_layer'] = df.layer.map(why)
+df[['product', 'layer', 'why_this_layer']].to_string(index=False)</pre><div class="nbout">                   product layer                                       why_this_layer
+        Tesla self-driving    AI acts without human intervention - the umbrella layer
+      Online ads targeting    AI acts without human intervention - the umbrella layer
+       Netflix recommender    ML statistical tools learning from data (no neural net)
+Churn XGBoost (MyOperator)    ML statistical tools learning from data (no neural net)
+    Sales forecast (Adani)    ML statistical tools learning from data (no neural net)
+               Face unlock    DL           multi-layered neural network on raw inputs</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — the interview drill, printed</div><pre>for _, r in df.sort_values('layer').iterrows():
+    print(f"{r['product']} -> {r['layer']} | {r['why_this_layer']}")</pre><div class="nbout">Tesla self-driving -> AI | acts without human intervention - the umbrella layer
+Online ads targeting -> AI | acts without human intervention - the umbrella layer
+Face unlock -> DL | multi-layered neural network on raw inputs
+Netflix recommender -> ML | statistical tools learning from data (no neural net)
+Churn XGBoost (MyOperator) -> ML | statistical tools learning from data (no neural net)
+Sales forecast (Adani) -> ML | statistical tools learning from data (no neural net)</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>This section draws the family tree that every interviewer expects you to draw cleanly.</p>
+<ul>
+<li><b>Artificial Intelligence (AI)</b> — the umbrella: applications that perform tasks <b>without human intervention</b>. Everyday examples given: <b>Netflix recommendations, Amazon product suggestions, online ads, Tesla self-driving</b>.</li>
+<li><b>Machine Learning (ML)</b> — a <b>subset of AI</b>. Provides <b>statistical tools</b> to analyze, visualize, predict and forecast from data. Examples: forecasting weather/sales, recommendation systems, image and speech analysis.</li>
+<li><b>Deep Learning (DL)</b> — a <b>subset of ML</b> that mimics the <b>human brain</b> using multi-layered neural networks. Runs best on big data + GPUs. Examples: face recognition, self-driving perception, voice assistants.</li>
+<li><b>Data Science</b> — the practitioner discipline working <b>across all of these</b>: data collection, cleaning, EDA, ML/DL modeling, and business communication. A Data Scientist may touch AI, ML and DL in the same quarter.</li>
+</ul>
+<div class="formula">AI ⊃ ML ⊃ DL &nbsp;&nbsp;|&nbsp;&nbsp; Data Science = practice across the stack</div>
+<table>
+<tr><th>Layer</th><th>One-line definition</th><th>Flagship example</th></tr>
+<tr><td>AI</td><td>Tasks without human intervention</td><td>Tesla self-driving</td></tr>
+<tr><td>ML</td><td>Statistical tools to predict from data</td><td>Netflix recommender</td></tr>
+<tr><td>DL</td><td>Multi-layer neural networks</td><td>Face recognition</td></tr>
+</table>
+<p>💡 <b>Interview angle:</b> the classic trap is mixing the levels. Say it as containment: 'DL ⊂ ML ⊂ AI', then one crisp example per layer. Job titles align to layers: AI engineer, ML engineer/developer, DL engineer, Data Scientist.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Your Project-01 recommender is a classic <b>ML</b> system: statistical tools (SVD matrix factorization, TF-IDF) on interaction data — no neural networks needed, and that was a deliberate sizing decision.</li>
+<li>Your churn model at MyOperator: <b>ML in production</b> — XGBoost + MLOps (MLflow, CI/CD on SageMaker), the 'statistical tools' layer delivering business value.</li>
+<li>Say it in interviews: 'I work in the ML layer of AI — and I size the tool to the problem; I chose matrix factorization over deep learning because it was right for the data scale.'</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'Which statement describes the relationship correctly?',options:['ML is a subset of DL','DL is a subset of ML, and ML is a subset of AI','AI and ML are unrelated','DL contains AI'],a:1,expl:'Containment: Deep Learning ⊂ Machine Learning ⊂ Artificial Intelligence.'},
+{q:'Netflix recommending shows and Tesla self-driving are examples of…',options:['Data engineering','AI applications performing tasks without human intervention','Only statistics','Database design'],a:1,expl:'Both are AI applications acting autonomously — the umbrella definition given in the video.'},
+{q:'Machine Learning is best defined as…',options:['Any program with if-else rules','Statistical tools to analyze, visualize, predict and forecast from data','Only neural networks','A hardware category'],a:1,expl:'ML = the statistical-tools layer inside AI; forecasting sales/weather and recommenders are the examples given.'},
+{q:'What makes Deep Learning a separate subset inside ML?',options:['It avoids data','It mimics the human brain using multi-layered neural networks','It never uses GPUs','It only does regression'],a:1,expl:'DL = ML via multi-layered neural networks inspired by the brain; big data + GPUs are its natural habitat.'},
+{q:'Face recognition and voice assistants are typically…',options:['Classic ML with hand-designed rules','Deep Learning applications','Unsupervised statistics only','Not AI at all'],a:1,expl:'Perception tasks like face/voice recognition are the flagship DL examples.'},
+{q:'A Data Scientist, compared to AI/ML/DL engineers, is characterized as…',options:['Someone who never models','A role that works across AI, ML and DL — data collection through modeling to communication','Only a visualization job','Only a database admin'],a:1,expl:'DS spans the stack: cleaning, EDA, modeling (ML or DL), and business communication.'},
+{q:'Online advertising targeting is cited as an example of…',options:['AI application — actions chosen without human intervention','Manual marketing','Hardware optimization','Reinforcement learning only'],a:0,expl:'Ads sit in the AI umbrella: systems decide what to show without a human in the loop.'},
+{q:'In an interview you should describe the layers as…',options:['AI = ML = DL (synonyms)','DL ⊂ ML ⊂ AI, with one example per layer','ML replaced AI in 2015','DL has no relation to ML'],a:1,expl:'Clean containment plus examples is the expected crisp answer; mixing levels is the classic mistake.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_2',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

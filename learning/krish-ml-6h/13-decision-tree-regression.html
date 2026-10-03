@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Decision Tree Regression — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=14627" target="_blank">▶ Watch this section</a></div>
+<h1>Decision Tree Regression</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 04:02:57 · approx 5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_13"><b>DECISION TREE REGRESSION — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>
+<ul>
+<li><b>Expecting a line.</b> A regression tree outputs piecewise-constant stairs — every point in a leaf gets the same number, and anything beyond the training range (say a 36-month contract) can never be extrapolated.</li>
+<li><b>Forgetting the leaf stores the MEAN.</b> The mean is the constant that minimizes squared error; switch the criterion to MAE and the leaf would store the median instead.</li>
+<li><b>Skipping the size-weighting.</b> Split quality = (|left|/n)·MSE_left + (|right|/n)·MSE_right — comparing raw child MSEs without the weights picks the wrong split.</li>
+<li><b>Trusting an unweighted-looking win.</b> One tiny pure child plus one huge messy child can look great until the weighting exposes it — always recompute the weighted number.</li>
+<li><b>Growing to single-row leaves.</b> Train MSE hits exactly 0 while test performance collapses — the same overfitting story as classification; cap with max_depth / min_samples_leaf.</li>
+<li><b>The scaling myth.</b> Threshold splits ignore units entirely — no standardization needed, unlike KNN or penalized regression.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Contract length → revenue: pricing an 18-month deal</h2>
+<div class="card">
+<p><b>Business problem:</b> a B2B SaaS account manager asks: does a longer contract mean a fatter account? Six customers, one feature (contract months), one target (monthly revenue ₹k). A new prospect signs an <b>18-month</b> contract — what monthly revenue should we expect?</p>
+<table>
+<tr><th>Customer</th><th>Contract (months)</th><th>Revenue (₹k/mo)</th></tr>
+<tr><td>1</td><td>1</td><td>2</td></tr>
+<tr><td>2</td><td>3</td><td>4</td></tr>
+<tr><td>3</td><td>6</td><td>6</td></tr>
+<tr><td>4</td><td>12</td><td>10</td></tr>
+<tr><td>5</td><td>12</td><td>12</td></tr>
+<tr><td>6</td><td>24</td><td>16</td></tr>
+</table>
+<p><b>Step 1 — the root: no split, one constant for everyone</b> (a regression tree leaf stores the MEAN):</p>
+<div class="formula">root mean = (2+4+6+10+12+16)/6 = 50/6 ≈ <b>8.333</b><br>MSE = ((2−8.333)² + (4−8.333)² + (6−8.333)² + (10−8.333)² + (12−8.333)² + (16−8.333)²)/6<br>&nbsp;&nbsp;&nbsp;&nbsp;= (40.111 + 18.778 + 5.444 + 2.778 + 13.444 + 58.778)/6 = 139.333/6 ≈ <b>23.222</b> ← the baseline to beat</div>
+<p><b>Step 2 — candidate split A: "months &lt; 6"</b> (left {2,4}, right {6,10,12,16}):</p>
+<div class="formula">left mean = (2+4)/2 = 3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ MSE = ((2−3)² + (4−3)²)/2 = 2/2 = <b>1.0</b><br>right mean = (6+10+12+16)/4 = 11 → MSE = (25+1+1+25)/4 = 52/4 = <b>13.0</b><br>weighted = (2/6)×1.0 + (4/6)×13.0 = 0.333 + 8.667 = <b>9.0</b></div>
+<p><b>Step 3 — candidate split B: "months &lt; 12"</b> (left {2,4,6}, right {10,12,16}):</p>
+<div class="formula">left mean = (2+4+6)/3 = 4 → MSE = (4+0+4)/3 = 8/3 ≈ <b>2.667</b><br>right mean = (10+12+16)/3 = 38/3 ≈ <b>12.667</b> → MSE = (7.111 + 0.444 + 11.111)/3 = 18.667/3 ≈ <b>6.222</b><br>weighted = (3/6)×2.667 + (3/6)×6.222 = 1.333 + 3.111 = <b>4.444</b></div>
+<p><b>Step 4 — pick the winner:</b> 4.444 &lt; 9.0 → <b>split at months &lt; 12</b>. MSE drops 23.222 → 4.444, an 81% cut. Leaf means: short contracts predict <b>₹4k</b>, long contracts predict <b>₹12.667k</b>.</p>
+<p><b>Step 5 — predict the 18-month prospect:</b> 18 ≥ 12 → right leaf → <b>₹12.667k/month</b>. A 13-month customer gets the identical number — the model is piecewise-constant: everything landing in a leaf gets that leaf's mean. No line, no extrapolation.</p>
+<p>💡 <b>Business read:</b> the tree just priced the sales incentive — moving a customer past the 12-month threshold is worth ≈ ₹8.7k/mo more (12.667 vs 4). Grow the tree deeper and it starts memorizing individual customers (train MSE → 0); that is exactly what depth/leaf-size limits are for.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — contract months vs monthly revenue</div><pre>import pandas as pd
+df = pd.DataFrame({'months': [1, 3, 6, 12, 12, 24], 'revenue': [2, 4, 6, 10, 12, 16]})
+df</pre><div class="nbout">   months  revenue
+0       1        2
+1       3        4
+2       6        6
+3      12       10
+4      12       12
+5      24       16</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — the root: one mean, one MSE</div><pre>mean_all = df.revenue.mean()
+mse_root = ((df.revenue - mean_all) ** 2).mean()
+print(f"root mean = 50/6 = {mean_all:.4f}")
+print(f"root MSE  = {mse_root:.4f}")</pre><div class="nbout">root mean = 50/6 = 8.3333
+root MSE  = 23.2222</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — both candidate splits, weighted MSE decides</div><pre>def mse_after(threshold):
+    L, R = df[df.months < threshold], df[df.months >= threshold]
+    mL, mR = L.revenue.mean(), R.revenue.mean()
+    mseL, mseR = ((L.revenue - mL)**2).mean(), ((R.revenue - mR)**2).mean()
+    w = len(L)/len(df) * mseL + len(R)/len(df) * mseR
+    print(f"split months < {threshold}: left mean={mL:.4f} (MSE {mseL:.4f}), "
+          f"right mean={mR:.4f} (MSE {mseR:.4f}), weighted MSE={w:.4f}")
+    return w
+
+w6, w12 = mse_after(6), mse_after(12)
+print("pick months < 12" if w12 < w6 else "pick months < 6",
+      f"-> MSE {mse_root:.3f} dropped to {min(w6, w12):.3f}")</pre><div class="nbout">split months < 6: left mean=3.0000 (MSE 1.0000), right mean=11.0000 (MSE 13.0000), weighted MSE=9.0000
+split months < 12: left mean=4.0000 (MSE 2.6667), right mean=12.6667 (MSE 6.2222), weighted MSE=4.4444
+pick months < 12 -> MSE 23.222 dropped to 4.444</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — predict the 18-month prospect</div><pre>leaf = df[df.months >= 12].revenue.mean()
+print(f"18 >= 12 -> right leaf -> mean = {leaf:.4f} thousand rupees / month")</pre><div class="nbout">18 >= 12 -> right leaf -> mean = 12.6667 thousand rupees / month</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — scikit-learn confirms it</div><pre>from sklearn.tree import DecisionTreeRegressor, export_text
+m = DecisionTreeRegressor(max_depth=1).fit(df[['months']].values, df.revenue)
+print(export_text(m, feature_names=['months']))
+print("predict 18 months:", m.predict([[18]])[0])</pre><div class="nbout">|--- months <= 9.00
+|   |--- value: [4.00]
+|--- months >  9.00
+|   |--- value: [12.67]
+
+predict 18 months: 12.666666666666666   <- same leaf mean as our from-scratch tree</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea</b>
+<ul>
+<li>Decision Tree Regression uses the <b>same tree structure</b> as classification — root node, internal nodes, leaf nodes, nested IF-ELSE splits — but the target is a <b>continuous number</b> instead of a class.</li>
+<li>Each <b>leaf stores the MEAN of the training targets</b> that reached it. That stored mean IS the prediction for anything that lands in the leaf.</li>
+</ul>
+
+<b>What changes: the split criterion</b>
+<ul><li>Classification scored splits with entropy/Gini. Regression instead picks the split that reduces <b>MSE</b> the most (MAE reduction also works) — in other words, children whose target values are as tightly grouped as possible.</li></ul>
+<div class="formula">Split quality = reduction in MSE (or MAE)</div>
+
+<b>Worked example from the video</b>
+<ul>
+<li>5 rows with outputs 20, 24, 26, 28, 30. The root predicts the mean of everything: 128/5 = <b>25.6</b>. Root MSE ≈ 13.8 (video figure) — large, because one constant must fit all five targets.</li>
+<li>Split on feature F1: node1 receives {20, 24, 26} → leaf mean <b>23.33</b>; node2 receives {28, 30} → leaf mean <b>29</b>.</li>
+<li>Within-node MSE is now much smaller than at the root — the split bought purity in the MSE sense.</li>
+<li>Split deeper: each further split shrinks within-node error again, and the tree keeps going until leaves (or a stopping rule) are reached.</li>
+</ul>
+
+<b>Why the mean?</b>
+<ul><li>The mean is the constant that minimizes squared error, so storing the leaf mean is the best possible constant guess for everything in that leaf — the regression mirror of a classification leaf storing the majority class.</li></ul>
+
+<b>Making a prediction</b>
+<ul><li>A new point walks down the IF-ELSE path and the output is simply <b>the mean of the leaf it lands in</b>. The model is piecewise-constant: every point in the same leaf gets the same value.</li></ul>
+
+<b>Overfitting warning</b>
+<ul><li>Split forever and every leaf ends up holding a single training row — training MSE = 0, test performance garbage. Control it with depth / leaf-size limits: the same pre- and post-pruning ideas as classification.</li></ul>
+
+💡 <b>Interview angle:</b> tree-family models — classification or regression — need no feature scaling, because splits compare values against thresholds. Contrast that with KNN, which lives and dies by distances.
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>The reco engine predicts continuous affinity scores, and bucket-then-average thinking — predict the mean behavior of the group a user falls into — is literally what a regression tree leaf stores.</li>
+<li>I keep regression trees honest with the same pruning discipline as classification: depth and leaf-size tuned on validation only, never trusting training MSE.</li>
+<li>Never train on the future: my reco temporal split is the regression-tree version of judging splits by held-out error instead of how good the training numbers look.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = /* QUIZ_JSON */ [
+{q:'The main change from DT classification to DT regression:',options:['Leaves store the MEAN of the targets instead of the majority class','Regression trees use entropy computed on continuous targets','Regression trees have no root node','Classification trees need scaling but regression trees do not'],a:0,expl:'Same structure; the output and split criterion change — leaf means + MSE reduction instead of class votes + entropy/Gini.'},
+{q:'Training outputs 20, 24, 26, 28, 30 all reach the root. The root predicts:',options:['26','25.6','20','30'],a:1,expl:'The root stores the mean of ALL its targets: 128/5 = 25.6.'},
+{q:'A split sends {20, 24, 26} to node1 and {28, 30} to node2. Node1 stores:',options:['25.6','29','23.33','24'],a:2,expl:'(20+24+26)/3 = 70/3 ≈ 23.33. Node2 stores (28+30)/2 = 29.'},
+{q:'Split quality in regression trees is measured by:',options:['Information gain using entropy','Gini impurity reduction','Size of the majority vote','Reduction in MSE (or MAE)'],a:3,expl:'Entropy/Gini need class labels; regression trees maximize the drop in squared (or absolute) error.'},
+{q:'A new point lands in a leaf whose training targets were {28, 30}. Its prediction:',options:['28','25.6','30','29'],a:3,expl:'Prediction = mean of the leaf it falls into: (28+30)/2 = 29. The model is piecewise-constant.'},
+{q:'What happens as the regression tree is grown deeper and deeper?',options:['Within-node MSE keeps dropping toward 0, and single-row leaves just memorize training data','MSE increases at every split','Predictions inside the same leaf keep changing','The mean is eventually replaced by the median'],a:0,expl:'Deeper splits group similar targets; a 1-row leaf has training MSE 0 — textbook overfitting, which is why we prune.'},
+{q:'Which statement about feature scaling is correct?',options:['DT regression needs standardization, just like KNN','No scaling needed — threshold splits are scale-invariant','Only the target column must be standardized','Scaling changes the stored leaf means'],a:1,expl:'Comparing a feature against a threshold ignores units — a key tree-family advantage over distance-based KNN.'},
+{q:'Two different points land in the SAME leaf of a regression tree. Their predictions are:',options:['Different — scaled by their feature values','Different — one gets the mean, the other the median','Identical — the leaf outputs one constant mean','Undefined until the model is retrained'],a:2,expl:'Each leaf stores exactly one value (the mean of its training targets), so output is constant within a leaf.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_13',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

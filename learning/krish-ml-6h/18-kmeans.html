@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>K-Means Clustering — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=18114" target="_blank">▶ Watch this section</a></div>
+<h1>K-Means Clustering</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 05:01:54 · approx 9.5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_18"><b>K-Means Clustering — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against each before the quiz:</p>
+<div class="missing"><b class="no">① K is an input, not an output.</b><br>You choose K up front; k-means never discovers it. Choosing K is a separate job (elbow here, silhouette in topic 20).</div>
+<div class="missing"><b class="no">② Assignment alone is not k-means.</b><br>The update step — recompute each centroid as the MEAN of its assigned points — is half the algorithm. Assign once and stop and you have not run k-means.</div>
+<div class="missing"><b class="no">③ Calling k-means++ "just random".</b><br>It deliberately spreads the starting centroids far apart. Two centroids landing in one dense region — the classic bad start — is exactly what it prevents.</div>
+<div class="missing"><b class="no">④ Reading the lowest WCSS as the answer.</b><br>WCSS always falls as K grows (it hits 0 when K = number of points). You pick the ELBOW — the bend of the curve — not the minimum.</div>
+<div class="missing"><b class="no">⑤ Ignoring feature scale.</b><br>Here spend runs 20-65 and visits 4-27; Euclidean distance lets the wider-range feature dominate. Real pipelines standardize before clustering.</div>
+<div class="missing"><b class="no">⑥ Expecting k-means to absorb outliers safely.</b><br>Every point must join a cluster, so extreme customers drag the mean-based centroids off target. DBSCAN (topic 21) is the outlier-safe alternative.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — Two loyalty campaigns from 6 customers, clustered by hand</h2>
+<div class="card">
+<p><b>Business problem:</b> Marketing wants to split 6 app customers into two campaign lists — a <b>nurture</b> list (reactivation offers, cheap channel) and a <b>VIP</b> list (retention perks). Features: annual spend (₹k) and orders/year. There are no labels, so k-means with K=2 makes the split.</p>
+<table>
+<tr><th>Customer</th><th>Spend (₹k/yr)</th><th>Orders/yr</th></tr>
+<tr><td>C1</td><td>20</td><td>5</td></tr>
+<tr><td>C2</td><td>25</td><td>4</td></tr>
+<tr><td>C3</td><td>22</td><td>6</td></tr>
+<tr><td>C4</td><td>60</td><td>25</td></tr>
+<tr><td>C5</td><td>65</td><td>22</td></tr>
+<tr><td>C6</td><td>58</td><td>27</td></tr>
+</table>
+<p><b>Step 1 — initial centroids (K=2), k-means++ spirit:</b> start at C1 (20, 5); the customer farthest from it is C5 (65, 22), so far-apart starts are easy to find. We take c1 = (20, 5) and c2 = (60, 25).</p>
+<div class="formula">Euclidean distance: d = √((x₂−x₁)² + (y₂−y₁)²) &nbsp; e.g. d(C2, c1) = √((25−20)² + (4−5)²) = √26 ≈ <b>5.10</b></div>
+<p><b>Step 2 — assignment pass 1</b> (every point, distance to BOTH centroids):</p>
+<table>
+<tr><th>Customer</th><th>Point</th><th>d to c1 (20,5)</th><th>d to c2 (60,25)</th><th>Assigned</th></tr>
+<tr><td>C1</td><td>(20,5)</td><td>0.00</td><td>44.72</td><td>A</td></tr>
+<tr><td>C2</td><td>(25,4)</td><td>5.10</td><td>40.82</td><td>A</td></tr>
+<tr><td>C3</td><td>(22,6)</td><td>2.24</td><td>42.49</td><td>A</td></tr>
+<tr><td>C4</td><td>(60,25)</td><td>44.72</td><td>0.00</td><td>B</td></tr>
+<tr><td>C5</td><td>(65,22)</td><td>48.10</td><td>5.83</td><td>B</td></tr>
+<tr><td>C6</td><td>(58,27)</td><td>43.91</td><td>2.83</td><td>B</td></tr>
+</table>
+<p><b>Step 3 — update: recompute each centroid as the mean of its members.</b></p>
+<div class="formula">cA = ((20+25+22)/3, (5+4+6)/3) = <b>(22.33, 5.00)</b><br>cB = ((60+65+58)/3, (25+22+27)/3) = <b>(61.00, 24.67)</b></div>
+<p><b>Step 4 — assignment pass 2:</b> C1: 2.33 vs 45.47 → A · C2: 2.85 vs 41.51 → A · C3: 1.05 vs 43.24 → A · C4: 42.65 vs 1.05 → B · C5: 45.93 vs 4.81 → B · C6: 41.91 vs 3.80 → B. <b>Nobody moved → converged.</b> Quality check: WCSS = 53.33.</p>
+<p><b>Business reading:</b> Segment A ≈ (₹22.3k, 5 orders) — low spend, low frequency → <b>nurture campaign</b>: reactivation discount, mass channel. Segment B ≈ (₹61k, 24.7 orders) — VIPs → <b>retention campaign</b>: early access + loyalty perks. Two lists, two messages, instead of one blast at everyone.</p>
+<p>💡 <b>Interview angle:</b> 'Why k-means++ over random init?' — far-apart starting centroids avoid two centers landing in one dense region and splitting a real cluster; 'why not hierarchical on 100K+ profiles?' — speed (topic 19).</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same 6 customers, same hand numbers — every output below is from a real run. Paste each cell into a notebook and compare.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the data</div><pre>import numpy as np, pandas as pd
+df = pd.DataFrame({'spend':  [20, 25, 22, 60, 65, 58],
+                   'visits': [ 5,  4,  6, 25, 22, 27]}, index=['C1','C2','C3','C4','C5','C6'])
+X = df.values
+df</pre><div class="nbout">    spend  visits
+C1     20       5
+C2     25       4
+C3     22       6
+C4     60      25
+C5     65      22
+C6     58      27</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — assignment pass 1</div><pre>c1, c2 = np.array([20,5]), np.array([60,25])   # initial centroids
+for name, p in zip(df.index, X):
+    d1, d2 = np.hypot(*(p-c1)), np.hypot(*(p-c2))
+    print(f"{name} {p}: d(c1)={d1:.2f}  d(c2)={d2:.2f} -&gt; {'A' if d1 &lt; d2 else 'B'}")</pre><div class="nbout">C1 [20  5]: d(c1)=0.00  d(c2)=44.72 -&gt; A
+C2 [25  4]: d(c1)=5.10  d(c2)=40.82 -&gt; A
+C3 [22  6]: d(c1)=2.24  d(c2)=42.49 -&gt; A
+C4 [60 25]: d(c1)=44.72  d(c2)=0.00 -&gt; B
+C5 [65 22]: d(c1)=48.10  d(c2)=5.83 -&gt; B
+C6 [58 27]: d(c1)=43.91  d(c2)=2.83 -&gt; B</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — update: recompute centroids as means</div><pre>lab = ['A','A','A','B','B','B']
+cA = X[[i for i,l in enumerate(lab) if l=='A']].mean(axis=0)
+cB = X[[i for i,l in enumerate(lab) if l=='B']].mean(axis=0)
+print("new centroids: A =", np.round(cA,2), " B =", np.round(cB,2))</pre><div class="nbout">new centroids: A = [22.33  5.  ]  B = [61.   24.67]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — assignment pass 2 + WCSS</div><pre>lab2 = []
+for name, p in zip(df.index, X):
+    dA, dB = np.hypot(*(p-cA)), np.hypot(*(p-cB))
+    lab2.append('A' if dA &lt; dB else 'B')
+    print(f"{name} {p}: d(A)={dA:.2f}  d(B)={dB:.2f} -&gt; {lab2[-1]}")
+print("assignments changed?", lab2 != lab, "-&gt; converged" if lab2 == lab else "")
+
+wcss = sum(float((p - (cA if l=='A' else cB)) @ (p - (cA if l=='A' else cB))) for p, l in zip(X, lab2))
+print("WCSS =", round(wcss, 2))</pre><div class="nbout">C1 [20  5]: d(A)=2.33  d(B)=45.47 -&gt; A
+C2 [25  4]: d(A)=2.85  d(B)=41.51 -&gt; A
+C3 [22  6]: d(A)=1.05  d(B)=43.24 -&gt; A
+C4 [60 25]: d(A)=42.65  d(B)=1.05 -&gt; B
+C5 [65 22]: d(A)=45.93  d(B)=4.81 -&gt; B
+C6 [58 27]: d(A)=41.91  d(B)=3.80 -&gt; B
+assignments changed? False -&gt; converged
+WCSS = 53.33</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — scikit-learn confirms it (k-means++)</div><pre>from sklearn.cluster import KMeans
+km = KMeans(n_clusters=2, init='k-means++', n_init=10, random_state=42).fit(X)
+print("sklearn labels:", km.labels_, "| centroids:", np.round(km.cluster_centers_,2), "| inertia:", round(km.inertia_,2))</pre><div class="nbout">sklearn labels: [0 0 0 1 1 1] | centroids: [[22.33  5.  ]
+ [61.   24.67]] | inertia: 53.33</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea: unsupervised learning</b>
+<p>K-Means is an <b>unsupervised</b> algorithm: the data has <b>no output labels</b>. Nobody hands the model the right answer — the goal is to <b>group similar points into K clusters</b>, where K is a number chosen up front. The flagship use case is <b>customer segmentation</b> for <b>targeted ad / marketing campaigns</b>: group customers by behavior, then speak to each segment differently instead of blasting one message at everyone.</p>
+<p>ELI10: sort LEGO bricks into 3 piles when nobody names the piles for you. You drop each brick beside the pile it most resembles, then re-center each pile and go again. That is the whole algorithm.</p>
+<b>The 5 steps</b>
+<ol>
+<li><b>Choose K</b> — the number of centroids (cluster centers).</li>
+<li><b>Initialize the K centroids.</b> <code>k-means++</code> initialization places them <b>far apart</b> from each other — better than plain random placement, which can cram two centroids into one region and split a real cluster in half.</li>
+<li><b>Assign</b> every point to its <b>nearest centroid</b> using <b>Euclidean distance</b>.</li>
+<li><b>Update</b> — recompute each centroid as the <b>mean of its assigned points</b>.</li>
+<li><b>Repeat</b> steps 3-4 until assignments stop changing.</li>
+</ol>
+<b>Picking K: WCSS and the Elbow Method</b>
+<p><b>WCSS</b> = <b>Within-Cluster Sum of Squares</b>: add up the squared distance from every point to its own centroid. Lower means tighter clusters — but WCSS always falls as K grows (it reaches 0 when K equals the number of points), so the bare minimum is meaningless. The fix: compute WCSS for <b>K = 1 to 10</b>, plot it, and apply the <b>Elbow Method</b> — pick the K at the <b>abrupt change (bend)</b> of the curve, where extra clusters stop paying for themselves.</p>
+<div class="formula">WCSS = Σ ( squared distance of each point to its own centroid ) → plot for K = 1..10 → pick K at the bend (the elbow)</div>
+<b>K-Means vs Hierarchical Clustering</b>
+<p>K-means is <b>faster than hierarchical clustering on large datasets</b>; the agglomerative merging gets expensive as data grows. Practical rule: big data → K-means; smaller data where you want a dendrogram and no pre-chosen K → hierarchical (next topic).</p>
+<p>💡 Interview angle: <i>Why k-means++ over random init?</i> — it spreads the starting centroids far apart, avoiding bad starts where two centroids land in the same dense region. <i>K-means or hierarchical for millions of rows?</i> — K-means, purely on speed.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>My resume line — <i>'Modeled customer segmentation via k-means clustering across 100K+ profiles'</i> (MyOperator) — is only as strong as the choices behind it: K picked from the WCSS elbow, k-means++ initialization, Euclidean distance on scaled features. I can defend each in one sentence.</li>
+<li>If asked why not hierarchical clustering on 100K+ profiles: speed — agglomerative merging is far more time-consuming at that scale, and K-means is the standard for large-data segmentation.</li>
+<li>The reco engine is label-light too, so the unsupervised framing transfers: with no ground-truth labels, evaluation design (the elbow here, silhouette next topic) does the job that labels normally do.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [/* QUIZ_JSON */
+{q:'K-Means is best described as which type of learning?',options:['Supervised classification — it predicts a labeled class','Unsupervised — it finds groups in data with no output labels','Supervised regression — it predicts a continuous value','Reinforcement learning — it learns from rewards'],a:1,expl:'There are no output labels in the data. The goal is to group similar points into K clusters, so this is unsupervised learning.'},
+{q:'What does k-means++ initialization do differently from plain random initialization?',options:['It picks K automatically using the elbow method','It normalizes all features before clustering','It assigns every point to a random cluster first','It places the initial centroids far apart from each other'],a:3,expl:'k-means++ spreads the starting centroids far apart, which gives better, more stable clusters than random placement.'},
+{q:'In the assignment step, each point is joined to its nearest centroid using which distance?',options:['Cosine similarity only','Euclidean distance','Manhattan distance only','Hamming distance'],a:1,expl:'Every point is assigned to the nearest centroid by Euclidean distance; then each centroid is recomputed as the mean of its points.'},
+{q:'After all points are assigned, how is each centroid updated?',options:['It moves to the mean of the points assigned to it','It stays fixed until convergence is declared','It moves to the point farthest from the cluster','It is re-initialized at a random data point'],a:0,expl:'Steps 3-4 repeat: assign points to the nearest centroid, recompute each centroid as the mean of its assigned points, until assignments stop changing.'},
+{q:'What does WCSS stand for?',options:['Weighted Centroid Standard Score','Within-Class Sample Size','Within-Cluster Sum of Squares','Ward Cluster Selection Scheme'],a:2,expl:'WCSS is the sum of squared distances from each point to its own centroid — lower means tighter clusters.'},
+{q:'On a WCSS vs K plot, where does the elbow method tell you to pick K?',options:['At the abrupt change, the bend of the curve','At the very end of the curve where WCSS is lowest','At the K with the highest WCSS','Wherever the curve becomes perfectly flat at zero'],a:0,expl:'WCSS always falls as K grows, so the global minimum is meaningless — you pick the K at the bend, where adding clusters stops helping much.'},
+{q:'What is a realistic risk of choosing K much too large?',options:['Euclidean distance stops working','Clusters get so fine-grained they stop being useful segments','The algorithm becomes supervised','Centroids can never be computed'],a:1,expl:'A too-large K slices the data into tiny fragments. WCSS keeps dropping, but the segments no longer map to real customer groups you can market to.'},
+{q:'Interview: a teammate has 1M rows to cluster. Why reach for K-means over hierarchical clustering?',options:['Hierarchical clustering cannot run on numeric data','K-means needs no K, hierarchical does','K-means guarantees the globally optimal clustering','K-means is faster on large datasets; hierarchical merging is too time-consuming at scale'],a:3,expl:'K-means is the speed pick on large data. Watch the trap in option 2 — it is exactly backwards: K-means requires K up front.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_18',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

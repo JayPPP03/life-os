@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Decision Tree Classification — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=14225" target="_blank">▶ Watch this section</a></div>
+<h1>Decision Tree Classification</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 03:57:05 · approx 34 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_12"><b>DECISION TREE CLASSIFICATION — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>
+<ul>
+<li><b>Sign errors in entropy.</b> H = −Σ p·log₂p: log₂(0.25) is −2, so that term is −0.25×(−2) = +0.5. Forget the leading minus and "entropy" comes out negative.</li>
+<li><b>Forgetting to WEIGHT the child entropies.</b> Gain = parent H − Σ(|child|/|parent|)·H(child); averaging children equally (or skipping the weights) is the classic wrong answer.</li>
+<li><b>Reading gain as causation.</b> A high-gain feature is the best splitter on this sample — the measure is biased toward many-valued features and explains nothing about WHY customers leave.</li>
+<li><b>Gini vs entropy confusion.</b> Same job: Gini = 1 − Σp², no logarithm, computationally faster — which is exactly why scikit-learn defaults to it; both pick near-identical splits.</li>
+<li><b>The scaling myth.</b> Splits compare a value against a threshold, so trees need NO feature scaling — the exact opposite of distance-based KNN.</li>
+<li><b>Unbounded depth = memorization.</b> Pure leaves that isolate single rows train perfectly and predict badly; control with max_depth / min_samples_leaf (pre-pruning, tuned via GridSearchCV) or cut after growth (post-pruning).</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Churn triage: which question do we ask first?</h2>
+<div class="card">
+<p><b>Business problem:</b> a MyOperator-style retention team holds 6 customers. The whole art of a decision tree is one question: <b>which feature splits keepers from leavers best?</b> We compute entropy and information gain by hand for both candidate features — every log₂ shown.</p>
+<table>
+<tr><th>#</th><th>Complained?</th><th>Contract</th><th>Churned?</th></tr>
+<tr><td>1</td><td>Yes</td><td>Monthly</td><td>Yes</td></tr>
+<tr><td>2</td><td>Yes</td><td>Monthly</td><td>Yes</td></tr>
+<tr><td>3</td><td>Yes</td><td>Annual</td><td>Yes</td></tr>
+<tr><td>4</td><td>Yes</td><td>Annual</td><td>No</td></tr>
+<tr><td>5</td><td>No</td><td>Monthly</td><td>No</td></tr>
+<tr><td>6</td><td>No</td><td>Annual</td><td>No</td></tr>
+</table>
+<p>Handy log₂ values: log₂(0.5) = 1 · log₂(0.75) ≈ 0.415 · log₂(0.25) = 2 · log₂(0.667) ≈ 0.585 · log₂(0.333) ≈ 1.585 &nbsp;(log₂ of a fraction is negative — the minus sign in H = −Σp·log₂p flips it back to positive).</p>
+<p><b>Step 1 — root entropy</b> (all 6 rows: 3 churned / 3 stayed → p = 0.5 each):</p>
+<div class="formula">H(S) = −0.5·log₂(0.5) − 0.5·log₂(0.5) = −0.5(−1) − 0.5(−1) = <b>1.0</b> ← maximum impurity</div>
+<p><b>Step 2 — split on "Complained?":</b></p>
+<div class="formula">Yes branch (4 rows: 3 churn / 1 stay → p = 0.75 / 0.25):<br>H = −0.75·log₂(0.75) − 0.25·log₂(0.25) = 0.75×0.415 + 0.25×2 = 0.311 + 0.5 = <b>0.811</b><br>No branch (2 rows: 0 churn / 2 stay) → <b>pure node → H = 0</b><br><br>weighted = (4/6)×0.811 + (2/6)×0 = 0.541 + 0 = <b>0.541</b><br>Gain(S, Complained) = 1 − 0.541 = <b>0.459</b></div>
+<p><b>Step 3 — split on "Contract":</b></p>
+<div class="formula">Monthly (3 rows: 2 churn / 1 stay → p = 0.667 / 0.333):<br>H = −0.667·log₂(0.667) − 0.333·log₂(0.333) = 0.667×0.585 + 0.333×1.585 = 0.390 + 0.528 = <b>0.918</b><br>Annual (3 rows: 1 churn / 2 stay) → mirror image → H = <b>0.918</b><br><br>weighted = (3/6)×0.918 + (3/6)×0.918 = <b>0.918</b><br>Gain(S, Contract) = 1 − 0.918 = <b>0.082</b></div>
+<p><b>Step 4 — compare and build:</b> Gain(Complained) = 0.459 ≫ Gain(Contract) = 0.082 → <b>the root asks "did they complain?"</b> Its No branch is already a pure stay-leaf (stop growing there); only the Yes branch splits again — and there rows 3 and 4 have identical features (Yes, Annual) but different labels, so no feature can ever separate them: that leftover uncertainty is real, not a modeling failure.</p>
+<p>💡 <b>Business read:</b> complaints are the retention alarm — call complainers first. Contract type barely separates (gain 0.082): it is a second-order follow-up question, not the root.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 6-customer churn table</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'complained': ['Yes', 'Yes', 'Yes', 'Yes', 'No', 'No'],
+    'contract':   ['Monthly', 'Monthly', 'Annual', 'Annual', 'Monthly', 'Annual'],
+    'churned':    ['Yes', 'Yes', 'Yes', 'No', 'No', 'No']})
+df</pre><div class="nbout">  complained contract churned
+0        Yes  Monthly     Yes
+1        Yes  Monthly     Yes
+2        Yes   Annual     Yes
+3        Yes   Annual      No
+4         No  Monthly      No
+5         No   Annual      No</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — entropy from scratch, root node</div><pre>import math
+def entropy(labels):
+    n = len(labels)
+    h = -sum((c/n) * math.log2(c/n) for c in labels.value_counts() if c > 0)
+    return 0.0 if abs(h) < 1e-12 else h   # pure node: entropy is exactly 0 (kills -1e-16 float noise)
+
+root = entropy(df.churned)
+print(f"root: {df.churned.value_counts().to_dict()}  H = {root:.3f}")</pre><div class="nbout">root: {'Yes': 3, 'No': 3}  H = 1.000</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — information gain for BOTH candidate features</div><pre>def split_info(col):
+    weighted = 0
+    for v, sub in df.groupby(col):
+        h = entropy(sub.churned)
+        weighted += len(sub)/len(df) * h
+        print(f"  {col}={v}: {sub.churned.value_counts().to_dict()}  H={h:.3f}")
+    gain = root - weighted
+    print(f"  weighted entropy = {weighted:.3f}  gain = {gain:.3f}\n")
+    return gain
+
+g_comp = split_info('complained')
+g_cont = split_info('contract')
+print("root feature:", 'complained' if g_comp > g_cont else 'contract',
+      f"(gain {max(g_comp, g_cont):.3f} vs {min(g_comp, g_cont):.3f})")</pre><div class="nbout">  complained=No: {'No': 2}  H=0.000
+  complained=Yes: {'Yes': 3, 'No': 1}  H=0.811
+  weighted entropy = 0.541  gain = 0.459
+
+  contract=Annual: {'No': 2, 'Yes': 1}  H=0.918
+  contract=Monthly: {'Yes': 2, 'No': 1}  H=0.918
+  weighted entropy = 0.918  gain = 0.082
+
+root feature: complained (gain 0.459 vs 0.082)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — scikit-learn builds the tree (entropy criterion)</div><pre>from sklearn.tree import DecisionTreeClassifier, export_text
+X = pd.DataFrame({'complained': (df.complained == 'Yes').astype(int),
+                  'contract':  (df.contract == 'Monthly').astype(int)})
+m = DecisionTreeClassifier(criterion='entropy', random_state=0).fit(X, df.churned)
+print(export_text(m, feature_names=['complained', 'contract']))
+imps = {c: float(v) for c, v in zip(X.columns, m.feature_importances_.round(3))}
+print("feature importances:", imps)</pre><div class="nbout">|--- complained <= 0.50
+|   |--- class: No
+|--- complained >  0.50
+|   |--- contract <= 0.50
+|   |   |--- class: No
+|   |--- contract >  0.50
+|   |   |--- class: Yes
+
+feature importances: {'complained': 0.689, 'contract': 0.311}</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — Gini gives the same tree (that's why it's the default)</div><pre>m_ent  = DecisionTreeClassifier(criterion='entropy', random_state=0).fit(X, df.churned)
+m_gini = DecisionTreeClassifier(criterion='gini',  random_state=0).fit(X, df.churned)
+print("entropy root:", X.columns[m_ent.tree_.feature[0]], "| gini root:", X.columns[m_gini.tree_.feature[0]])
+print("same tree text?", export_text(m_ent, feature_names=list(X.columns)) == export_text(m_gini, feature_names=list(X.columns)))</pre><div class="nbout">entropy root: complained | gini root: complained
+same tree text? True</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea</b>
+<ul>
+<li>A decision tree is a set of <b>nested IF-ELSE conditions</b> learned from data — the same if/else you would write by hand, but the questions and their order are chosen automatically by an algorithm.</li>
+<li><b>Root node</b>: the first split. <b>Internal nodes</b>: further splits. <b>Leaf nodes</b>: the final output — the predicted class.</li>
+</ul>
+
+<b>Splitting the tennis dataset</b>
+<ul>
+<li>Root = all 14 rows: 9-yes / 5-no → mixed, i.e. <b>impure</b>.</li>
+<li>Split on Outlook: Sunny → 2-yes / 3-no (still impure), Overcast → 4-yes / 0-no (<b>pure</b> — stop; leaf says Yes), Rain → 3-yes / 2-no (impure → split again).</li>
+<li><b>Pure node</b> = all rows belong to one class. <b>Impure node</b> = mixed classes. The tree always picks the split that makes children as pure as possible.</li>
+</ul>
+
+<b>Entropy — measuring impurity</b>
+<div class="formula">H(S) = −p₊·log₂(p₊) − p₋·log₂(p₋)</div>
+<ul>
+<li>H(S) = <b>0 for a pure node</b> and reaches its <b>maximum of 1 at 50/50</b>. The 9/5 root gives H ≈ 0.94 — very impure.</li>
+</ul>
+
+<b>Gini impurity — the faster cousin</b>
+<div class="formula">Gini = 1 − Σ pᵢ²</div>
+<ul>
+<li>0 for a pure node, maximum <b>0.5 for binary classes</b> at 50/50.</li>
+<li>No logarithm → <b>computationally faster</b> than entropy; it is the default criterion in scikit-learn.</li>
+</ul>
+
+<b>Information gain — choosing the best feature</b>
+<div class="formula">Gain(S, feature) = H(S) − Σ (|Sᵥ|/|S|) · H(Sᵥ)</div>
+<ul>
+<li>Parent entropy minus the size-weighted average of the child entropies. Bigger gain = better split.</li>
+<li>Video worked example: root H(S) = 0.94. feature1 → weighted child entropy ≈ 0.89 → gain ≈ <b>0.041</b> (barely purifies anything). feature2 → gain ≈ <b>0.51</b> (huge). Pick feature2.</li>
+</ul>
+
+<b>Continuous features</b>
+<ul><li>Sort the values, test each candidate threshold between consecutive points, compute the gain for every threshold, and keep the best one — that is how numeric columns become tests like x &lt; 6.5.</li></ul>
+
+<b>Pruning — controlling overfitting</b>
+<ul>
+<li><b>Post-pruning</b>: grow the full tree first, then cut branches that add nothing. Video example: a split separating 47 samples from just 1 is pure memorization and should be cut.</li>
+<li><b>Pre-pruning</b>: stop growth early via hyperparameters — <b>max_depth</b>, <b>min_samples_leaf</b>, etc. — typically searched with <b>GridSearchCV</b>.</li>
+</ul>
+
+💡 <b>Interview angle:</b> do decision trees need feature scaling? No. Splits compare a value against a threshold, so units and scales do not matter — a sharp contrast with distance-based models like KNN.
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>My reco engine leans on tree-family models, so split discipline — picking features by measured information gain, not intuition — is exactly how I defend feature choices there.</li>
+<li>Overfitting control via pre-pruning is my default: validation-tuned max_depth / min_samples_leaf, the same mindset as my SVD grid + α regularization tuned on validation only.</li>
+<li>The temporal split in my reco project is the same honesty this section teaches: evaluate every split and parameter on data it has not seen — never train on the future.</li>
+</ul></div>
+<h2>🧪 Quiz — 10 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = /* QUIZ_JSON */ [
+{q:'In a decision tree, the FINAL predicted output is produced at the:',options:['Root node','Internal nodes','Leaf nodes','Branch edges'],a:2,expl:'The root asks the first question, internal nodes ask more, and the leaves hold the final class output.'},
+{q:'A decision tree is best described as:',options:['A weighted sum of all input features','Learned nested IF-ELSE conditions','A distance calculation in feature space','A chain of matrix multiplications'],a:1,expl:'Each root-to-leaf path is literally one if-else rule; the algorithm learns which questions to ask and in what order.'},
+{q:'After the tennis data (root 9-yes / 5-no) splits on Outlook, which node is PURE?',options:['The root: 9-yes / 5-no','Sunny: 2-yes / 3-no','Rain: 3-yes / 2-no','Overcast: 4-yes / 0-no'],a:3,expl:'Pure = all rows belong to one class. The overcast branch stops immediately with leaf output Yes.'},
+{q:'The entropy of a PURE node is:',options:['1','0.5','0','Undefined'],a:2,expl:'H = −p·log₂(p) − (1−p)·log₂(1−p) gives 0 at p=0 or p=1; the maximum of 1 occurs at 50/50.'},
+{q:'Root entropy H(S) = 0.94 and a split produces children with weighted entropy ≈ 0.43. The information gain is about:',options:['0.487','1.37','0.041','0.51'],a:3,expl:'Gain = 0.94 − 0.43 ≈ 0.51 — the strong feature from the video. The weak feature1 only reached ≈ 0.041 (children still ≈ 0.89 impure).'},
+{q:'Why does scikit-learn use Gini as its default criterion instead of entropy?',options:['Gini always finds different, better splits','No logarithm is needed, so it is computationally faster with very similar splits','Entropy is undefined for binary problems','Gini allows unlimited tree depth'],a:1,expl:'Gini = 1 − Σpᵢ² needs no log; in practice both criteria pick nearly the same splits.'},
+{q:'The maximum Gini impurity for a BINARY classification node is:',options:['0.5','1','0','2'],a:0,expl:'At 50/50: 1 − (0.5² + 0.5²) = 0.5. Entropy maxes at 1, Gini at 0.5.'},
+{q:'For a CONTINUOUS feature, candidate splits are found by:',options:['Splitting at the mean value only','Splitting at the median value only','Sorting the values, testing thresholds between consecutive points, and computing the gain of each','Sampling random thresholds until one looks good'],a:2,expl:'Every candidate threshold gets its own information-gain score; the best one becomes the IF-ELSE test (e.g. x < 6.5).'},
+{q:'The video shows a split separating 47 samples from just 1. Cutting that branch afterwards is called:',options:['A perfect pure split worth keeping','Pre-pruning with max_depth','A required class-balancing step','Post-pruning: grow the full tree, then remove branches that only memorize single rows'],a:3,expl:'Cutting after growing = post-pruning. Pre-pruning limits growth upfront (max_depth, min_samples_leaf — tuned with GridSearchCV).'},
+{q:'Interview rapid-fire: which models need feature scaling?',options:['KNN: yes · Decision Tree: yes','KNN: no · Decision Tree: yes','KNN: yes · Decision Tree: no','KNN: no · Decision Tree: no'],a:2,expl:'KNN sums distances across features → scale-sensitive. Trees compare values against thresholds → scale-invariant.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_12',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

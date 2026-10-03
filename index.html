@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1220">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>LIFE OS — Jay Patel</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;
+--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24;--blue:#60A5FA;--purple:#A78BFA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.55;padding:24px 16px}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:1.55rem;letter-spacing:-.02em}h1 span{color:var(--teal)}
+.sub{color:var(--muted);font-size:.85rem;margin:.3rem 0 1rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:.78rem}
+.chip b{color:var(--teal)}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.85rem;color:var(--muted)}
+.tab.active{background:var(--teal);color:var(--bg);border-color:var(--teal);font-weight:700}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px}
+h3{font-size:.95rem;margin-bottom:.7rem;color:var(--teal)}
+.slider{margin:14px 0}
+.slider label{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px}
+.slider label b{font-size:1rem}
+.slider input[type=range]{width:100%;accent-color:var(--teal)}
+.mini{font-size:.75rem;color:var(--muted)}
+.mins{display:grid;gap:8px;margin:10px 0}
+.minline{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:.9rem}
+.minline input{width:18px;height:18px;accent-color:var(--green)}
+.minline.done{border-color:var(--green);background:rgba(52,211,153,.08)}
+.savebtn{background:var(--teal);color:var(--bg);border:0;border-radius:12px;padding:.8rem 1.6rem;font-weight:800;font-size:1rem;cursor:pointer;width:100%;margin-top:6px}
+.verdict{border-radius:16px;padding:20px;text-align:center;margin-bottom:14px}
+.verdict .v{font-size:1.6rem;font-weight:800;letter-spacing:.05em}
+.verdict .msg{font-size:.9rem;margin-top:.5rem}
+.v-push{background:rgba(94,234,212,.1);border:1px solid var(--teal)}.v-push .v{color:var(--teal)}
+.v-ease{background:rgba(251,191,36,.08);border:1px solid var(--amber)}.v-ease .v{color:var(--amber)}
+.v-rest{background:rgba(96,165,250,.08);border:1px solid var(--blue)}.v-rest .v{color:var(--blue)}
+.weekgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:.6rem 0}
+.day{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;font-size:.7rem;color:var(--muted)}
+.day .d1{font-size:1rem}
+.day.good{border-color:var(--green)}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:.6rem 0}
+.stat div{background:var(--bg2);border-radius:10px;padding:10px;text-align:center}
+.stat b{font-size:1.2rem;color:var(--teal)}
+.stat span{font-size:.7rem;color:var(--muted);display:block}
+.anchors{display:grid;gap:8px}
+.anchor{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:.85rem}
+.anchor b{color:var(--teal)}
+.evi{padding:10px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.evi b{color:var(--teal)}
+.evi small{color:var(--muted);display:block;font-size:.72rem}
+input[type=text]{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:.9rem}
+.linkrow{margin-top:1.2rem;display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem}
+.linkrow a{color:var(--teal)}
+.hidden{display:none}
+.warn{background:rgba(248,113,113,.08);border:1px solid var(--red);border-radius:12px;padding:10px 14px;font-size:.82rem;margin-top:10px;color:var(--red)}
+.quotebox{background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(94,234,212,.08));border:1px solid rgba(167,139,250,.35);border-radius:16px;padding:20px;margin-bottom:14px}
+.quotebox .q{font-size:1.05rem;font-style:italic;line-height:1.5}
+.quotebox .a{margin-top:.6rem;color:var(--teal);font-size:.82rem;font-weight:600}
+.tbtns{display:flex;gap:6px;flex-wrap:wrap;margin:.5rem 0}
+.tbtn{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:.8rem}
+.tbtn:hover{border-color:var(--teal)}
+.tlog{display:flex;justify-content:space-between;font-size:.82rem;padding:6px 0;border-bottom:1px solid var(--border)}
+.hbar{height:20px;background:var(--bg2);border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.hbar>i{display:block;height:100%;border-radius:6px}
+.journal{width:100%;min-height:110px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:.88rem;font-family:inherit;resize:vertical}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌱 LIFE <span>OS</span></h1>
+  <p class="sub">3 minutes a day. One honest verdict: PUSH, EASE, or REST. A day with only the minimums done is a GOOD day.</p>
+  <div class="chips">
+    <div class="chip">💍 Engagement <b id="cd-eng"></b></div>
+    <div class="chip">💒 Wedding <b id="cd-wed"></b></div>
+    <div class="chip">🎯 Offer target <b id="cd-offer"></b></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="show('scr-today')">TODAY</div>
+    <div class="tab" onclick="show('scr-week');renderWeek()">WEEK</div>
+    <div class="tab" onclick="show('scr-plan');renderPlan()">PLAN</div>
+    <div class="tab" onclick="show('scr-evidence')">EVIDENCE</div>
+    <div class="tab" onclick="show('scr-time');renderTime()">⏳ TIME</div>
+    <div class="tab" onclick="show('scr-mind');renderMind()">🧠 MIND</div>
+  </div>
+
+  <div id="scr-today">
+    <div class="card">
+      <h3>🔋 How are you, honestly? (no wrong answers)</h3>
+      <div class="slider"><label>Energy 🔋 <b id="v-energy">3</b></label><input type="range" min="1" max="5" value="3" id="s-energy"></div>
+      <div class="slider"><label>Focus 🎯 <b id="v-focus">3</b></label><input type="range" min="1" max="5" value="3" id="s-focus"></div>
+      <div class="slider"><label>Tension / stress 😰 <b id="v-tension">3</b></label><input type="range" min="1" max="5" value="3" id="s-tension"></div>
+    </div>
+    <div class="card">
+      <h3>✅ Today's 3 minimums — tick = good day</h3>
+      <div class="mins">
+        <label class="minline" id="m-study-w"><input type="checkbox" id="c-study"> 📚 Study 25 min (Arena quiz or lesson — anything counts)</label>
+        <label class="minline" id="m-move-w"><input type="checkbox" id="c-move"> 🚶 Move 25 min (walk counts. Back: gentle)</label>
+        <label class="minline" id="m-sleep-w"><input type="checkbox" id="c-sleep"> 😴 Lights out by your target time</label>
+      </div>
+      <p class="mini">Meeting all 3 = ✅ GOOD DAY. Extra hours are bonus, never required.</p>
+      <button class="savebtn" onclick="saveDay()">Save today → get my verdict</button>
+    </div>
+    <div id="verdictbox"></div>
+  </div>
+
+  <div id="scr-week" class="hidden">
+    <div class="card">
+      <h3>📅 Last 7 days</h3>
+      <div class="weekgrid" id="weekgrid"></div>
+      <p class="mini">GREEN = all 3 minimums met (a good day) · BLUE = rest day (recovery counts) · GRAY = not logged</p>
+    </div>
+    <div class="card">
+      <h3>📊 This week</h3>
+      <div class="stat">
+        <div><b id="w-min">0</b><span>good days (3 minimums)</span></div>
+        <div><b id="w-study">0</b><span>study sessions</span></div>
+        <div><b id="w-move">0</b><span>movement days</span></div>
+        <div><b id="w-rest">0</b><span>rest days (that's allowed)</span></div>
+      </div>
+      <p class="mini" style="margin-top:.8rem">🔍 <b>Lazy or overloaded?</b> Good energy + skipped tasks = just start 5 minutes. Low energy 2+ days in a row = overloaded — the OS says REST, not push. Tension 4+ for 3 days = talk to someone tonight.</p>
+    </div>
+    <div class="card">
+      <h3>🧠 The rule that matters</h3>
+      <p class="mini">You studied 1–2h on a tense day and called it lazy. Wrong unit. <b style="color:var(--green)">Streak counts DAYS, not hours.</b> 3 minimums = the bar. Everything above = bonus. — your coach</p>
+    </div>
+  </div>
+
+  <div id="scr-plan" class="hidden">
+    <div class="card">
+      <h3>🎯 This week's ONE career priority</h3>
+      <input type="text" id="priority" placeholder="e.g., Clear Stage 1 in the Arena + upload resume to Naukri">
+      <button class="savebtn" onclick="savePriority()">Save priority</button>
+      <p class="mini" style="margin-top:.5rem">One priority. Not five. (The One Thing — Gary Keller)</p>
+    </div>
+    <div class="card">
+      <h3>📌 Fixed anchors</h3>
+      <div class="anchors">
+        <div class="anchor"><span>💍 Engagement</span><b>Oct 20, 2026</b></div>
+        <div class="anchor"><span>💒 Wedding</span><b>Jan 29, 2027</b></div>
+        <div class="anchor"><span>🎯 Offer target</span><b>Dec 15, 2026</b></div>
+        <div class="anchor"><span>⚡ Application engine ON</span><b>Oct 4, 2026</b></div>
+        <div class="anchor"><span>🚀 All projects public</span><b>Nov 8, 2026</b></div>
+      </div>
+      <p class="mini" style="margin-top:.8rem">Planned LIGHT weeks (by design, not by failure): <b>Oct 15–25</b> (engagement) and <b>Dec 15 – Jan 29</b> (wedding). The career push is front-loaded into Sep–Nov on purpose.</p>
+    </div>
+  </div>
+
+  <div id="scr-evidence" class="hidden">
+    <div class="card">
+      <h3>🔬 Why every rule here works (verified sources)</h3>
+      <div class="evi"><b>Tiny starts beat motivation.</b> Start with 2 minutes; action creates motivation, not the reverse.<small>Atomic Habits — James Clear · Tiny Habits — BJ Fogg, Stanford Behavior Design Lab</small></div>
+      <div class="evi"><b>Missing one day never breaks a habit.</b> Habits take ~66 days to form; a single miss has no measurable effect.<small>Lally et al. 2009, University College London</small></div>
+      <div class="evi"><b>Write when + where = double the follow-through.</b> Implementation intentions (X at Y time in Z place).<small>Gollwitzer, American Psychologist 1999; meta-analysis Gollwitzer & Sheeran 2006</small></div>
+      <div class="evi"><b>Self-compassion beats self-criticism.</b> Self-criticism predicts MORE procrastination and stress, not less.<small>Kristin Neff (TED) + research on self-compassion and self-regulation</small></div>
+      <div class="evi"><b>Exercise is antidepressant-grade.</b> Regular activity rivals medication for mild-moderate depression/anxiety in several trials.<small>JAMA Psychiatry trials; WHO 2020 guidelines</small></div>
+      <div class="evi"><b>25 minutes a day is a real dose.</b> WHO: 150 min/week moderate + 2 strength days. 25×7 = 175. You're above guideline.<small>WHO 2020 physical activity guidelines</small></div>
+      <div class="evi"><b>7,000–8,000 steps captures most of the benefit.</b> The 10k figure was a 1965 pedometer ad, not science. Benefits rise to ~7.5k then plateau — 10k is a fine bonus target.<small>Paluch et al., JAMA 2021; St-Maurice et al. 2022</small></div>
+      <div class="evi"><b>Back-safe core = McGill Big 3.</b> Curl-up, side plank, bird-dog — spine-researcher endorsed, no sit-ups needed.<small>Stuart McGill, Back Mechanic</small></div>
+      <div class="evi"><b>Walk after meals.</b> Even 10 min of walking after eating cuts glucose spikes.<small>DiPietro et al., Diabetes Care 2013</small></div>
+      <div class="evi"><b>Sleep 7–9 hours.</b> Poor sleep = worse focus, more hunger, higher weight gain risk.<small>National Sleep Foundation / AASM</small></div>
+      <div class="evi"><b>Deep work beats multitasking.</b> Task-switching costs up to 40% of productive time.<small>Cal Newport, Deep Work; Rubinstein/Meyer/Evans, APA</small></div>
+      <div class="evi"><b>One priority beats five.</b> Focus on the ONE thing; extra tasks are noise.<small>The One Thing — Gary Keller · Essentialism — Greg McKeown</small></div>
+      <div class="evi"><b>Worry-time works.</b> Scheduling 15 min of worry reduces all-day tension.<small>Borkovec et al., Penn State stimulus-control research</small></div>
+      <div class="evi"><b>Relationships are the #1 predictor of long-term wellbeing.</b> The engagement and wedding are not distractions from life — they ARE life.<small>Harvard Study of Adult Development (85+ years)</small></div>
+      <div class="evi"><b>Measuring itself improves behavior — proven.</b> A meta-analysis of 138 studies (d=0.40) found self-monitoring alone changes outcomes. Your weekly time log is the highest-leverage habit here.<small>Harkin et al. 2016, Psychological Bulletin (meta-analysis)</small></div>
+      <div class="evi"><b>Action before motivation is a formal clinical treatment.</b> Behavioral activation beat usual care and matched antidepressants in a Cochrane review of 53 studies. Waiting to feel ready is the bug; 5-minute starts are the fix.<small>Cochrane Review 2020; Martell behavioral activation</small></div>
+      <div class="evi"><b>7,000 steps captures ~90% of the benefit — pace doesn't matter.</b> 10k is a bonus, not a pass mark.<small>Paluch et al., JAMA Network Open 2021</small></div>
+      <div class="evi"><b>Walking prevents back pain from returning.</b> The WalkBack trial: regular walking cut recurrence risk ~28%.<small>Lancet 2024 WalkBack trial</small></div>
+      <div class="evi"><b>15 minutes after dinner is the highest-leverage walk of your day.</b> Post-meal walks beat one long session for blood-sugar control.<small>DiPietro et al., Diabetes Care 2013</small></div>
+      <div class="evi"><b>30–60 min/week of strength = the optimal dose.</b> Two of your 25-min home sessions hit the zone where disease risk drops 10–20%.<small>Momma et al., Br J Sports Med 2022 (meta-analysis)</small></div>
+      <div class="evi"><b>Crunches do not burn belly fat — and stress does.</b> 6 weeks of ab work produced zero fat change in RCTs; chronic stress is an independent belly-fat driver. Sleep and calm are fat-loss tools.<small>Vispute 2011 RCT; Epel 2000</small></div>
+      <div class="evi"><b>Honesty note:</b> the famous Buffett "25/5 two-list" story is apocryphal — the real version of that rule is Gary Keller's The One Thing. And "what gets measured gets managed" is misattributed to Deming — he called that exact idea "a costly myth." We cite what's real here.<small>attribution research, Oct 2026</small></div>
+    </div>
+  </div>
+
+  <div id="scr-time" class="hidden">
+    <div class="card">
+      <h3>⏳ Where did today's hours go? <span class="mini">(log in 0.5h steps — tracking alone changes behavior)</span></h3>
+      <div class="tbtns">
+        <button class="tbtn" onclick="logTime('work',1)">+1h Work 💼</button>
+        <button class="tbtn" onclick="logTime('study',1)">+1h Study 📚</button>
+        <button class="tbtn" onclick="logTime('move',0.5)">+30m Move 🚶</button>
+        <button class="tbtn" onclick="logTime('family',1)">+1h Family 💍</button>
+        <button class="tbtn" onclick="logTime('sleep',1)">+1h Sleep 😴</button>
+        <button class="tbtn" onclick="logTime('scroll',0.5)">+30m Scroll 📱</button>
+      </div>
+      <div id="timelog"></div>
+      <button class="homebtn" onclick="clearTodayTime()">Clear today</button>
+    </div>
+    <div class="card">
+      <h3>📊 This week by category (hours)</h3>
+      <div id="weekhours"></div>
+      <p class="mini">Time is the only currency you spend without getting it back. Seeing it is controlling it. <br>Evidence: people misestimate their own hours badly — tracking fixes it (Vanderkam, 168 Hours) · work expands to fill available time (Parkinson's Law, Economist 1955) · task-switching wastes real minutes (APA) · time-block your ONE priority (Cal Newport).</p>
+    </div>
+  </div>
+
+  <div id="scr-mind" class="hidden">
+    <div class="quotebox">
+      <div class="q" id="qotd-text">…</div>
+      <div class="a" id="qotd-author"></div>
+    </div>
+    <button class="tbtn" onclick="nextQuote()">↻ Another one</button>
+    <div class="card" style="margin-top:14px">
+      <h3>🧠 Thoughts of my mind — today</h3>
+      <textarea class="journal" id="journal" placeholder="What is on your mind today? Wins, worries, ideas — empty it here."></textarea>
+      <button class="savebtn" style="margin-top:8px" onclick="saveJournal()">Save today's thought</button>
+      <p class="mini" style="margin-top:.5rem">Expressive writing lowers tension — one of the oldest validated tools in psychology (Pennebaker's expressive-writing research).</p>
+    </div>
+    <div class="card">
+      <h3>🙏 One good thing today</h3>
+      <input type="text" id="gratitude" placeholder="One good thing from today (however small)">
+      <button class="savebtn" style="margin-top:8px" onclick="saveGratitude()">Save</button>
+      <p class="mini" id="grat-last"></p>
+      <p class="mini">Gratitude listing is among the most-replicated mood interventions in positive psychology (Emmons & McCullough, 2003).</p>
+    </div>
+    <div class="card">
+      <h3>👑 How the great ones ran their days (verified, with sources)</h3>
+      <p class="mini" style="margin-bottom:.6rem">The 3 patterns that repeat across ALL of them: <b>1.</b> Sleep protected as a performance tool · <b>2.</b> One deep block before noon on the single most important thing · <b>3.</b> Daily movement used deliberately. Full verified file: <a href="learning/life-os/routines.md" style="color:var(--teal)">routines.md</a></p>
+      <div class="evi"><b>Steve Jobs</b> — same simple outfit daily (decision-minimization); walking meetings; cut priorities to 3. <small>Isaacson biography, 2011</small></div>
+      <div class="evi"><b>Jeff Bezos</b> — 8h sleep protected; no meetings before 10am; ~3 high-quality decisions per day, then stops deciding.<small>Bezos summit interview, 2018</small></div>
+      <div class="evi"><b>Virat Kohli</b> — fitness discipline transformed his career: strict early sleep, hydration, plant-forward diet.<small>Kohli interviews, 2019</small></div>
+      <div class="evi"><b>Roger Federer</b> — 10–12h sleep (his own casual statements); quality blocks over sheer volume.<small>Federer interviews + Dartmouth 2024</small></div>
+      <div class="evi"><b>MS Dhoni</b> — famous 'process over outcome' calm — thin documentation, but the philosophy is his signature.<small>press interviews 2019/2022</small></div>
+      <div class="evi"><b>Haruki Murakami</b> — 5–6 dawn writing hours, 10km run, 9pm bed. Repeatable rhythm IS the message.<small>Novelist as a Vocation, 2022; Paris Review</small></div>
+      <div class="evi"><b>Charles Darwin</b> — two 90-min deep sessions + the Sandwalk (thinking walk).<small>Daily Rituals, 2013, citing Francis Darwin 1887</small></div>
+      <div class="evi"><b>Jocko Willink</b> — 4:30am workout, 'Discipline Equals Freedom'.<small>Discipline Equals Freedom, 2017</small></div>
+      <div class="evi"><b>Benjamin Franklin</b> — morning question: 'What good shall I do this day?' + evening review. (He admitted he often failed to keep it — so can you forgive yourself.)<small>Franklin Autobiography</small></div>
+      <div class="evi"><b>Albert Einstein</b> — deep thought blocks + long walks. ⚠️ the 'Einstein slept 10 hours' claim is unverified.<small>Einstein, Autobiographical Notes 1949; Straus 1979</small></div>
+    </div>
+  </div>
+
+  <div class="linkrow">
+    <a href="https://github.com/JayPPP03/life-os">← Progress Dashboard</a>
+    <a href="learning/ai-arena/index.html">⚔️ Arena</a>
+    <a href="learning/krish-ml-6h/index.html">📚 Study Center</a>
+    <a href="https://github.com/JayPPP03/life-os">🏛️ Bootcamp</a>
+  </div>
+</div>
+
+<script src="learning/ai-arena/data/quotes.js"></script>
+<script>
+/* ---------- state ---------- */
+const KEY = 'lifeos_save_v1';
+let S = {days:{}, priority:'', time:{}, journal:{}, gratitude:{}};
+function loadS(){ try{ const r = localStorage.getItem(KEY); if(r) S = Object.assign(S, JSON.parse(r)); }catch(e){} }
+function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function todayKey(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysUntil(dateStr){ return Math.ceil((new Date(dateStr+'T00:00:00') - new Date(new Date().toDateString()))/86400000); }
+function show(id){
+  ['scr-today','scr-week','scr-plan','scr-evidence','scr-time','scr-mind'].forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  const idx = {'scr-today':0,'scr-week':1,'scr-plan':2,'scr-evidence':3,'scr-time':4,'scr-mind':5}[id];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+}
+
+/* ---------- sliders ---------- */
+['energy','focus','tension'].forEach(k => {
+  const el = document.getElementById('s-'+k);
+  el.addEventListener('input', () => document.getElementById('v-'+k).textContent = el.value);
+});
+
+/* ---------- save day ---------- */
+function saveDay(){
+  const e = +document.getElementById('s-energy').value;
+  const f = +document.getElementById('s-focus').value;
+  const t = +document.getElementById('s-tension').value;
+  const s = document.getElementById('c-study').checked;
+  const m = document.getElementById('c-move').checked;
+  const l = document.getElementById('c-sleep').checked;
+  const minsMet = [s,m,l].filter(Boolean).length;
+
+  // verdict logic: REST > EASE > PUSH
+  const yKey = (d => { const x = new Date(d.getTime()-86400000); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); })(new Date());
+  const yDay = S.days[yKey];
+  let verdict, cls, msg;
+  if (e <= 2) {
+    verdict = 'REST-RECOVER'; cls = 'v-rest';
+    msg = yDay && yDay.energy <= 2
+      ? 'Two low-energy days in a row = OVERLOAD, not laziness. Today\u2019s job: sleep, walk, eat right. Cut ONE thing this week. Minimums are optional today.'
+      : 'Low battery. Minimums are optional — sleep and a short walk IS the win today. Zero guilt.';
+  } else if (t >= 4) {
+    verdict = 'EASE'; cls = 'v-ease';
+    msg = 'High tension — shrink the scope. Minimums only, and 10 minutes of writing worries down, then park them. If tension stays 4+ for 3 days, talk to your fianc\u00e9e or a friend tonight.';
+  } else {
+    verdict = 'PUSH'; cls = 'v-push';
+    msg = 'Good state: minimums + your ONE priority. You\u2019re in the top 10% of your own history today.';
+  }
+  const day = {e, f, t, s, m, l, verdict, minsMet};
+  S.days[todayKey()] = day;
+  saveS();
+  renderVerdict(verdict, cls, msg, minsMet);
+  renderWeek();
+}
+
+function renderVerdict(verdict, cls, msg, minsMet){
+  const good = minsMet === 3;
+  let html = '<div class="verdict '+cls+'"><div class="v">'+verdict+' DAY</div><div class="msg">'+msg+'</div></div>';
+  html += '<div class="card"><h3>'+(good ? '✅ GOOD DAY — all 3 minimums met.' : 'Minimums met: '+minsMet+'/3. Missing ones still count if done within 24h.')+'</h3>';
+  html += '<p class="mini">Streak counts DAYS. '+(good ? 'This day is banked forever.' : 'Do the missing minimum within 24h and re-save.')+'</p></div>';
+  document.getElementById('verdictbox').innerHTML = html;
+}
+
+/* ---------- week ---------- */
+function renderWeek(){
+  const grid = document.getElementById('weekgrid'); grid.innerHTML = '';
+  let min = 0, study = 0, move = 0, rest = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(new Date().toDateString() - i*86400000);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const day = S.days[key];
+    const label = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    let cls = '', top = '·';
+    if (day) {
+      if (day.verdict === 'REST-RECOVER') { cls = 'style="border-color:var(--blue)"'; top = '😴'; rest++; }
+      else if (day.minsMet === 3) { cls = 'class="good"'; top = '✅'; min++; }
+      if (day.s) study++;
+      if (day.m) move++;
+    }
+    grid.innerHTML += '<div class="day '+cls+'"><div class="d1">'+top+'</div>'+label+'<br>'+key.slice(5)+'</div>';
+  }
+  document.getElementById('w-min').textContent = min;
+  document.getElementById('w-study').textContent = study;
+  document.getElementById('w-move').textContent = move;
+  document.getElementById('w-rest').textContent = rest;
+}
+
+/* ---------- plan ---------- */
+function renderPlan(){
+  document.getElementById('priority').value = S.priority || '';
+  ['eng','wed','offer'].forEach((id,i) => {
+    const dates = ['2026-10-20','2027-01-29','2026-12-15'];
+    const n = daysUntil(dates[i]);
+    document.getElementById('cd-'+id).textContent = n >= 0 ? 'in '+n+' days' : '✓';
+  });
+}
+function savePriority(){
+  S.priority = document.getElementById('priority').value;
+  saveS(); renderHUDCountdowns(); toast('Priority saved: '+ (S.priority || '(empty)'));
+}
+
+/* ---------- countdowns ---------- */
+function renderHUDCountdowns(){
+  document.getElementById('cd-eng').textContent = 'in ' + Math.max(0, daysUntil('2026-10-20')) + 'd';
+  document.getElementById('cd-wed').textContent = 'in ' + Math.max(0, daysUntil('2027-01-29')) + 'd';
+  document.getElementById('cd-offer').textContent = 'in ' + Math.max(0, daysUntil('2026-12-15')) + 'd';
+}
+
+/* ---------- restore today if already saved ---------- */
+function restoreToday(){
+  const key = todayKey();
+  const day = S.days[key];
+  if (!day) return;
+  document.getElementById('s-energy').value = day.e; document.getElementById('v-energy').textContent = day.e;
+  document.getElementById('s-focus').value = day.f; document.getElementById('v-focus').textContent = day.f;
+  document.getElementById('s-tension').value = day.t; document.getElementById('v-tension').textContent = day.t;
+  document.getElementById('c-study').checked = day.s;
+  document.getElementById('c-move').checked = day.m;
+  document.getElementById('c-sleep').checked = day.l;
+  const cls = day.verdict === 'PUSH' ? 'v-push' : day.verdict === 'EASE' ? 'v-ease' : 'v-rest';
+  renderVerdict(day.verdict, cls, 'Already saved today — minimums '+ (day.minsMet) +'/3. You can update.', day.minsMet);
+  document.getElementById('journal').value = S.journal[key] || '';
+  const g = S.gratitude[key];
+  document.getElementById('gratitude').value = g || '';
+  document.getElementById('grat-last').textContent = g ? 'Today\u2019s good thing: ' + g : '';
+}
+
+/* ---------- TIME tracking ---------- */
+const TCATS = [
+  ['work','Work 💼','#60A5FA'], ['study','Study 📚','#A78BFA'], ['move','Move 🚶','#34D399'],
+  ['family','Family 💍','#FBBF24'], ['sleep','Sleep 😴','#5EEAD4'], ['scroll','Scroll 📱','#F87171']
+];
+function logTime(cat, h){
+  const key = todayKey();
+  S.time[key] = S.time[key] || [];
+  S.time[key].push({cat, h});
+  saveS(); renderTime();
+}
+function clearTodayTime(){ delete S.time[todayKey()]; saveS(); renderTime(); }
+function renderTime(){
+  const key = todayKey();
+  const log = S.time[key] || [];
+  const el = document.getElementById('timelog');
+  el.innerHTML = log.length ? log.map((e,i) => {
+    const label = (TCATS.find(t => t[0] === e.cat) || ['','',''])[1];
+    return '<div class="tlog"><span>'+label+'</span><span>'+e.h+'h <a href="#" style="color:var(--red)" onclick="delTime('+i+');return false">✕</a></span></div>';
+  }).join('') : '<p class="mini">Nothing logged yet today.</p>';
+  const total = log.reduce((a,e) => a + e.h, 0);
+  el.innerHTML += '<div class="tlog"><b>Today total</b><b>'+total+'h</b></div>';
+  // weekly bars
+  const sums = {}; TCATS.forEach(c => sums[c[0]] = 0);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(new Date().toDateString() - i*86400000);
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    (S.time[k] || []).forEach(e => { if (sums[e.cat] !== undefined) sums[e.cat] += e.h; });
+  }
+  const max = Math.max(1, ...Object.values(sums));
+  document.getElementById('weekhours').innerHTML = TCATS.map(c =>
+    '<div style="display:grid;grid-template-columns:90px 1fr 50px;gap:8px;align-items:center;font-size:.82rem">' +
+    '<span>'+c[1]+'</span><div class="hbar"><i style="width:'+Math.round(100*sums[c[0]]/max)+'%;background:'+c[2]+'"></i></div>' +
+    '<span>'+sums[c[0]]+'h</span></div>').join('');
+}
+function delTime(i){
+  const key = todayKey();
+  S.time[key].splice(i, 1);
+  saveS(); renderTime();
+}
+
+/* ---------- MIND: quote + journal + gratitude ---------- */
+const QUOTE_FALLBACK = [
+  {text:'Your time is limited, so don’t waste it living someone else’s life.', author:'Steve Jobs', source:'Stanford Commencement 2005', theme:'time'},
+  {text:'Stay hungry. Stay foolish.', author:'Steve Jobs', source:'Stanford Commencement 2005', theme:'learning'},
+  {text:'You have power over your mind — not outside events. Realize this, and you will find strength.', author:'Marcus Aurelius', source:'Meditations', theme:'calm'},
+  {text:'The impediment to action advances action. What stands in the way becomes the way.', author:'Marcus Aurelius', source:'Meditations', theme:'courage'},
+  {text:'It is not that we have a short time to live, but that we waste a lot of it.', author:'Seneca', source:'On the Shortness of Life', theme:'time'},
+  {text:'Dream is not that which you see while sleeping, it is something that does not let you sleep.', author:'A.P.J. Abdul Kalam', source:'verified speech', theme:'courage'},
+  {text:'You do not rise to the level of your goals. You fall to the level of your systems.', author:'James Clear', source:'Atomic Habits', theme:'discipline'},
+  {text:'Focus on the vital few; ignore the trivial many.', author:'after Joseph Juran / Greg McKeown', source:'Essentialism / quality field', theme:'focus'}
+];
+function allQuotes(){
+  if (typeof QUOTES !== 'undefined' && Array.isArray(QUOTES) && QUOTES.length) return QUOTES;
+  return QUOTE_FALLBACK.map((q,i) => ({...q, id: 'fb'+i}));
+}
+let lastQuote = null;
+function renderMind(){
+  const qs = allQuotes();
+  const doy = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  const idx = (lastQuote === null) ? doy % qs.length : Math.floor(Math.random()*qs.length);
+  const q = qs[idx];
+  lastQuote = idx;
+  document.getElementById('qotd-text').textContent = '“' + q.text + '”';
+  document.getElementById('qotd-author').textContent = '— ' + q.author + (q.source ? ' · ' + q.source : '');
+  const key = todayKey();
+  document.getElementById('journal').value = S.journal[key] || '';
+  const g = S.gratitude[key];
+  document.getElementById('grat-last').textContent = g ? 'Today’s good thing: ' + g : '';
+}
+function nextQuote(){ lastQuote = null; renderMind(); }
+function saveJournal(){
+  const key = todayKey();
+  S.journal[key] = document.getElementById('journal').value;
+  saveS(); toast('Thought saved for today');
+}
+function saveGratitude(){
+  const key = todayKey();
+  S.gratitude[key] = document.getElementById('gratitude').value;
+  saveS(); renderMind(); toast('Good thing banked. This compounds.');
+}
+
+/* ---------- init ---------- */
+/* ---------- init ---------- */
+loadS();
+renderHUDCountdowns();
+renderWeek();
+restoreToday();
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+document.getElementById('priority').value = S.priority || '';
+
+function toast(msg){ const t = document.createElement('div'); t.textContent = msg; t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#101B2E;border:1px solid #5EEAD4;color:#E6EDF7;border-radius:10px;padding:10px 18px;font-size:.85rem;z-index:99'; document.body.appendChild(t); setTimeout(()=>t.remove(), 2500); }
+</script>
+</body>
+</html>

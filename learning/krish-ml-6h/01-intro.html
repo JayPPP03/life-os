@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Introduction — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=0" target="_blank">▶ Watch this section</a></div>
+<h1>Introduction</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 00:00:00 · approx 1.5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_1"><b>The course contract — what "interview-ready" means for me:</b><br><br>(watch the section, then write what YOU remember — the intuition → math → code ladder, and which of YOUR projects each block of the course maps to — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review — common learner gaps in this topic</h2>
+<div class="card">
+<p>You haven't written notes for this topic yet. When you do, the coach checks them against this list — the things learners most often miss or get wrong in a course-intro section:</p>
+<div class="missing"><b class="no">① Skipping the 1.5-minute intro.</b><br>It sets the contract for the whole course — intuition FIRST, then math, then code — which is exactly the order interviewers probe: 'what is it', 'why do we need it', 'show me'.</div>
+<div class="missing"><b class="no">② Watching passively, with no project hooks.</b><br>Every topic should be anchored to one of YOUR systems (churn XGBoost, k-means segmentation, hybrid recommender). No anchor = nothing sticks.</div>
+<div class="missing"><b class="no">③ Treating fundamentals as trivia to memorize.</b><br>Interviews pivot from definition to defense: why this algorithm, what breaks it, how did you evaluate it. Practicals are not optional extras.</div>
+<div class="missing"><b class="no">④ Assuming advanced tools exempt you from basics.</b><br>Your production XGBoost IS this syllabus: sigmoid/log-loss (logistic regression), boosting (AdaBoost → XGBoost), distance metrics (KNN → clustering).</div>
+<div class="missing"><b class="no">⑤ No recall loop.</b><br>Watch → write notes from memory → score ≥ 80% on the quiz. Skipping the write-up step is why 'I watched it all' and 'I can explain none of it' go together.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — light warm-up: map 4 real systems to the AI/ML/DL/DS layers</h2>
+<div class="card">
+<p><b>Exercise:</b> this intro is 90 seconds long, so the 'worked' part is a mapping drill you can run in one minute — the same drill an interviewer runs with 'where does your work sit?'. For each real system ask: does it <b>act without human intervention</b> (AI)? does it <b>learn statistical patterns from data</b> (ML)? is it a <b>multi-layered neural net on big data + GPUs</b> (DL)? And <b>who builds and runs it</b> end-to-end (DS)?</p>
+<table>
+<tr><th>Real system</th><th>Q1: acts alone?</th><th>Q2: learns from data?</th><th>Q3: neural nets?</th><th>Layer</th><th>The DS role in it</th></tr>
+<tr><td>Netflix recommendations</td><td>yes</td><td>yes — viewing history</td><td>no</td><td><b>ML</b> (inside AI)</td><td>builds + evaluates the model</td></tr>
+<tr><td>Tesla self-driving</td><td>yes</td><td>yes — perception uses neural nets</td><td>yes</td><td><b>AI</b> umbrella, DL inside</td><td>data + modeling + safety cases</td></tr>
+<tr><td>Spam filter</td><td>yes</td><td>yes — labeled mail</td><td>no</td><td><b>ML</b> (classification)</td><td>labels data, trains, monitors drift</td></tr>
+<tr><td>Sales forecast</td><td>no — it informs humans</td><td>yes — time series</td><td>no</td><td><b>ML</b> (forecasting)</td><td>collect → clean → model → present</td></tr>
+</table>
+<div class="formula">AI ⊃ ML ⊃ DL &nbsp;&nbsp;|&nbsp;&nbsp; DS = the practice that runs across all three layers</div>
+<p><b>Business reading:</b> only one of the four systems is even a DL candidate — and none of YOUR production systems (churn XGBoost, k-means segmentation, SVD recommender) need neural nets. The ML layer is where most business value lives.</p>
+<p>💡 <b>Interview angle:</b> 'Where does your churn model sit?' → 'In the ML layer of AI — statistical tools (boosted trees) learning from tabular call-log data; no neural networks needed.' One sentence, correct level, done.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Same mapping as above, executable. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 4 systems as a DataFrame</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'system': ['Netflix recommender', 'Tesla self-driving', 'Spam filter', 'Sales forecast'],
+    'layer':  ['ML', 'AI', 'ML', 'ML'],
+    'what_it_actually_does': [
+        'learns your taste from viewing history',
+        'drives with no human in the loop',
+        'learns spam patterns from labeled mail',
+        'statistical forecast of next quarter']
+})
+df</pre><div class="nbout">                system layer                   what_it_actually_does
+0  Netflix recommender    ML  learns your taste from viewing history
+1   Tesla self-driving    AI        drives with no human in the loop
+2          Spam filter    ML  learns spam patterns from labeled mail
+3       Sales forecast    ML     statistical forecast of next quarter</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — one-liner groupby: systems per layer</div><pre>df.groupby('layer').size()</pre><div class="nbout">layer
+AI    1
+ML    3
+dtype: int64</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — the containment: which layer sits inside which</div><pre>parent = {'AI': 'top of the stack', 'ML': 'subset of AI', 'DL': 'subset of ML'}
+df['sits_inside'] = df.layer.map(parent)
+df[['system', 'layer', 'sits_inside']]</pre><div class="nbout">                system layer       sits_inside
+0  Netflix recommender    ML      subset of AI
+1   Tesla self-driving    AI  top of the stack
+2          Spam filter    ML      subset of AI
+3       Sales forecast    ML      subset of AI</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — the interview drill, printed</div><pre>for _, r in df.iterrows():
+    print(f"{r.system} ({r.layer}) -- {r.what_it_actually_does}")</pre><div class="nbout">Netflix recommender (ML) -- learns your taste from viewing history
+Tesla self-driving (AI) -- drives with no human in the loop
+Spam filter (ML) -- learns spam patterns from labeled mail
+Sales forecast (ML) -- statistical forecast of next quarter</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>The opening minutes set the contract for the whole course: <b>this session exists to make you interview-ready in machine learning fundamentals</b> — the algorithms, the intuition behind them, and their practical implementation.</p>
+<ul>
+<li><b>Scope preview:</b> the full classical-ML ladder — regression (linear, ridge, lasso, logistic), classification algorithms (Naive Bayes, KNN, decision trees, random forest, boosting, XGBoost, SVM), clustering (K-means, hierarchical, DBSCAN), plus evaluation concepts (bias-variance) and hands-on practicals.</li>
+<li><b>Mindset:</b> every algorithm is taught as intuition FIRST (what problem it solves, why it exists), then math, then code. That is also exactly how interviewers probe: 'what is it', 'why do we need it', 'show me'.</li>
+<li><b>Why fundamentals matter for you:</b> the advanced stuff you use daily (XGBoost churn models, recommender systems) is built on precisely these blocks — sigmoid/log-loss (logistic regression), boosting (AdaBoost → XGBoost), distance metrics (KNN → clustering).</li>
+</ul>
+<p>💡 <b>Interview angle:</b> 'Walk me through ML fundamentals' is really asking: can you move smoothly from problem type (regression vs classification) → algorithm choice → evaluation? This course gives you that spine.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>This intro maps to the WHOLE journey: your reco engine project (temporal split → 4 model arms → +100.8% lift) is this course's syllabus in miniature, executed and measured.</li>
+<li>Your brush-up rule: after every topic in this course, say the concept out loud using one of your resume projects (churn XGBoost, k-means segmentation, reco hybrid).</li>
+</ul></div>
+<h2>🧪 Quiz — 6 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'What is the stated purpose of this 6-hour course?',options:['To replace a university degree','To cover ML algorithms + practical implementation so you can clear interviews','To teach deep learning research','To prepare only for coding rounds'],a:1,expl:'The intro frames the session as interview-ready fundamentals: algorithms, intuition, and practicals.'},
+{q:'The course ladder moves from intuition to math to code. Why that order?',options:['Code is unimportant','Understanding the problem an algorithm solves makes the math and code stick','Math is optional in interviews','It matches a textbook chapter order'],a:1,expl:'Interviewers probe exactly this chain: what is it → why do we need it → show me.'},
+{q:'Which of these course topics does your Project-01 (hybrid recommender) directly exercise?',options:['Only linear regression','Evaluation protocol, regularization, tuning, and ensemble thinking','Only SQL','Only neural networks'],a:1,expl:'Your reco engine used a temporal split, an SVD reg grid tuned on validation, and ensemble-style fusion of two model arms.'},
+{q:'A production XGBoost churn model (like yours at MyOperator) builds on which course fundamentals?',options:['Boosting algorithms and classification metrics','Image convolution','Reinforcement learning','No fundamentals needed'],a:0,expl:'XGBoost is boosted trees — covered via AdaBoost/boosting — and its production value is judged by classification metrics.'},
+{q:'What is the risk of learning algorithms WITHOUT practicals?',options:['None — theory is enough','You can define a term but cannot defend why you chose it or what breaks it','Practicals are illegal in interviews','It only matters for research jobs'],a:1,expl:'Interviews pivot from definition to defense: why this algorithm, what are its failure modes, how did you evaluate it.'},
+{q:'Your own equivalent of this course intro is…',options:['Skipping to XGBoost code','The Project-01 plan doc: problem → pipeline → models → evaluation protocol','Reading the sklearn docs once','Memorizing formulas'],a:1,expl:'You already built the same arc end-to-end: 09_project_plan_01 → code → measured +100.8% lift.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_1',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

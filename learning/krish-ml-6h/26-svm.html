@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVM Algorithm — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY" target="_blank">▶ Watch this section</a></div>
+<h1>SVM (Support Vector Machine)</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · final section of the video · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_26"><b>SVM — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p>Common learner gaps in this topic — these are the six places SVM interviews most often go wrong.</p>
+<div class="missing"><b class="no">① "Support vectors are all the training points."</b><br>Only the points touching the margin planes define the boundary — below, that's (2,2) and (5,5) out of six. Delete the rest and nothing moves. That's the definition.</div>
+<div class="missing"><b class="no">② Misplacing the marginal planes.</b><br>They sit at wᵀx + b = +1 and −1, with the hyperplane at 0 between them. The full street width is 2/||w|| — maximizing it ⇔ minimizing ||w||.</div>
+<div class="missing"><b class="no">③ Getting C backwards.</b><br>LARGE C = strict about errors → narrow margin, memorizes outliers, overfit risk. Small C = forgiving → wider margin, tolerates violations. The lab shows the real trade: C=0.1 → train 83%/test 100%; C=100 → train 100%/test 88%.</div>
+<div class="missing"><b class="no">④ Forgetting why soft margins exist.</b><br>Real data overlaps. Slack ξᵢ measures each violation and the objective ||w||²/2 + C·Σξᵢ prices them. A hard margin (zero errors) is the rare, clean-data special case.</div>
+<div class="missing"><b class="no">⑤ Not knowing WHEN to reach for a kernel.</b><br>Only when data is NOT separable in the current space — the kernel lifts it a dimension (2D → 3D) where a flat plane works. Fitting a poly kernel on already-separable data is wasted complexity.</div>
+<div class="missing"><b class="no">⑥ Classifying by magnitude instead of sign.</b><br>A new point's class = sign(wᵀx + b). The SIZE of wᵀx+b tells you confidence/distance from the boundary, not the class.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — churn-style risk scoring: 6 customers, 1 hyperplane, every number from a real run</h2>
+<div class="card">
+<p><b>Business problem:</b> score customers on two risk axes (x₁ = complaint-intensity, x₂ = usage-drop score). Six labelled customers, cleanly separable — fit the widest street between "stayed" and "churned", then classify 2 new customers by sign(wᵀx + b). All numbers below are from the real run in the lab.</p>
+<table>
+<tr><th>Customer</th><th>x₁</th><th>x₂</th><th>Class</th></tr>
+<tr><td>A</td><td>1</td><td>1</td><td>0 — stayed</td></tr>
+<tr><td>B</td><td>2</td><td>2</td><td>0 — stayed</td></tr>
+<tr><td>C</td><td>1</td><td>2</td><td>0 — stayed</td></tr>
+<tr><td>D</td><td>6</td><td>6</td><td>1 — churned</td></tr>
+<tr><td>E</td><td>5</td><td>5</td><td>1 — churned</td></tr>
+<tr><td>F</td><td>6</td><td>5</td><td>1 — churned</td></tr>
+</table>
+<div class="formula">fit (sklearn, linear kernel, C=1): w = [0.333, 0.333], b = −2.333<br>hyperplane: 0.333x₁ + 0.333x₂ − 2.333 = 0 · margin planes: wᵀx + b = ±1<br>total margin width = 2/||w|| = 2/0.4714 = <b>4.24</b> &nbsp;·&nbsp; support vectors: <b>(2,2) and (5,5) ONLY</b></div>
+<p><b>Classify 2 new customers by the sign:</b></p>
+<div class="formula">(3,3): 0.333·3 + 0.333·3 − 2.333 = <b>−0.333</b> → stayed side → routine check-in<br>(5,7): 0.333·5 + 0.333·7 − 2.333 = <b>+1.667</b> → churned side → retention offer now</div>
+<p><b>C — the error-budget dial (real run):</b></p>
+<div class="formula">separable data: C=0.01 → margin 11.74 · C=1 → 4.24 · C=100 → 4.24 (train acc 100% each — the MARGIN is what moves)<br>add one mislabelled point (4.5, 4.7):<br>C=0.1 → train 83% / test 100%, margin 5.65 — ignores the outlier, generalizes better<br>C=100 → train 100% / test 88%, margin 0.58 — memorizes the outlier, boundary bends, a borderline customer gets misranked</div>
+<p>💡 <b>Interview angle:</b> "What are support vectors?" → here, only (2,2) and (5,5); remove A, C, D, F and the boundary doesn't change. "What does C do?" → error budget: big C = strict/narrow/overfit-prone, small C = forgiving/wide. And kernels are for NON-separable data only — ours is separable, so a linear kernel is the honest choice.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Same 6 customers, every output pasted from a real run of these exact cells.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — fit the linear SVM, extract w, b, margin, support vectors</div><pre>import numpy as np
+from sklearn.svm import SVC
+
+X = np.array([[1., 1.], [2., 2.], [1., 2.], [6., 6.], [5., 5.], [6., 5.]])
+y = np.array([0, 0, 0, 1, 1, 1])
+clf = SVC(kernel='linear', C=1.0).fit(X, y)
+w = clf.coef_[0]; b = clf.intercept_[0]
+print("w =", np.round(w, 4), " b =", round(b, 4))
+print("||w|| =", round(np.linalg.norm(w), 4))
+print("total margin width 2/||w|| =", round(2 / np.linalg.norm(w), 4))
+print("support vectors:\n", np.round(clf.support_vectors_, 3))
+print("dual coefs:", np.round(clf.dual_coef_, 3))
+print("train decision values:", np.round(clf.decision_function(X), 3))
+print("train predictions   :", clf.predict(X))</pre><div class="nbout">w = [0.3333 0.3333]  b = -2.3333
+||w|| = 0.4714
+total margin width 2/||w|| = 4.2426
+support vectors:
+ [[2. 2.]
+ [5. 5.]]
+dual coefs: [[-0.111  0.111]]
+train decision values: [-1.667 -1.    -1.333  1.667  1.     1.333]
+train predictions   : [0 0 0 1 1 1]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — classify 2 new customers by the sign of w.x + b</div><pre>for pt in [np.array([3., 3.]), np.array([5., 7.])]:
+    score = w @ pt + b
+    print(f"new point {pt}: w.x + b = {score:.4f} -> class {int(score > 0)} (sklearn agrees: {clf.predict(pt.reshape(1,-1))[0]})")</pre><div class="nbout">new point [3. 3.]: w.x + b = -0.3333 -> class 0 (sklearn agrees: 0)
+new point [5. 7.]: w.x + b = 1.6667 -> class 1 (sklearn agrees: 1)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — hand-check: support vectors sit EXACTLY on the margin planes</div><pre>for pt in clf.support_vectors_:
+    print(f"support vector {pt}: |w.x + b| / ||w|| = {abs(w @ pt + b) / np.linalg.norm(w):.4f}")
+print("half-margin = 1/||w|| =", round(1 / np.linalg.norm(w), 4),
+      " total = 2/||w|| =", round(2 / np.linalg.norm(w), 4))</pre><div class="nbout">support vector [2. 2.]: |w.x + b| / ||w|| = 2.1213
+support vector [5. 5.]: |w.x + b| / ||w|| = 2.1213
+half-margin = 1/||w|| = 2.1213  total = 2/||w|| = 4.2426</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — C on separable data: accuracy is already perfect, the MARGIN moves</div><pre>print("separable data, C sweep:")
+for C in [0.01, 1.0, 100.0]:
+    c = SVC(kernel='linear', C=C).fit(X, y)
+    w_c = c.coef_[0]
+    print(f"  C={C:>6}: train acc = {c.score(X, y):.2f}   ||w|| = {np.linalg.norm(w_c):.4f}"
+          f"   margin = {2/np.linalg.norm(w_c):.2f}   n_support = {c.n_support_}")</pre><div class="nbout">separable data, C sweep:
+  C=  0.01: train acc = 1.00   ||w|| = 0.1703   margin = 11.74   n_support = [3 3]
+  C=   1.0: train acc = 1.00   ||w|| = 0.4714   margin = 4.24   n_support = [1 1]
+  C= 100.0: train acc = 1.00   ||w|| = 0.4714   margin = 4.24   n_support = [1 1]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — C on real-world (noisy) data: the accuracy trade-off appears</div><pre>Xn = np.array([[1., 1.], [2., 2.], [1., 2.], [6., 6.], [5., 5.], [4.5, 4.7]])  # mislabelled point
+yn = np.array([0, 0, 0, 1, 1, 0])
+Xtest = np.array([[1.5, 1.5], [2.5, 2.], [3., 2.], [5.5, 5.5], [7., 7.], [6.5, 4.5],
+                  [4., 4.2], [4.8, 5.2]])
+ytest = np.array([0, 0, 0, 1, 1, 1, 1, 1])
+print("noisy data (point (4.5,4.7) = class 0 inside class-1 zone), C sweep:")
+for C in [0.1, 100.0]:
+    c = SVC(kernel='linear', C=C).fit(Xn, yn)
+    w_n = c.coef_[0]
+    print(f"  C={C:>6}: train acc = {c.score(Xn, yn):.2f}   test acc = {c.score(Xtest, ytest):.2f}"
+          f"   margin = {2/np.linalg.norm(w_n):.2f}   n_support = {c.n_support_}")</pre><div class="nbout">noisy data (point (4.5,4.7) = class 0 inside class-1 zone), C sweep:
+  C=   0.1: train acc = 0.83   test acc = 1.00   margin = 5.65   n_support = [2 2]
+  C= 100.0: train acc = 1.00   test acc = 0.88   margin = 0.58   n_support = [1 1]</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>SVM classifies by finding the <b>best separating hyperplane</b> — the one with the WIDEST safety margin between classes.</p>
+<ul>
+<li><b>The hyperplane:</b> wᵀx + b = 0. A new point's class = the SIGN of wᵀx + b (positive → one class, negative → the other).</li>
+<li><b>Worked example from the video:</b> w = [−1], b = 0 → point (−4, 0): wᵀx + b = (−1)(−4) = +4 → class A. Point (4, 4): −4 → class B.</li>
+<li><b>Marginal planes:</b> wᵀx + b = +1 and wᵀx + b = −1 (the two dashed lines, distance K apart). The <b>support vectors</b> are the points touching these planes — they alone define the boundary.</li>
+<li><b>The objective:</b> maximize the margin = <b>2/||w||</b>, which is equivalent to minimizing ||w||. Wider margin → more confident generalization.</li>
+<li><b>Soft margin (real data):</b> perfect separation rarely exists. Allow errors with slack variables <b>ξᵢ</b> (how far each offender crosses) and minimize <b>||w||²/2 + C·Σξᵢ</b>. <b>C</b> controls the tolerance for errors: small C = forgiving (wider margin, more violations), large C = strict (narrow margin, fewer violations, overfit risk). A HARD margin (zero errors) is the ideal-but-rare case.</li>
+<li><b>Kernels:</b> when data isn't separable in 2D, a kernel lifts it to a higher dimension (2D → 3D) where a flat plane CAN separate it — the 'kernel trick'.</li>
+<li><b>SVR (assignment):</b> regression version — the video leaves deriving the ±ε tube (predictions inside the tube incur no penalty) as homework.</li>
+<li>💡 <b>Interview angle:</b> 'What are support vectors?' → only the boundary-defining points matter; remove the rest and the boundary doesn't change. 'What does C do?' → error budget: big C = strict/overfit-prone, small C = tolerant/softer margin.</li>
+</ul>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>SVM is in the classification toolbox behind your <b>churn classifier</b> work — in interviews, contrasting margin-based (SVM) vs boosting-based (XGBoost) approaches shows range.</li>
+<li>The soft-margin slack ξ maps to your production mindset: real data violates clean assumptions, so you budget for violations (C) instead of pretending perfection exists — same philosophy as your drift monitoring.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'The SVM decision for a new point is based on…',options:['The sign of wᵀx + b','The magnitude of wᵀx + b','The point\u2019s nearest neighbor','Random assignment'],a:0,expl:'Sign of wᵀx + b picks the side: video example, w=[−1], b=0 → point (−4,0) gives +4 → class A.'},
+{q:'The two marginal planes are defined as…',options:['wᵀx + b = 0 and wᵀx + b = 1','wᵀx + b = ±1','wᵀx + b = ±2/||w||','w = 0'],a:1,expl:'The margin planes are wᵀx + b = ±1; the separating hyperplane sits at 0 between them.'},
+{q:'What are support vectors?',options:['All training points','The points touching the marginal planes that define the boundary','Only the misclassified points','The cluster centroids'],a:1,expl:'Support vectors touch the margin planes; remove every other point and the boundary is unchanged.'},
+{q:'SVM\u2019s objective is to…',options:['Minimize the margin','Maximize the margin 2/||w||','Minimize the number of features','Maximize ξ'],a:1,expl:'Widest street between classes = best generalization; maximizing 2/||w|| ⇔ minimizing ||w||.'},
+{q:'The soft-margin objective adds which term?',options:['C · Σξᵢ — a penalty for margin violations','α · learning rate','A sigmoid activation','The silhouette score'],a:0,expl:'ξᵢ measures how badly each point violates the margin; C prices those violations.'},
+{q:'A LARGE value of C means…',options:['Very tolerant of errors — wide margin','Strict about errors — narrow margin, overfit risk','No hyperplane is found','Kernels are disabled'],a:1,expl:'Big C punishes violations heavily → fits training tightly, risking overfit; small C is forgiving.'},
+{q:'Kernels are used when…',options:['Data is already linearly separable','Data is not separable in the current dimension — lift it higher (2D → 3D)','You want fewer support vectors','The dataset is too small'],a:1,expl:'The kernel trick maps data to a higher dimension where a flat separating plane exists.'},
+{q:'A HARD margin (zero training errors) is rare in practice because…',options:['SVM cannot compute it','Real data almost always overlaps between classes','It requires deep learning','Margins are illegal'],a:1,expl:'Real datasets have noise/overlap — hence the soft margin with slack ξ and penalty C.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_26',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

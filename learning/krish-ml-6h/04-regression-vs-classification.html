@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supervised Learning: Regression vs Classification — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=545" target="_blank">▶ Watch this section</a></div>
+<h1>Supervised Learning: Regression vs Classification (+ Unsupervised)</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 00:09:05 · approx 9 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_4"><b>Regression vs Classification (and unsupervised) — my own words:</b><br><br>(watch the section, then write what YOU remember — how you decide the problem type by the OUTPUT variable, one project of yours per box, and which metric belongs to which — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review — common learner gaps in this topic</h2>
+<div class="card">
+<p>You haven't written notes for this topic yet. When you do, the coach checks them against this list — the things learners most often miss or get wrong here:</p>
+<div class="missing"><b class="no">① Deciding regression-vs-classification by the ALGORITHM.</b><br>Decide by the OUTPUT variable: continuous number → regression; fixed categories → classification. The same algorithm family can serve either side.</div>
+<div class="missing"><b class="no">② Thinking a classifier outputs numbers like a regressor.</b><br>Fit pass=1/fail=0 with a line and a student gets '0.37' — neither pass nor fail. Categories are fixed; that's why classifiers output a class (and probabilities behind the scenes).</div>
+<div class="missing"><b class="no">③ Reporting accuracy on imbalanced problems.</b><br>Churn at 5%: 'always predict no' scores 95% accuracy while catching zero churners. Precision/recall (your churn model: precision +18% QoQ) are the honest metrics.</div>
+<div class="missing"><b class="no">④ Calling clustering a type of classification.</b><br>Unsupervised has NO output variable y at all — it groups (segmentation) or compresses (PCA). There is no label to be 'correct' against.</div>
+<div class="missing"><b class="no">⑤ Forgetting multiclass sits between binary and regression.</b><br>Pass/fail is binary; digits 0–9 is multiclass (3+ fixed categories); weight is continuous. Three different output shapes, three different setups.</div>
+<div class="missing"><b class="no">⑥ Metric drift across paradigms.</b><br>Quoting R²/MAE for a classifier, or accuracy for a forecast — R²/MAE belong to regression; accuracy/precision/recall belong to classification.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — two tiny datasets: why continuous vs fixed-category changes everything</h2>
+<div class="card">
+<p><b>Business problem:</b> two questions from the same business review — <b>'how many calls will this agent handle next month?' (a number)</b> and <b>'will this trainee pass QA?' (a label)</b>. Same supervised setup (X and y both known), opposite machinery. The video's toy pair — age→weight and study/play→pass/fail — carries both ends.</p>
+<p><b>Dataset A — REGRESSION (age → weight, the video's example):</b></p>
+<table>
+<tr><th>Age x (years)</th><th>12</th><th>16</th><th>20</th><th>24</th></tr>
+<tr><td>Weight y (kg)</td><td>40</td><td>52</td><td>58</td><td>70</td></tr>
+</table>
+<p><b>Step 1 — fit the line by least squares:</b> means x̄ = 18, ȳ = 55</p>
+<div class="formula">θ1 = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)² = (90+6+6+90) / (36+4+4+36) = 192/80 = <b>2.4</b> kg per year<br>θ0 = ȳ − θ1·x̄ = 55 − 2.4×18 = <b>11.8</b> &nbsp;→&nbsp; weight = 2.4·age + 11.8</div>
+<p><b>Step 2 — predict a CONTINUOUS answer:</b> age 18 → 2.4×18 + 11.8 = <b>55.0 kg</b>. Any value on the scale is allowed — that's what makes it regression.</p>
+<p><b>Step 3 — score it the regression way:</b> predictions 40.6, 50.2, 59.8, 69.4 → errors +0.6, −1.8, +1.8, −0.6 → SSres = 7.2, SStot = Σ(y−ȳ)² = 225+9+9+225 = 468</p>
+<div class="formula">R² = 1 − 7.2/468 = <b>0.985</b> &nbsp;·&nbsp; MAE = (0.6+1.8+1.8+0.6)/4 = <b>1.2 kg</b> — distance-based errors make sense for numbers.</div>
+<p><b>Dataset B — CLASSIFICATION (study vs play hours → pass/fail, the video's example):</b></p>
+<table>
+<tr><th>Student</th><th>Study hrs</th><th>Play hrs</th><th>Outcome</th><th>study − play</th></tr>
+<tr><td>S1</td><td>2</td><td>6</td><td>fail</td><td>−4</td></tr>
+<tr><td>S2</td><td>5</td><td>3</td><td>pass</td><td>+2</td></tr>
+<tr><td>S3</td><td>6</td><td>2</td><td>pass</td><td>+4</td></tr>
+<tr><td>S4</td><td>1</td><td>5</td><td>fail</td><td>−4</td></tr>
+<tr><td>S5</td><td>3</td><td>5</td><td>fail</td><td>−2</td></tr>
+</table>
+<p><b>Step 1 — why NOT the regression line:</b> code pass=1, fail=0 and fit a line — a new student gets a prediction like <b>0.37</b>, which is neither pass nor fail. Categories are fixed, so the right shape is a <b>boundary</b>, not a line: pass when study − play &gt; 0.</p>
+<p><b>Step 2 — apply the boundary:</b> new student studies 4, plays 5 → 4 − 5 = −1 &lt; 0 → predict <b>fail</b> (logistic regression agrees: P(pass) ≈ 0.32 &lt; 0.5 → fail).</p>
+<p><b>Step 3 — score it the classification way:</b> the rule gets all 5 students right → accuracy 5/5 on this toy. On real imbalanced data (churn ~5%), accuracy lies — <b>precision/recall</b> are the honest scores (your churn model: precision +18% QoQ, a 3x high-risk cohort).</p>
+<div class="formula">Continuous y → regression model + R²/MAE &nbsp;&nbsp;|&nbsp;&nbsp; fixed-category y → classifier + accuracy/precision/recall</div>
+<p>💡 <b>Interview angle:</b> 'How do you decide regression or classification?' → 'I look at the output variable, not the algorithm — and I pick the metric from the same answer.' Then cite one project of yours per box: forecasts (regression), churn (classification), segmentation (clustering, no y at all).</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Both datasets from above, executable — watch the model type AND the metric change.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — REGRESSION: age → weight, fit the line</div><pre>import pandas as pd
+from sklearn.linear_model import LinearRegression, LogisticRegression
+
+reg = pd.DataFrame({'age': [12, 16, 20, 24], 'weight': [40, 52, 58, 70]})
+lin = LinearRegression().fit(reg[['age']], reg['weight'])
+print("weight = %.1f * age + %.1f" % (lin.coef_[0], lin.intercept_))</pre><div class="nbout">weight = 2.4 * age + 11.8</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — a continuous prediction + regression metrics</div><pre>age18 = pd.DataFrame({'age': [18]})
+print("predicted weight at age 18:", lin.predict(age18)[0])
+print("R2 =", round(lin.score(reg[['age']], reg['weight']), 4))</pre><div class="nbout">predicted weight at age 18: 55.0
+R2 = 0.9846</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — CLASSIFICATION: study vs play → pass/fail</div><pre>clf_df = pd.DataFrame({
+    'study_hrs': [2, 5, 6, 1, 3],
+    'play_hrs':  [6, 3, 2, 5, 5],
+    'passed':    [0, 1, 1, 0, 0]
+})
+clf_df</pre><div class="nbout">   study_hrs  play_hrs  passed
+0          2         6       0
+1          5         3       1
+2          6         2       1
+3          1         5       0
+4          3         5       0</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — the output is a CLASS, with a probability behind it</div><pre>Xc, yc = clf_df[['study_hrs', 'play_hrs']], clf_df['passed']
+clf = LogisticRegression(max_iter=1000).fit(Xc, yc)
+new_student = pd.DataFrame({'study_hrs': [4], 'play_hrs': [5]})
+print("P(pass) =", clf.predict_proba(new_student)[0, 1].round(3))
+print("verdict :", clf.predict(new_student)[0], "(1 = pass, 0 = fail)")</pre><div class="nbout">P(pass) = 0.316
+verdict : 0 (1 = pass, 0 = fail)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — the metric mismatch, demonstrated</div><pre>from sklearn.metrics import accuracy_score, mean_absolute_error
+pred_c = clf.predict(Xc)
+print("classification accuracy:", accuracy_score(yc, pred_c))
+print("MAE on pass/fail labels :", mean_absolute_error(yc, pred_c), "&lt;- meaningless for classes")
+print("R2 / MAE belong to regression; accuracy / precision / recall to classification")</pre><div class="nbout">classification accuracy: 1.0
+MAE on pass/fail labels : 0.0 &lt;- meaningless for classes
+R2 / MAE belong to regression; accuracy / precision / recall to classification</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>This is the map of the whole ML territory — every algorithm you'll ever meet sits in one of these boxes.</p>
+<ul>
+<li><b>Supervised learning</b>: the dataset has <b>independent features (X)</b> and a known <b>dependent output (y)</b>. Video example: <b>age → weight</b>. The model learns the mapping X → y from labeled examples.</li>
+<li><b>Regression</b>: supervised, output is a <b>CONTINUOUS number</b>. Examples: predicting a person's weight from age, house price, tomorrow's temperature, sales next month.</li>
+<li><b>Classification</b>: supervised, output belongs to <b>FIXED categories</b>. Video example: given study-hours vs play-hours → <b>pass/fail</b> (binary). <b>Multiclass</b> = more than two categories (digit recognition 0–9).</li>
+<li><b>Unsupervised learning</b>: <b>no output variable</b> at all — only features. Two main flavors:
+  <ul>
+  <li><b>Clustering</b> — group similar items together (customer segmentation; the ad-marketing use case: target each segment with the right campaign).</li>
+  <li><b>Dimensionality reduction</b> — compress many features into fewer while keeping the essence (PCA: 1000 features → 100).</li>
+  </ul></li>
+<li><b>Reinforcement learning</b> — mentioned as the third paradigm: an agent learns by reward/penalty from an environment.</li>
+</ul>
+<div class="formula">Supervised: (X, y) known → predict y. &nbsp; Regression: y continuous. &nbsp; Classification: y ∈ fixed classes.
+Unsupervised: X only → structure (clusters / fewer dimensions).</div>
+<table>
+<tr><th>Paradigm</th><th>Output?</th><th>Examples</th></tr>
+<tr><td>Regression</td><td>continuous number</td><td>weight from age, price, forecast</td></tr>
+<tr><td>Classification</td><td>fixed categories</td><td>pass/fail, spam/not-spam, churn yes/no</td></tr>
+<tr><td>Clustering</td><td>none — group similarity</td><td>customer segmentation</td></tr>
+<tr><td>Dim. reduction</td><td>none — compress features</td><td>PCA 1000 → 100</td></tr>
+</table>
+<p>💡 <b>Interview angle:</b> the fastest sanity check an interviewer runs: 'is this a regression or classification problem?' Answer by looking at the OUTPUT variable, not the algorithm — continuous → regression; fixed categories → classification.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Regression → your <b>Adani demand forecasts</b> (~20% planning-accuracy lift, ARIMA/XGBoost) — continuous output forecasting.</li>
+<li>Classification → your <b>MyOperator churn model</b> (churn yes/no, precision +18% QoQ, 3x high-risk cohort).</li>
+<li>Clustering → your <b>k-means customer segmentation across 100K+ profiles</b> — the exact unsupervised use-case in this section.</li>
+<li>Your reco engine is a hybrid beast: it PREDICTS scores (regression-flavored) but is EVALUATED as ranking/classification (hit-rate) — a great nuance to mention.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'Supervised learning requires…',options:['No labels at all','Both independent features (X) and a known dependent output (y)','Only one feature','A GPU'],a:1,expl:'Supervised = learning a mapping from labeled examples, like age → weight in the video.'},
+{q:'Predicting a person\u2019s weight from their age is…',options:['Classification','Regression — the output is continuous','Clustering','Dimensionality reduction'],a:1,expl:'Weight is a continuous number → regression (the video\u2019s own example).'},
+{q:'Given study-hours and play-hours, predicting pass/fail is…',options:['Regression','Clustering','Classification — binary with fixed categories','PCA'],a:2,expl:'Pass/fail is a fixed category → binary classification.'},
+{q:'Multiclass classification means…',options:['The output has more than two fixed categories','Multiple regression models','The data has many rows','Two outputs'],a:0,expl:'Binary = 2 classes; multiclass = 3+ fixed categories (e.g., digits 0–9).'},
+{q:'Unsupervised learning is defined by…',options:['Having a very large y','Having NO output variable — only features','Using deep networks','Requiring GPUs'],a:1,expl:'No labels: the algorithm must find structure (clusters) or compress features (PCA) by itself.'},
+{q:'Customer segmentation for targeted ad campaigns is the standard example of…',options:['Regression','Classification','Clustering','Reinforcement learning'],a:2,expl:'Group similar customers, then market to each group differently — the video\u2019s clustering use-case.'},
+{q:'Dimensionality reduction, e.g. PCA turning 1000 features into 100, is used to…',options:['Increase the number of features','Keep the essence of the data with fewer features','Create labels','Split data into clusters'],a:1,expl:'PCA compresses feature count while preserving information — the second unsupervised flavor.'},
+{q:'Your Project-01 recommender predicts scores but is judged by hit-rate@10. Correctly framed, it is…',options:['Pure regression, nothing else','A ranking problem: scores are regression-flavored, evaluation is classification-flavored','Unsupervised with no evaluation','Reinforcement learning'],a:1,expl:'Matrix-factorization scoring is regression-style; HR@10 judges top-k like classification — a nuance interviewers enjoy.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_4',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

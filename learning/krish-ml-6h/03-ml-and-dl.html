@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machine Learning and Deep Learning — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=476" target="_blank">▶ Watch this section</a></div>
+<h1>Machine Learning and Deep Learning</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 00:07:56 · approx 1 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_3"><b>ML vs DL — my own words:</b><br><br>(watch the section, then write what YOU remember — what DL is BY MECHANISM, when it beats classical ML, and why your churn/reco projects did not need it — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review — common learner gaps in this topic</h2>
+<div class="card">
+<p>You haven't written notes for this topic yet. When you do, the coach checks them against this list — the things learners most often miss or get wrong here:</p>
+<div class="missing"><b class="no">① Thinking deep learning is a 2010s invention.</b><br>The ideas go back to the <b>1950s–60s</b> (perceptron era). What changed recently is <b>data volume + GPU compute</b> — the ideas are old, the fuel is new.</div>
+<div class="missing"><b class="no">② 'DL is just better ML.'</b><br>On tabular business data (churn, forecasting, recommenders), classical ML like XGBoost usually wins AND is explainable. DL dominates perception: images, audio, speech.</div>
+<div class="missing"><b class="no">③ Defining DL by vibes instead of mechanism.</b><br>The definition: <b>multi-layered neural networks mimicking the human brain</b>, each layer learning more abstract representations. 'Modern' or 'advanced' is not a definition.</div>
+<div class="missing"><b class="no">④ No engineering answer to 'why didn't you use DL?'.</b><br>The strong answer has three parts: data scale, explainability, measured lift over baseline — e.g. SVD recommender, +100.8% over popularity.</div>
+<div class="missing"><b class="no">⑤ Confusing the ML/DL split with supervised/unsupervised.</b><br>Orthogonal axes: a CNN can be supervised or not; XGBoost is supervised classical ML. One axis is the TOOL, the other is the LABELS.</div>
+<div class="missing"><b class="no">⑥ Assuming forecasting/recommenders need DL.</b><br>ARIMA, SVD, XGBoost are classical and production-proven (your own Adani ~20% lift). Reaching for DL by default is a sizing failure, not a skill signal.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — pick the tool: classical ML vs DL across 4 real scenarios</h2>
+<div class="card">
+<p><b>Exercise:</b> the whole ML-vs-DL decision compresses into two questions: <b>what does the data look like?</b> (tabular vs raw perception/text) and <b>how much of it is there?</b> Run the four scenarios:</p>
+<table>
+<tr><th>Scenario</th><th>Data</th><th>Right tool</th><th>Why</th><th>Your anchor</th></tr>
+<tr><td>Predict churn from call logs (calls, plan, tenure → yes/no)</td><td>tabular, ~100K rows</td><td><b>Classical ML</b> — XGBoost/logistic</td><td>tabular + explainability + modest size</td><td>MyOperator churn, precision +18% QoQ</td></tr>
+<tr><td>Recognize faces in photos</td><td>raw pixels, millions</td><td><b>DL</b> — CNN</td><td>perception features can't be hand-designed; needs GPUs</td><td>—</td></tr>
+<tr><td>Answer free-text support questions</td><td>text sequences</td><td><b>DL</b> — language models</td><td>word order and context need learned representations</td><td>—</td></tr>
+<tr><td>Forecast next month's demand</td><td>tabular time series</td><td><b>Classical ML</b> — ARIMA/XGBoost</td><td>few features, interpretable, business-audited</td><td>Adani, ~20% planning-accuracy lift</td></tr>
+</table>
+<div class="formula">Decision rule: tabular + up to a few million rows + must explain → classical ML<br>raw images / audio / text + big data + GPUs → DL (invented in the 1950s–60s — only the data + compute are new)</div>
+<p><b>Business reading:</b> three of the four realistic work scenarios are classical-ML territory — and every production model you've shipped lives there. DL is a sizing decision, not a status upgrade.</p>
+<p>💡 <b>Interview angle:</b> 'Why not deep learning for the recommender?' → 'Right-sizing: classical ML fit the data scale, was explainable to the business, and beat the popularity baseline by a measured +100.8%.'</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">A toy tabular churn problem solved the classical-ML way — the exact scenario from the table above, executable.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — 8-row toy churn data (tabular, small: classical ML territory)</div><pre>import pandas as pd
+from sklearn.linear_model import LogisticRegression
+
+df = pd.DataFrame({
+    'support_calls': [0, 1, 2, 3, 4, 6, 8, 9],
+    'churned':       [0, 0, 0, 1, 0, 1, 1, 1]
+})
+df</pre><div class="nbout">   support_calls  churned
+0              0        0
+1              1        0
+2              2        0
+3              3        1
+4              4        0
+5              6        1
+6              8        1
+7              9        1</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — fit logistic regression (a classical-ML classifier)</div><pre>X, y = df[['support_calls']], df['churned']
+model = LogisticRegression(max_iter=1000).fit(X, y)
+print("coef =", model.coef_[0][0].round(3), " intercept =", model.intercept_[0].round(3))</pre><div class="nbout">coef = 0.776  intercept = -2.982</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — predictions and accuracy on the 8 rows</div><pre>pred = model.predict(X)
+print("predictions:", pred.tolist())
+print("accuracy   :", round((pred == y).mean(), 3))</pre><div class="nbout">predictions: [0, 0, 0, 0, 1, 1, 1, 1]
+accuracy   : 0.75</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — churn probability for 3 new customers</div><pre>new_customers = pd.DataFrame({'support_calls': [1, 5, 8]})
+proba = model.predict_proba(new_customers)[:, 1]
+for calls, p in zip(new_customers.support_calls, proba):
+    print(f"{calls} support calls -> P(churn) = {p:.2f}")</pre><div class="nbout">1 support calls -> P(churn) = 0.10
+5 support calls -> P(churn) = 0.71
+8 support calls -> P(churn) = 0.96</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — the tool-choice takeaway</div><pre>print(f"rows in df: {len(df)} -> classical ML territory")
+print("tabular + small data + need explainability -> classical ML (this cell)")
+print("raw images / audio / text + millions of rows -> DL (needs GPUs)")</pre><div class="nbout">rows in df: 8 -> classical ML territory
+tabular + small data + need explainability -> classical ML (this cell)
+raw images / audio / text + millions of rows -> DL (needs GPUs)</div></div>
+
+<p class="mini" style="margin-top:.6rem">Read on the 0.75: the two mistakes are the noisy rows (3 calls but churned, 4 calls but stayed). The model still captures the trend — and every coefficient is explainable to the business, which is exactly what classical ML buys you here.</p>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>A short recap section that locks in the subset relationship before the course dives into algorithms.</p>
+<ul>
+<li><b>ML recap:</b> statistical tools that let systems analyze and visualize data, then predict and forecast (sales forecasting, weather, recommenders).</li>
+<li><b>DL recap:</b> the part of ML that <b>mimics the human brain</b> — a <b>multi-layered neural network</b> where each layer learns increasingly abstract representations.</li>
+<li><b>History nugget:</b> deep learning research is not new — it goes back to the <b>1950s–60s</b> (perceptron era, 'mimic the thinking of the human brain'). What changed recently: <b>data volume + GPU compute</b>, which finally made deep networks practical.</li>
+<li><b>Why the distinction matters in practice:</b> DL needs big data + GPUs and gives state-of-the-art perception; classical ML often wins on tabular business data — which is exactly the data most companies (and your projects) run on.</li>
+</ul>
+<p>💡 <b>Interview angle:</b> 'Why didn't you use deep learning for your recommender/churn model?' — Answer: classical ML was the right size for the data, it's explainable, and it beat the baseline by a measured margin. Tool choice is an engineering decision, not a fashion decision.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Project-01 deliberately used <b>classical ML (SVD + TF-IDF), not DL</b> — and measured +100.8% lift over popularity. Right-sized tooling is the answer, not trendy tooling.</li>
+<li>Your churn model is XGBoost (classical ML) in production across 100K+ users — business tabular data is classical ML territory.</li>
+</ul></div>
+<h2>🧪 Quiz — 6 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'Deep learning mimics the human brain using…',options:['Decision trees','Multi-layered neural networks','SQL joins','Rule-based systems'],a:1,expl:'The defining idea of DL: layered neural networks, each learning more abstract representations.'},
+{q:'Deep learning research actually dates back to…',options:['The 2010s','The 1950s–60s','2012 only','The 1990s internet era'],a:1,expl:'The video notes DL ideas go back to the 1950s-60s; recent data + GPU compute made them practical.'},
+{q:'What recently made deep learning practical at scale?',options:['Fewer layers','More data + GPU compute','Slower computers','Removal of neural networks'],a:1,expl:'Data volume and GPU compute are the two enablers cited for DL\u2019s rise.'},
+{q:'For tabular business data (like churn), the typically right-sized choice is…',options:['Always deep learning','Classical ML (e.g., XGBoost) — often better and more explainable','Only neural networks work','No modeling is possible'],a:1,expl:'Classical ML usually wins on tabular data; your XGBoost churn model is the production proof.'},
+{q:'Your Project-01 used SVD + TF-IDF instead of neural networks. The strongest interview defense is…',options:['I did not know deep learning','Right-sizing: classical ML fit the data scale, was explainable, and beat the baseline by +100.8%','Deep learning is illegal for recommenders','TF-IDF is a neural network'],a:1,expl:'Tool choice as an engineering decision — measured lift, explainability, and data scale justify it.'},
+{q:'The relationship ML : DL is correctly drawn as…',options:['Siblings with no overlap','DL ⊂ ML','ML ⊂ DL','Identical'],a:1,expl:'Deep learning is the subset of ML that uses multi-layered neural networks.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_3',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

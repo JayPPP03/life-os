@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XGBoost Regressor — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=22744" target="_blank">▶ Watch this section</a></div>
+<h1>XGBoost Regressor</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 06:19:04 · approx 13 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_25"><b>XGBoost Regressor — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p>Common learner gaps in this topic — nail these and the classifier/regressor contrast becomes your easiest interview win.</p>
+<div class="missing"><b class="no">① Starting from 0.5 (the classifier habit).</b><br>For continuous targets the blind base model is the MEAN of all targets — the video's 51k, our lab's 51.0. Residuals are measured from that mean.</div>
+<div class="missing"><b class="no">② Using Σp(1−p) in the regression similarity.</b><br>That's the classifier's curvature term. Regression similarity = Σ residuals² / (n + λ): count of rows, not probabilities.</div>
+<div class="missing"><b class="no">③ Confusing the leaf VALUE with the similarity score.</b><br>Leaf value = mean (sum/(n+λ)) of its residuals — e.g. −11/(1+1) = −5.5. The similarity score only RANKS candidate splits; it's never the prediction.</div>
+<div class="missing"><b class="no">④ Reporting the leaf as the final prediction.</b><br>Final = base mean + α × leaf output — 51 + 0.8×(−5.5) = 46.6. Forgetting the base or the α is the classic slip.</div>
+<div class="missing"><b class="no">⑤ Missing the λ shrinkage demo.</b><br>Same leaf, λ=0 → 121, λ=1 → 60.5: bigger λ shrinks similarity → smaller, humbler corrections → less overfit. Be able to say that in one breath.</div>
+<div class="missing"><b class="no">⑥ "The next tree starts from scratch."</b><br>No — tree 2 is built on the UPDATED residuals (lab: −6.6, −5.2, +2.8, +6.8, root similarity collapses 47.2 → 24.9). Sequential correction is the whole point; parallel trees = random forest.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — demand forecasting: predict a listing's bookings from 4 rows (the video's example)</h2>
+<div class="card">
+<p><b>Business problem:</b> your Adani demand-forecast work shrunk to one boosting round you can do on a napkin: predict weekly bookings (×100) for a listing from its size. Base model = the MEAN of all targets. Every number comes from a real run — the lab reproduces all of it.</p>
+<table>
+<tr><th>Listing</th><th>Size (sqft)</th><th>Bookings y</th><th>Base = 51</th><th>Residual y−51</th></tr>
+<tr><td>L1</td><td>800</td><td>40</td><td>51</td><td>−11</td></tr>
+<tr><td>L2</td><td>1200</td><td>48</td><td>51</td><td>−3</td></tr>
+<tr><td>L3</td><td>1500</td><td>56</td><td>51</td><td>+5</td></tr>
+<tr><td>L4</td><td>1800</td><td>60</td><td>51</td><td>+9</td></tr>
+</table>
+<p><b>Step 1 — base = mean 51.</b> Residuals −11, −3, +5, +9 — they sum to 0 (the mean is the balance point).</p>
+<p><b>Step 2 — similarity</b> = Σ residuals² / (n + λ), with λ=1:</p>
+<div class="formula">leaf {−11}: 121/(1+1) = <b>60.5</b> &nbsp;(λ=0 would give 121 = 11²/1 — the video's shrinkage demo: 121 → 60.5)<br>leaf {+5, +9, −3}: 115/4 = <b>28.75</b> (video: ≈28.8) &nbsp;·&nbsp; root (all 4 rows): 236/5 = <b>47.2</b></div>
+<p><b>Step 3 — gain picks the split</b> (Gain = sim(left) + sim(right) − sim(root)):</p>
+<div class="formula">size ≤ 1000: 60.5 + 28.75 − 47.2 = <b>42.05</b> ← kept<br>size ≤ 1350: 43.33 + 35.33 − 47.2 = <b>31.47</b><br>(the video's own split comparison: 89 vs 243.58 — same rule: higher gain wins)</div>
+<p><b>Step 4 — leaf values + inference = mean + α × leaf</b> (α = 0.8):</p>
+<div class="formula">left leaf: −11/2 = −5.5 &nbsp;·&nbsp; right leaf: 3/4 = 0.75<br>size 900 → 51 + 0.8×(−5.5) = <b>46.6</b> &nbsp;·&nbsp; size 1500 → 51 + 0.8×0.75 = <b>53.2</b> &nbsp;(video: 51k + (−10) or +7)</div>
+<p><b>Step 5 — tree 2 attacks the leftovers:</b> new residuals −6.6, −5.2, +2.8, +6.8 → root similarity falls 47.2 → 24.9. The video's root of ≈1/6 is the same story late-game: after enough rounds there's almost nothing left to learn, so the root score collapses toward zero.</p>
+<p>💡 <b>Interview angle:</b> contrast the twins in one breath: "classifier starts at 0.5 and ends in a sigmoid; regressor starts at the mean and adds α×leaf directly — the shared skeleton is residuals → similarity → gain → sequential correction."</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">The video's numbers, recomputed end to end. Every output below is pasted from a real run of these exact cells.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the data, the mean base model, the residuals</div><pre>import numpy as np
+y = np.array([40., 56., 60., 48.])            # bookings (x100)
+size = np.array([800., 1200., 1500., 1800.])  # sqft
+base = y.mean()
+res = y - base
+print("prices y      :", y)
+print("base (mean)   :", base)
+print("residuals     :", res)
+print("residual sum  :", res.sum(), "(zero - the mean is the balance point)")</pre><div class="nbout">prices y      : [40. 56. 60. 48.]
+base (mean)   : 51.0
+residuals     : [-11.   5.   9.  -3.]
+residual sum  : 0.0 (zero - the mean is the balance point)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — similarity = sum(res^2) / (n + lambda)</div><pre>def sim(r, lam):
+    return (r ** 2).sum() / (len(r) + lam)
+
+leaf_neg11 = np.array([-11.])
+print("single-residual leaf (res = -11):")
+print("   lambda=0 :", round(sim(leaf_neg11, 0), 4), "  (the video's 121 = 11^2 / 1)")
+print("   lambda=1 :", round(sim(leaf_neg11, 1), 4), "  (the video's 60.5 = 121 / 2)")
+leaf_rest = np.array([5., 9., -3.])
+print("other leaf (+5,+9,-3), lambda=1:", round(sim(leaf_rest, 1), 4), "  (the video's 28.8)")
+print("root (all 4 rows), lambda=1    :", round(sim(res, 1), 4))</pre><div class="nbout">single-residual leaf (res = -11):
+   lambda=0 : 121.0   (the video's 121 = 11^2 / 1)
+   lambda=1 : 60.5   (the video's 60.5 = 121 / 2)
+other leaf (+5,+9,-3), lambda=1: 28.75   (the video's 28.8)
+root (all 4 rows), lambda=1    : 47.2</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — two candidate splits; gain picks the split</div><pre>L1, R1 = np.array([-11.]), np.array([5., 9., -3.])          # split size <= 1000
+g1 = sim(L1, 1) + sim(R1, 1) - sim(res, 1)
+L2, R2 = np.array([-11., -3.]), np.array([5., 9.])          # split size <= 1350
+g2 = sim(L2, 1) + sim(R2, 1) - sim(res, 1)
+print(f"split size<=1000 : {sim(L1,1):.2f} + {sim(R1,1):.2f} - {sim(res,1):.2f} = gain {g1:.4f}")
+print(f"split size<=1350 : {sim(L2,1):.2f} + {sim(R2,1):.2f} - {sim(res,1):.2f} = gain {g2:.4f}")
+print("kept split:", "size<=1000 (higher gain wins)" if g1 > g2 else "size<=1350")</pre><div class="nbout">split size<=1000 : 60.50 + 28.75 - 47.20 = gain 42.0500
+split size<=1350 : 43.33 + 35.33 - 47.20 = gain 31.4667
+kept split: size<=1000 (higher gain wins)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — leaf values + inference = mean + alpha * leaf</div><pre>def leaf_out(r, lam):
+    return r.sum() / (len(r) + lam)
+
+outL, outR = leaf_out(L1, 1), leaf_out(R1, 1)
+alpha = 0.8
+print(f"leaf output left  = -11 / 2 = {outL:.2f}")
+print(f"leaf output right = 3 / 4   = {outR:.2f}")
+pred_small = base + alpha * outL
+pred_large = base + alpha * outR
+print(f"inference size=900  : 51 + {alpha}*{outL:.1f} = {pred_small:.1f}")
+print(f"inference size=1500 : 51 + {alpha}*{outR:.2f} = {pred_large:.2f}")
+res2 = y - np.where(size <= 1000, pred_small, pred_large)   # tree 2's residuals
+print("round-2 residuals:", res2)
+print("round-2 root similarity:", round(sim(res2, 1), 4), "(was 47.2 -> correction is working)")</pre><div class="nbout">leaf output left  = -11 / 2 = -5.50
+leaf output right = 3 / 4   = 2.75
+inference size=900  : 51 + 0.8*-5.5 = 46.6
+inference size=1500 : 51 + 0.8*2.75 = 53.20
+round-2 residuals: [-6.6  2.8  6.8 -5.2]
+round-2 root similarity: 24.936 (was 47.2 -> correction is working)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — the real library confirms the pipeline</div><pre>from xgboost import XGBRegressor
+m = XGBRegressor(n_estimators=2, max_depth=1, learning_rate=0.8, reg_lambda=1.0,
+                 base_score=51.0, objective='reg:squarederror', random_state=42)
+m.fit(size.reshape(-1, 1), y)
+print("XGBRegressor preds for sizes [900, 1500]:", np.round(m.predict(np.array([[900.], [1500.]])), 2),
+      "<- hand math said 46.6 / 53.2 (same direction)")</pre><div class="nbout">XGBRegressor preds for sizes [900, 1500]: [43.96 54.08] <- hand math said 46.6 / 53.2 (same direction)</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>The regressor twin of the classifier: same sequential logic, but the base model and leaf values are <b>averages</b> instead of probabilities.</p>
+<ul>
+<li><b>Base model:</b> the <b>MEAN of all targets</b>. Video example: house sizes 50–120 with prices around 51k → every row's first prediction = 51 (thousand), residual = y − 51.</li>
+<li><b>Tree building:</b> try a split (e.g., size ≤ 2.5), compute similarity per side, keep the split with the higher gain.</li>
+</ul>
+<div class="formula">Similarity = Σ residuals² / (n + λ) &nbsp;&nbsp;·&nbsp;&nbsp; Gain = sim(left) + sim(right) − sim(root) &nbsp;&nbsp;·&nbsp;&nbsp; Leaf value = mean residual of the leaf</div>
+<ul>
+<li><b>Similarity worked numbers:</b> with λ = 0, a single-residual leaf (residual 11) scores <b>121</b>; with λ = 1 it becomes <b>60.5</b>; other leaves gave <b>28.8</b> and a root of ≈ <b>1/6</b> — purer groups score higher, and bigger λ shrinks them.</li>
+<li><b>Gain decides:</b> split on size ≤ 2.5 gave gain ≈ <b>89</b>; a competing split gave ≈ <b>243.58</b> → the higher-gain split is kept.</li>
+<li><b>Inference:</b> prediction = <b>base mean + α × leaf average residual</b> — e.g., 51k + (−10) or 51k + 7. Then the NEXT tree is built on the fresh residuals; repeat sequentially.</li>
+<li><b>Same tuning story:</b> λ (regularization) and α (learning rate) via cross-validation; XGBoost remains a <b>black box</b> relative to linear models — control it with regularization, pre-pruning and CV.</li>
+<li>💡 <b>Interview angle:</b> be ready to contrast the classifier (base 0.5, sigmoid, log-odds) with the regressor (base mean, direct additive leaves). The shared skeleton — residuals → similarity → gain → sequential correction — is what proves you actually understand gradient boosting, not just the import statement.</li>
+</ul>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Your Adani <b>demand forecasts</b> and any tree-model regression you've done map directly here — the video's house-price framing is a demand/price problem.</li>
+<li>The churn model's XGBoost is this regressor's sibling: in interviews, contrasting classifier vs regressor internals is an easy way to look senior.</li>
+<li>Sequential correction of a baseline = your reco engine's design pattern (baseline popularity → hybrid corrections, +100.8% lift).</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'XGBoost Regressor\u2019s base model predicts…',options:['0.5 for every row','The MEAN of all target values','The median class','Zero'],a:1,expl:'For continuous targets the blind start is the mean (video example: 51k); residuals are computed from it.'},
+{q:'The similarity score for regression is…',options:['Σ residuals² / (n + λ)','Σ p(1−p) × λ','mean residual × n','sigmoid(residuals)'],a:0,expl:'Same shape as the classifier but with n (count) instead of p(1−p) — λ regularizes.'},
+{q:'With λ = 0, a leaf holding a single point with residual 11 has similarity…',options:['121','11','60.5','28.8'],a:0,expl:'11² / (1 + 0) = 121 — with λ = 0 the denominator is just n = 1. The video first shows λ = 0, then λ = 1 to demonstrate shrinkage (121 → 60.5).'},
+{q:'A gain of 89 for one split vs 243.58 for another means…',options:['Keep the 89 split — smaller is safer','Keep the 243.58 split — higher gain = better separation','Neither; XGBoost picks randomly','Both splits are invalid'],a:1,expl:'Gain = how much purity improves; XGBoost always keeps the higher-gain split.'},
+{q:'The output value stored in a regression leaf is…',options:['The mean residual of its samples','The max target','The similarity score','Always zero'],a:0,expl:'Leaves hold the average residual; inference adds α × that to the base mean.'},
+{q:'Final prediction for a house = …',options:['base mean + α × leaf average residual','base mean only','leaf similarity + residual','α × λ'],a:0,expl:'Video example: 51k + (−10) or +7 — sequential corrections, damped by the learning rate α.'},
+{q:'What happens after the first tree is built?',options:['Training stops','A new tree is built on the UPDATED residuals, sequentially','All trees are built in parallel','The residuals are deleted'],a:1,expl:'Boosting = sequential: each tree attacks what the previous ones still got wrong.'},
+{q:'λ in the similarity formula makes leaves smaller when…',options:['λ increases — a regularization effect','λ decreases to 0','n increases','Targets are integers'],a:0,expl:'Bigger λ → smaller similarity → smaller, more conservative leaf corrections (anti-overfit).'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_25',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

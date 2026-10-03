@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hierarchical Clustering — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=18688" target="_blank">▶ Watch this section</a></div>
+<h1>Hierarchical Clustering</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 05:11:28 · approx 6.3 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_19"><b>Hierarchical Clustering — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against each before the quiz:</p>
+<div class="missing"><b class="no">① Confusing dendrogram HEIGHT with a data value.</b><br>The height of a join is the merge DISTANCE between the two clusters — it is not a spend value, not a coordinate, not a count.</div>
+<div class="missing"><b class="no">② Comparing points when you should compare clusters.</b><br>After the first merge, the algorithm compares CLUSTERS. With single linkage that means the MINIMUM distance between any member of each — skip the matrix update and every later merge is wrong.</div>
+<div class="missing"><b class="no">③ Assuming K must be chosen in advance.</b><br>That is k-means' requirement. Hierarchical clustering's headline advantage is reading K off the dendrogram — no pre-chosen K.</div>
+<div class="missing"><b class="no">④ Miscounting clusters after the cut.</b><br>The number of clusters = the number of vertical lines the horizontal cut CROSSES — not the leaves, not the merges.</div>
+<div class="missing"><b class="no">⑤ Running it on raw, unscaled features.</b><br>One wide-range feature dominates every distance in the matrix and the whole tree is garbage. Standardize first.</div>
+<div class="missing"><b class="no">⑥ Treating merges as reversible.</b><br>Agglomerative merging is greedy: an early bad merge is locked in forever — one reason large, noisy datasets prefer k-means (topic 18).</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — 5 customers, merged by hand into campaign tiers</h2>
+<div class="card">
+<p><b>Business problem:</b> A small CRM export: 5 customers scored on spend and visit frequency (standardized, 1-10 scale — that is why the numbers look small). Nobody knows how many tiers exist. Agglomerative clustering + a dendrogram reading decides it — no pre-chosen K.</p>
+<table>
+<tr><th>Customer</th><th>Spend score</th><th>Frequency score</th></tr>
+<tr><td>P1</td><td>1</td><td>1.0</td></tr>
+<tr><td>P2</td><td>2</td><td>1.5</td></tr>
+<tr><td>P3</td><td>4</td><td>2.0</td></tr>
+<tr><td>P4</td><td>7</td><td>5.0</td></tr>
+<tr><td>P5</td><td>8</td><td>5.0</td></tr>
+</table>
+<p><b>Step 1 — every point is its own cluster</b> (5 points → 5 clusters). Compute the full distance matrix (Euclidean):</p>
+<table>
+<tr><th></th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr>
+<tr><td><b>P1</b></td><td>.</td><td>1.1180</td><td>3.1623</td><td>7.2111</td><td>8.0623</td></tr>
+<tr><td><b>P2</b></td><td>1.1180</td><td>.</td><td>2.0616</td><td>6.1033</td><td>6.9462</td></tr>
+<tr><td><b>P3</b></td><td>3.1623</td><td>2.0616</td><td>.</td><td>4.2426</td><td>5.0000</td></tr>
+<tr><td><b>P4</b></td><td>7.2111</td><td>6.1033</td><td>4.2426</td><td>.</td><td>1.0000</td></tr>
+<tr><td><b>P5</b></td><td>8.0623</td><td>6.9462</td><td>5.0000</td><td>1.0000</td><td>.</td></tr>
+</table>
+<p><b>Step 2 — merge 1: the two closest are P4 and P5 at 1.0000</b> → cluster {P4,P5}. Now update the matrix with <b>single linkage</b> — distance between clusters = MIN distance between any pair of members:</p>
+<div class="formula">d(P1,{P4,P5}) = min(7.2111, 8.0623) = <b>7.2111</b> &nbsp;·&nbsp; d(P2,{P4,P5}) = min(6.1033, 6.9462) = <b>6.1033</b> &nbsp;·&nbsp; d(P3,{P4,P5}) = min(4.2426, 5.0000) = <b>4.2426</b></div>
+<p><b>Step 3 — merge 2: next closest is P1-P2 at 1.1180</b> → {P1,P2}. Update again:</p>
+<div class="formula">d({P1,P2},P3) = min(3.1623, 2.0616) = <b>2.0616</b> &nbsp;·&nbsp; d({P1,P2},{P4,P5}) = min(7.2111, 6.1033) = <b>6.1033</b> &nbsp;·&nbsp; d(P3,{P4,P5}) = 4.2426 (unchanged)</div>
+<p><b>Step 4 — merge 3: closest is {P1,P2}+P3 at 2.0616</b> → {P1,P2,P3}. One pair remains:</p>
+<div class="formula">d({P1,P2,P3},{P4,P5}) = min(6.1033, 4.2426) = <b>4.2426</b> ← the final merge height</div>
+<p><b>Step 5 — merge 4 (final): everything joins at 4.2426.</b> The full merge history — the dendrogram — has heights <b>1.0000 → 1.1180 → 2.0616 → 4.2426</b>.</p>
+<p><b>Step 6 — read the dendrogram:</b> the longest vertical stretch no horizontal line crosses is between 2.0616 and 4.2426 (a jump of 2.18, the biggest in the tree). Cut through it → the cut crosses <b>2 vertical lines → 2 clusters</b>: {P1,P2,P3} and {P4,P5}.</p>
+<p><b>Business reading:</b> {P4,P5}, centroid (7.5, 5.0) = premium loyalists → <b>VIP retention campaign</b>. {P1,P2,P3}, centroid (2.33, 1.5) = budget browsers → <b>win-back / discount campaign</b>. Want 3 tiers instead? Cut a little lower: {P1,P2}, {P3}, {P4,P5} — P3 emerges as the transitional mid-tier. One tree, several cuts, and the data — not a guess — picked the Ks.</p>
+<p>💡 <b>Interview angle:</b> '500 rows, unknown K — what do you run?' Agglomerative, then cut at the longest un-crossed vertical stretch. '1M rows?' K-means — hierarchical merging is too slow at scale.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same 5 customers, same hand merges — every output below is from a real run.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the data</div><pre>import numpy as np, pandas as pd
+df = pd.DataFrame({'spend':  [1, 2, 4, 7, 8],
+                   'visits': [1, 1.5, 2, 5, 5]}, index=['P1','P2','P3','P4','P5'])
+X = df.values
+df</pre><div class="nbout">    spend  visits
+P1      1     1.0
+P2      2     1.5
+P3      4     2.0
+P4      7     5.0
+P5      8     5.0</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — the initial distance matrix</div><pre>names = list(df.index)
+def dist(i, j): return float(np.hypot(*(X[i] - X[j])))
+print("--- initial distance matrix ---")
+print("       " + "  ".join(f"{n:&gt;6}" for n in names))
+for i, a in enumerate(names):
+    print(f"{a:&gt;5}  " + "  ".join("   .  " if i==j else f"{dist(i,j):6.4f}" for j in range(5)))</pre><div class="nbout">--- initial distance matrix ---
+           P1      P2      P3      P4      P5
+   P1     .    1.1180  3.1623  7.2111  8.0623
+   P2  1.1180     .    2.0616  6.1033  6.9462
+   P3  3.1623  2.0616     .    4.2426  5.0000
+   P4  7.2111  6.1033  4.2426     .    1.0000
+   P5  8.0623  6.9462  5.0000  1.0000     .  </div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — scipy single-linkage merges (heights match the hand run)</div><pre>from scipy.cluster.hierarchy import linkage, fcluster
+Z = linkage(X, method='single')
+print("scipy merge heights:", np.round(Z[:,2], 4))</pre><div class="nbout">scipy merge heights: [1.     1.118  2.0616 4.2426]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — cutting the tree: 2 tiers vs 3 tiers</div><pre>print("clusters if cut -&gt; k=2:", fcluster(Z, 2, criterion='maxclust'))
+print("clusters if cut -&gt; k=3:", fcluster(Z, 3, criterion='maxclust'))</pre><div class="nbout">clusters if cut -&gt; k=2: [2 2 2 1 1]
+clusters if cut -&gt; k=3: [2 2 3 1 1]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — name the segments (the k=2 cut)</div><pre>df['seg'] = fcluster(Z, 2, criterion='maxclust')
+for s, grp in df.groupby('seg'):
+    print(f"segment {s}: {list(grp.index)}  centroid = {np.round(grp[['spend','visits']].mean().values, 2)}")</pre><div class="nbout">segment 1: ['P4', 'P5']  centroid = [7.5 5. ]
+segment 2: ['P1', 'P2', 'P3']  centroid = [2.33 1.5 ]</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea: agglomerative = bottom-up</b>
+<p>This section covers <b>agglomerative</b> hierarchical clustering, which builds clusters <b>bottom-up</b>: <b>every point starts as its own cluster</b> (n points → n clusters), and the algorithm <b>repeatedly merges the two closest clusters</b>, one merge per round, until a single cluster remains. Each merge reduces the cluster count by exactly one — n becomes n-1, then n-2, and so on down to 1 — so the whole run is one long merge sequence.</p>
+<p>ELI10: nearby villages merge into towns, towns into cities, cities into one country — and every merger gets written down in the family tree.</p>
+<b>The dendrogram</b>
+<p>That family tree is the <b>dendrogram</b>: it records the full <b>merge history</b>. Each leaf is a single point; every <b>horizontal join</b> is one merge event, and its height shows how far apart the two merged clusters were. Short joins = obvious merges; tall joins = reluctant ones. Cut the same tree at different heights and you get different cluster counts from one run — one cut, one clustering. The dendrogram is the artifact hierarchical clustering gives you and K-means does not.</p>
+<b>Choosing the number of clusters (no pre-chosen K!)</b>
+<p>The headline advantage: <b>you do not need to pre-choose K</b>. Instead, scan the dendrogram for the <b>longest vertical line that no horizontal line crosses</b>, and pass a horizontal cut through it. The <b>number of vertical lines the cut crosses = the number of clusters</b>. Intuition: that long un-crossed stretch is the biggest jump in merge distance — everything merged below the cut is genuinely similar, while the branches joined above it are truly different groups.</p>
+<b>The cost: time</b>
+<p>Hierarchical clustering is <b>more time-consuming than K-means on large datasets</b> — the merging keeps comparing cluster pairs as data grows — so it is typically <b>used on smaller datasets</b>. On big data, K-means is the speed pick (topic 18).</p>
+<p>💡 Interview angle: <i>Why ever pick agglomerative over K-means?</i> Two reasons from this section: no need to pre-choose K, and the dendrogram hands you a whole family of clusterings you can cut at different levels. <i>The counterpoint?</i> Time — on large datasets K-means wins, which is exactly why big segmentation jobs use K-means.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>The honest footnote to my k-means resume line: on 100K+ profiles (MyOperator) I chose K-means for speed — and I can say exactly when I would switch: smaller data, unknown K, or a stakeholder who wants to SEE the cluster structure in a dendrogram.</li>
+<li>Reco engine work is label-light, and agglomerative clustering is the same unsupervised spirit — no labels, structure discovered by merging. I keep dendrogram-reading sharp as a quick sanity check for a plausible K before scaling up to K-means.</li>
+<li>Interview one-liner I keep ready: hierarchical buys me no-pre-K plus the dendrogram; K-means buys me time on large data.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [/* QUIZ_JSON */
+{q:'Agglomerative hierarchical clustering builds clusters in which direction?',options:['Top-down — one big cluster splits repeatedly','Bottom-up — every point starts as its own cluster and pairs merge','Left to right across the feature columns','Random restarts from many seeds'],a:1,expl:'Agglomerative means bottom-up: begin from n single-point clusters and repeatedly merge the two closest clusters.'},
+{q:'With n data points, how many clusters exist at the very start?',options:['1','K','log2(n)','n — one cluster per point'],a:3,expl:'Every point begins as its own cluster, so n points give n clusters; each merge reduces the count by one.'},
+{q:'What does a dendrogram record?',options:['The WCSS value for each K','The full history of which clusters merged and at what distances','The silhouette score of each point','The coordinates of the final centroids'],a:1,expl:'A dendrogram is the merge history drawn as a tree — each horizontal join is one merge, and its height shows how far apart the merged clusters were.'},
+{q:'To choose the number of clusters, where do you cut the dendrogram?',options:['Across the longest vertical line that no horizontal line crosses','Across the tallest horizontal line','At the root, always leaving one cluster','Wherever the leaf count equals ten'],a:0,expl:'Find the longest vertical line with no horizontal line crossing it and cut there — that un-crossed stretch marks the most natural separation.'},
+{q:'After making that cut, the number of clusters equals…',options:['The number of leaves minus one','The height of the tallest merge','The number of vertical lines the cut crosses','The number of horizontal lines in the whole tree'],a:2,expl:'Count the vertical lines crossed by the horizontal cut — that count is your number of clusters.'},
+{q:'What is the headline advantage of hierarchical clustering over K-means?',options:['It always runs faster','It needs no distance measure','It handles unlimited data sizes','You do not need to pre-choose the number of clusters'],a:3,expl:'K-means demands K up front; the dendrogram lets hierarchical clustering reveal a natural K instead.'},
+{q:'Why is hierarchical clustering typically used on smaller datasets?',options:['It is more time-consuming than K-means on big data','It cannot compute distances on big data','It requires labels, which big data lacks','The dendrogram turns into a circle'],a:0,expl:'The merging gets expensive as data grows, so K-means is preferred for speed on large datasets.'},
+{q:'Interview: 500 rows to segment, and nobody knows K. What do you propose?',options:['Insist on K-means with K=10','Collect labels first — clustering is impossible without them','Try agglomerative clustering and read K off the dendrogram — small data is exactly its use case','Refuse — hierarchical clustering has no way to choose K'],a:2,expl:'Small data plus unknown K is the sweet spot for hierarchical clustering: no pre-chosen K, and the dendrogram justifies the cut.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_19',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

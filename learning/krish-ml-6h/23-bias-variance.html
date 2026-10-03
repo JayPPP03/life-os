@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bias And Variance — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=20664" target="_blank">▶ Watch this section</a></div>
+<h1>Bias And Variance</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 05:43:44 · approx 8.5 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_23"><b>Bias &amp; Variance — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p>Common learner gaps in this topic — make sure YOUR notes above end up covering all six.</p>
+<div class="missing"><b class="no">① Reciting "bias = underfit, variance = overfit" without the definitions.</b><br>Bias = error on the TRAINING data (can't even fit the pattern); variance = how much performance swings when the data changes (memorized noise that doesn't transfer). Two independent axes, not two names for one thing.</div>
+<div class="missing"><b class="no">② "Underfit = high bias + LOW variance."</b><br>The video's frame says underfit fails BOTH: train 60 / test 55. It can't fit the train pattern AND it doesn't transfer.</div>
+<div class="missing"><b class="no">③ Believing training accuracy can detect overfitting.</b><br>It can't. Below, degree 3 AND degree 9 both hit train MSE ≈ 0 — only held-out data exposes the memorizer. Exactly why your reco tuning touched test once, at the end.</div>
+<div class="missing"><b class="no">④ "A more complex model is always better."</b><br>Extra capacity fits the NOISE too — the degree-9 blow-up below (test MSE 147,735) is the invoice for that.</div>
+<div class="missing"><b class="no">⑤ Vague on the actual levers.</b><br>Overfit → regularize (Ridge/Lasso/λ), simplify/prune, get more data. Underfit → richer features/model, train longer. Name the diagnosis, then name the knob — in that order.</div>
+<div class="missing"><b class="no">⑥ Not connecting it to your own stack.</b><br>Your reco engine's validation-only tuning (reg_all and α grids, test touched once) IS the bias-variance framework in practice — that's the interview story to tell.</div>
+</div>
+
+<h2>🧮 Worked Mini-Project — discount depth → weekly sales lift: which model do you ship?</h2>
+<div class="card">
+<p><b>Business problem:</b> a retail chain ran 6 promotions at increasing discount depths and recorded the weekly sales lift (₹ lakh). A straight line probably can't capture how discounts really work — so: degree 1 (line), 3 (curve) or 9 (anything goes)? Train on 4 points, hold 2 out. Every number below comes from a real run — the Python Lab reproduces all of it.</p>
+<table>
+<tr><th>x = discount %</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+<tr><td>y = lift (₹L)</td><td>3.9</td><td>2.1</td><td>2.0</td><td>4.1</td><td>7.8</td><td>14.3</td></tr>
+</table>
+<p>Train on x = 0, 1, 3, 5 · test (never touched while fitting) on x = 2, 4.</p>
+<div class="formula">degree 1: train MSE 6.73 · test MSE 8.34    → UNDERFIT    (video: train 60 / test 55)<br>degree 3: train MSE 0.00 · test MSE 0.06    → GENERALIZED (video: train 90 / test 92)<br>degree 9: train MSE 0.00 · test MSE 147,735 → OVERFIT     (video: train 90 / test 75)</div>
+<p><b>Read it against the 2×2 grid:</b></p>
+<ul>
+<li><b>degree 1 = high bias + high variance:</b> a straight line can't bend — test predictions 5.57 and 9.78 vs actual 2.0 and 7.8. Fails train AND test.</li>
+<li><b>degree 3 = low bias + low variance:</b> test predictions 2.13 and 8.12 vs actual 2.0 and 7.8 — misses of 0.13 and 0.32. Ship this one.</li>
+<li><b>degree 9 = low bias + high variance:</b> 10 free parameters memorize 4 points (train MSE 0.0000), then predict <b>551</b> at x = 4 where reality is 7.8. Textbook overfit.</li>
+</ul>
+<div class="formula">Fix UNDERFIT (degree 1): more capacity → degree 3. &nbsp;&nbsp; Fix OVERFIT (degree 9): regularize / simplify / more data.<br>Proof the overfit fix works: degree 9 + standardize + Ridge(α=0.01) → test MSE 0.11, down from 147,735.</div>
+<p>💡 <b>Interview angle:</b> "Train accuracy alone can't catch overfitting — degree 3 and degree 9 both scored 0 on train; only held-out data separates them." That sentence + your validation-only tuning story = senior signal.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
+<div class="card">
+<p class="mini">Same 6 points, same splits, every output pasted from a real run. Paste each cell into a notebook and compare.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the data and the split</div><pre>import numpy as np
+x = np.array([0., 1., 2., 3., 4., 5.])
+y = np.array([3.9, 2.1, 2.0, 4.1, 7.8, 14.3])   # discount % -> lift (Rs lakh)
+train = [0, 1, 3, 5]; test = [2, 4]
+print("train x:", x[train], " train y:", y[train])
+print("test  x:", x[test], " test  y:", y[test])</pre><div class="nbout">train x: [0. 1. 3. 5.]  train y: [ 3.9  2.1  4.1 14.3]
+test  x: [2. 4.]  test  y: [2.  7.8]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — fit degrees 1, 3, 9 and score both sets</div><pre>from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import mean_squared_error
+
+results = {}
+for d in [1, 3, 9]:
+    pf = PolynomialFeatures(degree=d)
+    Xtr = pf.fit_transform(x[train].reshape(-1, 1))
+    Xte = pf.transform(x[test].reshape(-1, 1))
+    m = LinearRegression().fit(Xtr, y[train])
+    results[d] = (mean_squared_error(y[train], m.predict(Xtr)),
+                  mean_squared_error(y[test],  m.predict(Xte)),
+                  np.round(m.predict(Xte), 2))
+for d, (tr, te, preds) in results.items():
+    print(f"degree {d}: train MSE = {tr:.4f}   test MSE = {te:.2f}   test preds {preds}")</pre><div class="nbout">degree 1: train MSE = 6.7319   test MSE = 8.34   test preds [5.57 9.78]
+degree 3: train MSE = 0.0000   test MSE = 0.06   test preds [2.13 8.12]
+degree 9: train MSE = 0.0000   test MSE = 147735.52   test preds [-17.81 551.01]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — map each row onto the video's 2x2 grid</div><pre>verdict = {1: "UNDERFIT    high bias + high variance (video: train 60 / test 55)",
+           3: "GENERALIZED low bias  + low variance  (video: train 90 / test 92)",
+           9: "OVERFIT     low bias  + high variance (video: train 90 / test 75)"}
+for d, (tr, te, _) in results.items():
+    print(f"degree {d}: train {tr:.2f} | test {te:.2f} -> {verdict[d]}")</pre><div class="nbout">degree 1: train 6.73 | test 8.34 -> UNDERFIT    high bias + high variance (video: train 60 / test 55)
+degree 3: train 0.00 | test 0.06 -> GENERALIZED low bias  + low variance  (video: train 90 / test 92)
+degree 9: train 0.00 | test 147735.52 -> OVERFIT     low bias  + high variance (video: train 90 / test 75)</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — the overfit fix: regularize the degree-9 model</div><pre>from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+pf9 = PolynomialFeatures(degree=9)
+Xtr9 = pf9.fit_transform(x[train].reshape(-1, 1))
+Xte9 = pf9.transform(x[test].reshape(-1, 1))
+for a in [0.01, 0.1, 1.0]:
+    pipe = make_pipeline(StandardScaler(), Ridge(alpha=a)).fit(Xtr9, y[train])
+    tr = mean_squared_error(y[train], pipe.predict(Xtr9))
+    te = mean_squared_error(y[test],  pipe.predict(Xte9))
+    print(f"degree 9 + scaler + Ridge(alpha={a}): train MSE = {tr:.4f}   test MSE = {te:.2f}")</pre><div class="nbout">degree 9 + scaler + Ridge(alpha=0.01): train MSE = 0.0356   test MSE = 0.11
+degree 9 + scaler + Ridge(alpha=0.1): train MSE = 0.2677   test MSE = 1.02
+degree 9 + scaler + Ridge(alpha=1.0): train MSE = 0.4551   test MSE = 1.64</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — ship the generalized model and answer the business question</div><pre>best = LinearRegression().fit(PolynomialFeatures(3).fit_transform(x[train].reshape(-1, 1)), y[train])
+lift25 = best.predict(PolynomialFeatures(3).fit_transform(np.array([[2.5]])))[0]
+print(f"shipped model (degree 3): predicted lift at 2.5% discount = {lift25:.2f} Rs lakh")</pre><div class="nbout">shipped model (degree 3): predicted lift at 2.5% discount = 2.87 Rs lakh</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<p>The single most-asked concept question in ML interviews, defined the video's way:</p>
+<ul>
+<li><b>Bias</b> = error from how well the model fits the TRAINING data. Fits train well → <b>low bias</b>; fails on train → <b>high bias</b>.</li>
+<li><b>Variance</b> = how much the model's performance CHANGES when the data changes. Performs well on TEST/new data → <b>low variance</b>; collapses on test → <b>high variance</b>.</li>
+</ul>
+<div class="formula">UNDERFIT  = high bias + high variance  (train 60 / test 55)
+OVERFIT   = low bias  + high variance  (train 90 / test 75)
+GENERALIZED = low bias + low variance  (train 90 / test 92)</div>
+<ul>
+<li><b>Model-behavior examples from the video:</b> a model scoring train 90 / test 75 memorized the training data → overfit. Train 60 / test 55 is too simple → underfit. Train 90 / test 92 is the target — generalized.</li>
+<li><b>How this drives decisions:</b> overfit → simplify the model, regularize (Ridge/Lasso, λ), get more data, prune; underfit → richer model/features, train longer.</li>
+<li><b>Deep-learning footnote:</b> neural-network cost surfaces DO contain local minima — that's why optimizers like <b>Adam and RMSprop</b> exist there; linear regression's convex parabola has a single global minimum.</li>
+<li>💡 <b>Interview angle:</b> be ready to classify a model from two scores (train/test) in one breath, and to say WHICH lever you'd pull: 'train 95/test 70 → overfit → I'd regularize and validate properly, exactly like my recommender's validation-only tuning.'</li>
+</ul>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>Your reco engine is an anti-overfit machine by design: hyperparameters (SVD reg_all, α) tuned on VALIDATION only, test touched once — you actively engineered the low-bias/low-variance zone.</li>
+<li>The regularization you used (reg_all = {0.05, 0.1} in the SVD) is literally the bias-variance trade-off knob: more regularization = more bias, less variance.</li>
+<li>Your churn model's +18% precision QoQ came from retraining — the retraining pipeline exists because variance drifts as data changes.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = [
+{q:'Bias measures error with respect to…',options:['The test set only','How well the model fits the TRAINING data','The number of features','The size of the hard disk'],a:1,expl:'Fails on train = high bias; fits train well = low bias.'},
+{q:'Variance measures…',options:['How much performance changes on different (test/new) data','Training speed','The model file size','The bias of the dataset'],a:1,expl:'Good on test = low variance; collapses on new data = high variance.'},
+{q:'A model scoring train 90 / test 75 is…',options:['Generalized','Underfit','Overfit — low bias, high variance','Perfect'],a:2,expl:'Strong on train, weak on test = memorization: the classic overfit signature.'},
+{q:'A model scoring train 60 / test 55 is…',options:['Overfit','Generalized','Underfit — high bias, high variance','Impossible'],a:2,expl:'Fails even on training data: too simple, high bias; and it doesn\u2019t transfer either.'},
+{q:'The GOAL state in the bias-variance framework is…',options:['High bias + high variance','Low bias + low variance = generalized','Low bias + high variance','High bias + low variance'],a:1,expl:'Like the video\u2019s 90/92 example: fits train well AND transfers — that\u2019s a generalized model.'},
+{q:'Your model is overfit. The most on-brand fixes are…',options:['Add more features, train longer','Regularize (Ridge/Lasso/λ), simplify/prune, get more data','Remove the test set','Lower the training accuracy'],a:1,expl:'Overfit = low bias + high variance → pull variance down: regularization, pruning, more data.'},
+{q:'In your reco engine, which design choice directly guards the variance side?',options:['Tuning SVD reg_all and α on VALIDATION only, touching test once','Training on the test set','Using the largest possible n_factors','Never evaluating'],a:1,expl:'Validation-only tuning + a regularization grid = engineered protection against overfitting.'},
+{q:'Why do deep learning practitioners use Adam or RMSprop?',options:['To create local minima','Neural cost surfaces have local minima — these optimizers navigate them better','To increase bias','They replace the dataset'],a:1,expl:'Unlike linear regression\u2019s convex parabola, NN surfaces are non-convex; smarter optimizers handle that.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_23',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

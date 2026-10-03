@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linear Regression Practical Implementation — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=8032" target="_blank">▶ Watch this section</a></div>
+<h1>Linear Regression Practical Implementation</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 02:13:52 · approx 15 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_8"><b>Linear regression practical — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>
+<ul>
+<li><b>Panicking at the minus sign.</b> scikit-learn maximizes scores, so loss metrics arrive negated in <code>neg_mean_squared_error</code> output. Flip the sign — there is no bug.</li>
+<li><b>Thinking cv=5 builds five different models.</b> It is the SAME estimator refit 5 times, each fold taking one turn as the test set; the 5 scores are averaged into one honest number.</li>
+<li><b>Trusting one lucky train/test split.</b> A single split (or a single fold's score) can fool you — quote the CV average, like the video's −37.1 mean.</li>
+<li><b>Slicing X/y backwards.</b> X = every column except the last (features), y = only the last (Price). Swap them and the model 'predicts features from price'.</li>
+<li><b>Reporting a bare MSE without units.</b> An MSE of 12.13 means nothing until translated: RMSE ≈ 3.5 → 'we miss house prices by ≈ ₹3.5 lakh on average'.</li>
+<li><b>Calling load_boston in modern scikit-learn.</b> It was removed over ethical concerns — knowing this (and the alternatives) signals you keep up with the libraries on your resume.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Mini-Boston: pricing a 5-house colony with 5-fold CV</h2>
+<div class="card">
+<p><b>Business problem:</b> a housing team wants an automated price estimate. The video's Boston flow — load → X/y → fit → <code>cross_val_score(neg_mean_squared_error, cv=5)</code> → predict — shrunk onto 5 synthetic houses:</p>
+<table>
+<tr><th>House</th><th>rooms</th><th>age_years</th><th>price_lakh y</th></tr>
+<tr><td>H1</td><td>3</td><td>40</td><td>50</td></tr>
+<tr><td>H2</td><td>4</td><td>25</td><td>65</td></tr>
+<tr><td>H3</td><td>5</td><td>15</td><td>85</td></tr>
+<tr><td>H4</td><td>6</td><td>10</td><td>100</td></tr>
+<tr><td>H5</td><td>7</td><td>5</td><td>120</td></tr>
+</table>
+<p><b>Step 1 — slice like the video:</b> <code>X = df.iloc[:,:-1]</code> (rooms, age), <code>y = df.iloc[:,-1]</code> (price).</p>
+<p><b>Step 2 — fit:</b></p>
+<div class="formula">price = 18.8421·rooms + 0.1579·age − 13.2105 &nbsp;(full-data R² = 0.9979)</div>
+<p>Honesty note: age's tiny <b>positive</b> sign makes no business sense (older houses pricier?) — with 5 rows and rooms/age moving together, individual coefficients get shaky. Judge the model by CV error, not coefficient signs.</p>
+<p><b>Step 3 — cross_val_score, cv=5 (real run):</b></p>
+<div class="formula">fold scores: [−34.03, −3.78, −12.41, −4.18, −6.25] &nbsp;→&nbsp; mean = <b>−12.13</b></div>
+<p>Why is fold 1 so terrible? With 5 rows, each fold holds out exactly <b>one house</b> — predicting the 3-room H1 from the other four means extrapolating below the training range. Tiny data → wild folds → <b>this is exactly why we average 5 of them</b> instead of trusting one split.</p>
+<p><b>Step 4 — decode the negative sign:</b> sklearn maximizes scores, so errors come negated. −12.13 means MSE = <b>12.13</b>, so RMSE = √12.13 ≈ <b>₹3.48 lakh</b> — 'we miss prices by about ₹3.5L on average'.</p>
+<p><b>Step 5 — predict a new house</b> (5 rooms, 12 years): 18.8421×5 + 0.1579×12 − 13.2105 = <b>₹82.89 lakh</b>.</p>
+<p>💡 <b>Quote it like the video:</b> 'Five-fold CV with neg_mean_squared_error gave a mean of −12.13, so MSE ≈ 12.13, RMSE ≈ ₹3.5 lakh.' One sentence, fully defensible.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the tiny colony (mini load_boston)</div><pre>import pandas as pd, numpy as np
+df = pd.DataFrame({'rooms':      [3, 4, 5, 6, 7],
+                   'age_years':  [40, 25, 15, 10, 5],
+                   'price_lakh': [50, 65, 85, 100, 120]})
+df</pre><div class="nbout">   rooms  age_years  price_lakh
+0      3         40          50
+1      4         25          65
+2      5         15          85
+3      6         10         100
+4      7          5         120</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — X/y slice and fit, exactly like the video</div><pre>from sklearn.linear_model import LinearRegression
+X, y = df.iloc[:, :-1], df.iloc[:, -1]
+model = LinearRegression().fit(X, y)
+print(dict(zip(X.columns, [round(float(c), 2) for c in model.coef_])),
+      'b0 =', round(float(model.intercept_), 2))
+print('full-data R2 =', round(model.score(X, y), 4))</pre><div class="nbout">{'rooms': 18.84, 'age_years': 0.16} b0 = -13.21
+full-data R2 = 0.9979</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — cross_val_score with neg_mean_squared_error, cv=5</div><pre>from sklearn.model_selection import cross_val_score
+scores = cross_val_score(model, X, y, scoring='neg_mean_squared_error', cv=5)
+print(scores.round(3))
+print('mean:', scores.mean().round(4), ' -> MSE:', (-scores.mean()).round(4))</pre><div class="nbout">[-34.028  -3.781 -12.41   -4.184  -6.25 ]
+mean: -12.1304  -> MSE: 12.1304</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — why folds swing: each fold holds out ONE house</div><pre>from sklearn.model_selection import KFold
+for i, (_, te) in enumerate(KFold(n_splits=5).split(X), 1):
+    print(f"fold {i}: test house row(s) = {[int(t) for t in te]}")</pre><div class="nbout">fold 1: test house row(s) = [0]
+fold 2: test house row(s) = [1]
+fold 3: test house row(s) = [2]
+fold 4: test house row(s) = [3]
+fold 5: test house row(s) = [4]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — RMSE and a prediction for a new house</div><pre>print('RMSE =', np.sqrt(-scores.mean()).round(2), 'lakh')
+new_house = pd.DataFrame({'rooms': [5], 'age_years': [12]})
+print('predicted price =', model.predict(new_house).round(2), 'lakh')</pre><div class="nbout">RMSE = 3.48 lakh
+predicted price = [82.89] lakh</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The dataset: Boston housing</b>
+<div class="formula">from sklearn.datasets import load_boston
+data = load_boston()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['Price'] = data.target</div>
+<ul>
+<li>13 numeric features (rooms, crime rate, age, ...) and one target column: house <b>Price</b>. Every row is one observation; the goal is to predict the price from the 13 features.</li>
+</ul>
+<b>Features and target</b>
+<div class="formula">X = df.iloc[:,:-1]        y = df.iloc[:,-1]</div>
+<ul>
+<li>X takes every column except the last; y takes just the Price column.</li>
+</ul>
+<b>Train + cross-validate in one move</b>
+<div class="formula">from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+scores = cross_val_score(model, X, y,
+                         scoring='neg_mean_squared_error', cv=5)
+np.mean(scores) ≈ −37.1</div>
+<ul>
+<li><b>cv = 5</b> splits the data into 5 folds. The model is trained and evaluated <b>5 separate times</b>, each fold taking one turn as the test set, and the 5 scores get averaged. cv = 5 → 5 fits, 5 scores, 1 average.</li>
+<li>Concretely: fold 1 is the test set while folds 2–5 train; then fold 2 takes its turn, and so on until every fold has been the test set exactly once.</li>
+<li>Why bother? <b>One lucky train/test split can fool you.</b> Averaging 5 folds makes the estimate honest — you quote one stable number instead of five swinging ones.</li>
+<li>The scores come out negative because scikit-learn <b>maximizes</b> scores, so error metrics are handed over negated. Flip the sign: <b>MSE ≈ 37.13</b>.</li>
+</ul>
+<b>Predict on new data</b>
+<div class="formula">model.predict(new_data)   →   predicted prices</div>
+<ul><li>Fit the model, hand it new feature rows, get price predictions back.</li></ul>
+<b>Quote it like this</b>
+<p>Five-fold CV with neg_mean_squared_error on Boston gave a mean of −37.1, so plain linear regression lands at MSE ≈ 37.13. One sentence, fully defensible.</p>
+<b>ELI10</b>
+<p>Cross-validation is five practice exams instead of one — a single lucky paper cannot hide weak prep.</p>
+<p>💡 <b>Interview nugget:</b> <code>load_boston</code> was later <b>removed from scikit-learn</b> over ethical concerns — modern code uses alternative datasets. Mentioning this signals you actually keep up with the libraries on your resume.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li><b>Honest metrics:</b> my Adani demand forecasts are judged on error averaged across validation folds — the same discipline as cross_val_score(cv=5) behind the ~20% planning-accuracy lift I claim.</li>
+<li><b>Library currency:</b> I can drop the load_boston removal nugget (ethical concerns, modern alternatives) in an interview to show I keep up with scikit-learn.</li>
+<li><b>Clean slicing:</b> same iloc-style X/y separation — features and target never get a chance to leak into each other.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'Which loader brings in the dataset for this practical?',options:['load_boston() from sklearn.datasets','pd.read_csv(boston.csv)','load_diabetes()','fetch_california_housing()'],a:0,expl:'The video uses sklearn.datasets.load_boston, then builds the table with pd.DataFrame(data.data, columns=data.feature_names) and adds df[&#39;Price&#39;] = data.target.'},
+{q:'How are X and y sliced from the DataFrame?',options:['X = df.iloc[:,:-1] (all but the last column), y = df.iloc[:,-1] (the Price column)','X = all columns, y = all rows','X = df.iloc[:,-1], y = df.iloc[:,:-1] — accidentally swapped','Both come from data.feature_names'],a:0,expl:'Features are every column except the last; the target is the last column, Price.'},
+{q:'Why use cross_val_score with cv=5 instead of a single train_test_split?',options:['It trains 5 different algorithms and picks one','It averages 5 different train/test folds, so one lucky split cannot fool you','It creates 5x more training data','It automatically removes outliers'],a:1,expl:'Five folds means five different train/test evaluations averaged — no single lucky split can inflate your score.'},
+{q:'The mean CV score is −37.1. What MSE does that correspond to?',options:['≈ 37.13','≈ −37.13','≈ 1376 (which is 37.1 squared)','≈ 0.371'],a:0,expl:'scikit-learn negates error metrics because it maximizes scores, so the MSE is the magnitude: ≈ 37.13.'},
+{q:'With cv=5, how many times does cross_val_score fit the model?',options:['Once, on all the data','5 times — one fit per fold','10 times','25 times'],a:1,expl:'Each of the 5 folds takes one turn as the test set, so the model is fit 5 times and the 5 scores are averaged.'},
+{q:'Why is the scoring string neg_mean_squared_error rather than mean_squared_error?',options:['Because MSE is negative by definition','scikit-learn maximizes scores, so loss metrics are handed over negated','A legacy typo kept for compatibility','To keep the score positive'],a:1,expl:'The negation is a scikit-learn convention: all scorers follow a higher-is-better contract, so errors come out negative.'},
+{q:'Interview nugget: what happened to load_boston?',options:['Nothing — it is still the default regression dataset','It was renamed to load_boston_v2','It was removed from scikit-learn over ethical concerns; modern code uses alternative datasets','It moved into the statsmodels library'],a:2,expl:'The dataset was pulled from scikit-learn for ethical reasons. Knowing this signals you keep up with the libraries on your resume.'},
+{q:'The model is trained. Which call produces price predictions for new data?',options:['model.score(new_data)','model.predict(new_data)','model.fit(new_data)','cross_val_score(new_data)'],a:1,expl:'predict() runs the fitted model on new feature rows and returns the predicted prices.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_8',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

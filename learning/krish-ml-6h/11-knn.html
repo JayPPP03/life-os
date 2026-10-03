@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KNN Algorithm Intuition — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=12227" target="_blank">▶ Watch this section</a></div>
+<h1>KNN Algorithm Intuition</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 03:23:47 · approx 7 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_11"><b>KNN — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>
+<ul>
+<li><b>Skipping standardization.</b> Distance ADDS duration (minutes) to complaints (small counts) — the wider-range feature silently decides every neighbor. KNN is distance-based: always scale first.</li>
+<li><b>k=1 memorizes.</b> A single mislabeled or unusual neighbor flips the label (overfitting); k too large lets far-away, irrelevant points outvote the local neighborhood (over-smoothing).</li>
+<li><b>Ties with even k.</b> Binary classes + k=4 can vote 2-2 with no winner — prefer odd k, or define a tie-break rule.</li>
+<li><b>"It trains on the data" misconception.</b> KNN is a lazy learner: no training phase, all cost moves to prediction time — fine for 6 rows, a real scaling problem at 100K+ customers.</li>
+<li><b>Reading vote share as a true probability.</b> 2-of-3 neighbors is a crude confidence signal, and on imbalanced data the frequent class wins overlapping regions just by showing up more often.</li>
+<li><b>Mixing up the metrics.</b> Euclidean = straight line √(ΣΔ²), Manhattan = city block Σ|Δ| — and you should know which one your library uses by default.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — MyOperator churn alert: does customer G churn?</h2>
+<div class="card">
+<p><b>Business problem:</b> the retention team keeps 6 customers summarized by two numbers — avg call duration (min) and complaints per month — plus whether they churned. New customer <b>G</b> arrives with (duration 4, complaints 2). With k=3 nearest neighbors: churn risk or safe?</p>
+<table>
+<tr><th>Customer</th><th>Duration (min)</th><th>Complaints/mo</th><th>Churned?</th></tr>
+<tr><td>A</td><td>3</td><td>2</td><td>Yes</td></tr>
+<tr><td>B</td><td>6</td><td>1</td><td>No</td></tr>
+<tr><td>C</td><td>2</td><td>0</td><td>No</td></tr>
+<tr><td>D</td><td>7</td><td>3</td><td>Yes</td></tr>
+<tr><td>E</td><td>1</td><td>0</td><td>Yes</td></tr>
+<tr><td>F</td><td>9</td><td>3</td><td>No</td></tr>
+</table>
+<p><b>Step 1 — Euclidean distance from G(4,2) to every customer:</b> √(Δduration² + Δcomplaints²), each one worked:</p>
+<div class="formula">d(G,A) = √((4−3)² + (2−2)²) = √(1+0) &nbsp;= √1 &nbsp;= <b>1.000</b> &nbsp;(churned)<br>d(G,B) = √((4−6)² + (2−1)²) = √(4+1) &nbsp;= √5 &nbsp;≈ <b>2.236</b> &nbsp;(stayed)<br>d(G,C) = √((4−2)² + (2−0)²) = √(4+4) &nbsp;= √8 &nbsp;≈ <b>2.828</b> &nbsp;(stayed)<br>d(G,D) = √((4−7)² + (2−3)²) = √(9+1) &nbsp;= √10 ≈ <b>3.162</b> &nbsp;(churned)<br>d(G,E) = √((4−1)² + (2−0)²) = √(9+4) &nbsp;= √13 ≈ <b>3.606</b> &nbsp;(churned)<br>d(G,F) = √((4−9)² + (2−3)²) = √(25+1) = √26 ≈ <b>5.099</b> &nbsp;(stayed)</div>
+<p><b>Step 2 — sort by distance:</b> A 1.000 (Yes) → B 2.236 (No) → C 2.828 (No) → D 3.162 (Yes) → E 3.606 (Yes) → F 5.099 (No).</p>
+<p><b>Step 3 — k=3 majority vote:</b> neighbors {A: churned, B: stayed, C: stayed} → <b>2 stay vs 1 churn → predict STAY</b>. No retention call needed… yet.</p>
+<p><b>Step 4 — but watch what k does to the verdict:</b></p>
+<div class="formula">k=1 → {Yes} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ 1 Yes vs 0 No &nbsp;→ <b>CHURN</b><br>k=3 → {Yes, No, No} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ 2 No vs 1 Yes &nbsp;→ <b>STAY</b><br>k=5 → {Yes, No, No, Yes, Yes} → 3 Yes vs 2 No → <b>CHURN</b></div>
+<p>💡 <b>Business read:</b> G sits exactly on the churn boundary — the single most-similar customer churned, two close stayers outvote at k=3, and the wider neighborhood tips back to churn at k=5. That flip-flopping is exactly why the video says to sweep k and keep the one with the lowest validation error, never gut feel — and why G belongs in the "monitor closely" bucket, not the safe list. (On real MyOperator data you'd standardize both features first; here the two axes have similar ranges, so raw distances are fair.)</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 6 customers + new customer G</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'customer':   ['A', 'B', 'C', 'D', 'E', 'F'],
+    'duration':   [3, 6, 2, 7, 1, 9],
+    'complaints': [2, 1, 0, 3, 0, 3],
+    'churn':      ['Yes', 'No', 'No', 'Yes', 'Yes', 'No']})
+G = (4, 2)   # new customer: 4 min avg call, 2 complaints
+df</pre><div class="nbout">  customer  duration  complaints churn
+0        A         3           2   Yes
+1        B         6           1    No
+2        C         2           0    No
+3        D         7           3   Yes
+4        E         1           0   Yes
+5        F         9           3    No</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — Euclidean distance to every training point</div><pre>import math
+dists = []
+for _, r in df.iterrows():
+    d = math.sqrt((G[0] - r.duration)**2 + (G[1] - r.complaints)**2)
+    dists.append(d)
+    print(f"d(G,{r.customer}) = sqrt(({G[0]}-{r.duration})^2 + ({G[1]}-{r.complaints})^2) = {d:.3f}  [{r.churn}]")
+df['dist'] = dists</pre><div class="nbout">d(G,A) = sqrt((4-3)^2 + (2-2)^2) = 1.000  [Yes]
+d(G,B) = sqrt((4-6)^2 + (2-1)^2) = 2.236  [No]
+d(G,C) = sqrt((4-2)^2 + (2-0)^2) = 2.828  [No]
+d(G,D) = sqrt((4-7)^2 + (2-3)^2) = 3.162  [Yes]
+d(G,E) = sqrt((4-1)^2 + (2-0)^2) = 3.606  [Yes]
+d(G,F) = sqrt((4-9)^2 + (2-3)^2) = 5.099  [No]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — k=3: nearest three, majority vote</div><pre>nn = df.nsmallest(3, 'dist')
+print(nn[['customer', 'dist', 'churn']].to_string(index=False))
+votes = nn.churn.value_counts()
+print(votes)
+print("prediction:", votes.idxmax())</pre><div class="nbout">customer     dist churn
+       A 1.000000   Yes
+       B 2.236068    No
+       C 2.828427    No
+churn
+No     2
+Yes    1
+Name: count, dtype: int64
+prediction: No</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — how k changes the verdict</div><pre>for k in [1, 3, 5]:
+    nn = df.nsmallest(k, 'dist')
+    votes = nn.churn.value_counts()
+    print(f"k={k}: neighbors {list(nn.churn)} -> vote { {a: int(b) for a, b in votes.items()} } -> predict {votes.idxmax()}")</pre><div class="nbout">k=1: neighbors ['Yes'] -> vote {'Yes': 1} -> predict Yes
+k=3: neighbors ['Yes', 'No', 'No'] -> vote {'No': 2, 'Yes': 1} -> predict No
+k=5: neighbors ['Yes', 'No', 'No', 'Yes', 'Yes'] -> vote {'Yes': 3, 'No': 2} -> predict Yes</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — scikit-learn confirms it</div><pre>from sklearn.neighbors import KNeighborsClassifier
+X, y = df[['duration', 'complaints']].values, df.churn
+for k in [1, 3, 5]:
+    m = KNeighborsClassifier(n_neighbors=k).fit(X, y)
+    p = m.predict_proba([[4, 2]])[0]
+    print(f"k={k}: predict {m.predict([[4, 2]])[0]}  proba={p.round(3)}")</pre><div class="nbout">k=1: predict Yes  proba=[0. 1.]
+k=3: predict No  proba=[0.667 0.333]
+k=5: predict Yes  proba=[0.4 0.6]   <- sklearn agrees with our from-scratch votes</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea</b>
+<ul>
+<li>K-Nearest Neighbors (KNN) classifies a new point by looking at the <b>k closest training points</b> and taking a <b>majority vote</b>.</li>
+<li>Video example with k=5: among the 5 nearest neighbors, 3 are red and 2 are white → the new point is labeled <b>red</b>.</li>
+<li>For <b>regression</b>, the same neighbor search is used, but the prediction is the <b>average</b> of the target values of those neighbors instead of a vote.</li>
+</ul>
+
+<b>Measuring closest — distance formulas</b>
+<div class="formula">Euclidean: √((x2−x1)² + (y2−y1)²)</div>
+<div class="formula">Manhattan: |x2−x1| + |y2−y1|</div>
+<ul><li>Euclidean is the straight-line distance; Manhattan is the city-block distance. Both decide who counts as a neighbor, so the choice matters.</li></ul>
+
+<b>How a prediction actually runs</b>
+<ul><li>1) Pick k. 2) Compute the distance from the new point to EVERY training point. 3) Sort ascending and keep the first k. 4) Classification → majority vote; regression → average of those k values. There is no formula being fitted — the neighbors are the model.</li></ul>
+
+<b>Choosing k — a hyperparameter</b>
+<ul>
+<li>k is not learned from data — you set it. Practical recipe from the video: try k = 1, 2, 3 … up to about 50, measure the error for each, and keep the k with the <b>lowest error</b>.</li>
+<li>k too small (e.g. k=1): a single noisy point decides → sensitive to outliers, overfits.</li>
+<li>k too large: distant, unrelated points join the vote → boundaries get too smooth.</li>
+</ul>
+
+<b>Known weaknesses</b>
+<ul>
+<li><b>Outliers</b>: a wrongly-labeled point sitting inside a neighborhood can flip the vote — KNN IS impacted by outliers.</li>
+<li><b>Imbalanced data</b>: a class with far more rows wins overlapping regions just by showing up more often.</li>
+<li><b>Scale sensitivity</b>: distances add features measured in different units, so the largest-scale feature dominates → <b>standardize or normalize the data first</b>.</li>
+</ul>
+
+<b>Lazy learner</b>
+<ul><li>KNN has <b>no real training phase</b>: it just stores the dataset and computes distances at prediction time. All the computational cost moves to inference.</li></ul>
+
+💡 <b>Interview angle:</b> three rapid-fire answers from this section. Is KNN impacted by outliers? <b>Yes</b>. Does KNN need normalization? <b>Yes</b> — it is distance-based. Do Decision Trees / Random Forests need normalization? <b>No</b> — threshold splits are scale-invariant.
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>I can justify in one breath why distance-based models need scaling while the tree-family models in my reco engine do not — that contrast signals I understand the math, not just the API.</li>
+<li>I tune k the disciplined way — sweep k = 1..50 and pick by validation error, never by gut feel.</li>
+<li>Before fitting any distance-based model I standardize features and check class imbalance, because KNN silently hands overlapping regions to the majority class.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = /* QUIZ_JSON */ [
+{q:'KNN assigns a class label to a new point by:',options:['Fitting a line through all training points','Computing a sigmoid probability','Majority vote among its k closest training points','Using only the single nearest neighbor, whatever k is'],a:2,expl:'Video example with k=5: 3 red vs 2 white neighbors → the new point is labeled red.'},
+{q:'KNN applied to REGRESSION predicts:',options:['The average of the target values of its k nearest neighbors','The majority vote of the neighbors','The median of the entire dataset','A polynomial extrapolation from the neighbors'],a:0,expl:'Same neighbor search, continuous output: average the neighbors instead of voting.'},
+{q:'The Manhattan distance between (1,2) and (4,6) is:',options:['√((4−1)² + (6−2)²) = 5','|4−1| + |6−2| = 7','3','10'],a:1,expl:'Manhattan = city-block distance: sum of absolute coordinate differences. Euclidean would give 5.'},
+{q:'How does the video recommend choosing k?',options:['Always use k = 1','Always use k = number of classes','Set k equal to the number of features','Try k = 1 up to about 50 and keep the k with the lowest error'],a:3,expl:'k is a hyperparameter: sweep values, compare the error for each, keep the winner.'},
+{q:'If k is too small (say k = 1):',options:['The decision boundary becomes too smooth and underfits','Single noisy points decide, so outliers can flip labels','Distance stops mattering','Predictions become the dataset average'],a:1,expl:'With k = 1 the nearest single point decides — noise and outliers win. Classic overfitting.'},
+{q:'Why must data be standardized or normalized before KNN?',options:['KNN cannot handle negative numbers','Standardization automatically removes outliers','Distances add features of different scales, so the largest-scale feature would dominate','k must equal the number of standardized features'],a:2,expl:'Salary in thousands vs age in years: without scaling, salary alone decides who the neighbors are.'},
+{q:'KNN is called a LAZY learner because:',options:['It never achieves good accuracy','It only works on small datasets','It skips the majority vote','There is no real training phase — the work happens at prediction time'],a:3,expl:'KNN just stores the data and computes distances when a prediction is requested: training cost near zero, inference cost high.'},
+{q:'Interview rapid-fire — pick the fully correct line:',options:['Outliers: no impact · Normalization: needed · Trees/Forests: need it too','Outliers: impact KNN · Normalization: needed · Trees/Forests: do NOT need it','Outliers: impact KNN · Normalization: not needed · Trees: need it','Outliers: no impact · Normalization: not needed · Trees: need it'],a:1,expl:'KNN is distance-based → outlier-sensitive and scale-sensitive. Trees compare values against thresholds → scale-invariant.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_11',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

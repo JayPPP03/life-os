@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ridge And Lasso Regression — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=4034" target="_blank">▶ Watch this section</a></div>
+<h1>Ridge And Lasso Regression</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 01:07:14 · approx 26 min · pass bar 80%</div>
+
+<h2>✍️ My Notes — written by me, from memory</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_6"><b>Ridge &amp; Lasso — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>
+<ul>
+<li><b>Calling the 2-point perfect fit a good model.</b> J = 0 on two points is textbook overfitting — low bias, high variance. Memorize the train/test table: 90/80 overfit, 92/91 generalized, 70/65 underfit.</li>
+<li><b>Mixing up the penalties.</b> Ridge (L2) adds λ·slope², Lasso (L1) adds λ·|slope|. The absolute value is exactly what lets Lasso reach zero.</li>
+<li><b>Thinking Ridge can eliminate a feature.</b> Ridge only shrinks coefficients toward 0 and never quite arrives — only Lasso zeroes them out (feature selection for free).</li>
+<li><b>Treating λ as something the model learns.</b> It is a hyperparameter: sweep values and let cross-validation pick, like any other dial.</li>
+<li><b>Diagnosing from the train score alone.</b> Overfitting is a GAP (high train, low test); underfitting is both scores low. A great train score alone proves nothing.</li>
+<li><b>Assuming a bigger λ is always safer.</b> λ huge → nearly flat line → underfit. There is a sweet spot, not a ceiling.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Churn-risk scoring: firing the useless feature</h2>
+<div class="card">
+<p><b>Business problem:</b> a telco team scores churn risk (0–100). Two real drivers exist — support tickets (more tickets → more risk) and tenure (longer stay → less risk) — but a careless pipeline also feeds in <b>customer_id</b>. Which features deserve to survive?</p>
+<table>
+<tr><th>Customer</th><th>support_tickets x₁</th><th>tenure_months x₂</th><th>customer_id (junk)</th><th>churn_risk y</th></tr>
+<tr><td>A</td><td>0</td><td>36</td><td>101</td><td>10</td></tr>
+<tr><td>B</td><td>1</td><td>30</td><td>102</td><td>22</td></tr>
+<tr><td>C</td><td>2</td><td>24</td><td>103</td><td>30</td></tr>
+<tr><td>D</td><td>4</td><td>12</td><td>104</td><td>48</td></tr>
+<tr><td>E</td><td>5</td><td>8</td><td>105</td><td>62</td></tr>
+<tr><td>F</td><td>7</td><td>3</td><td>106</td><td>85</td></tr>
+</table>
+<p><b>Step 1 — plain linear regression (λ = 0) fits the junk too:</b></p>
+<div class="formula">churn_risk = 12.73·tickets + 0.98·tenure + 3.67·customer_id − 396.16</div>
+<p>Two red flags, straight from a real run: the model <b>adds 3.67 points of risk per unit of ID number</b> (it pays customers for their ID!), and tenure's sign <b>flipped positive (+0.98)</b> even though long-tenure customers obviously churn less — the junk ID column, which just counts rows, colluded with the trend and stole weight. Overfitting, written in coefficients.</p>
+<p><b>Step 2 — Ridge (L2), alpha = 10: shrink everything, fire nothing.</b></p>
+<div class="formula">tickets 12.73 → <b>1.48</b> &nbsp;·&nbsp; tenure +0.98 → <b>−1.64</b> &nbsp;·&nbsp; customer_id 3.67 → <b>0.77</b> &nbsp;(intercept −396 → −10.7)<br>penalty bill: 10 × (1.48² + 1.64² + 0.77²) = 10 × 5.48 = <b>54.8</b></div>
+<p>All three coefficients survive — customer_id is defanged (0.77) but still in the model, and tenure's sign is sane again.</p>
+<p><b>Step 3 — Lasso (L1), alpha = 1: fire the junk.</b></p>
+<div class="formula">tickets <b>9.13</b> &nbsp;·&nbsp; tenure <b>−0.24</b> &nbsp;·&nbsp; customer_id <b>0.0</b> ← exactly zero: feature selection for free<br>penalty bill: 1 × (9.13 + 0.24 + 0) = <b>9.37</b></div>
+<p><b>Step 4 — why 'small but kept' is still dangerous:</b> score a new customer with 3 tickets, 18 months tenure, id = 777. Lasso (id term gone): <b>41.5</b> — believable. Ridge (0.77 × 777 = 597 coming from the ID alone!): <b>562.3</b> — absurd. ID columns have huge ranges, so even a shrunken coefficient explodes on unseen IDs.</p>
+<p>💡 <b>Business rules this buys:</b> deploy tickets + tenure only; never feed raw IDs to a linear model; reach for Lasso when you suspect dead columns, Ridge when real features are correlated and you want stable coefficients.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 6-customer table</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'support_tickets': [0, 1, 2, 4, 5, 7],
+    'tenure_months':   [36, 30, 24, 12, 8, 3],
+    'customer_id':     [101, 102, 103, 104, 105, 106],
+    'churn_risk':      [10, 22, 30, 48, 62, 85]})
+X, y = df[['support_tickets', 'tenure_months', 'customer_id']], df['churn_risk']
+df</pre><div class="nbout">   support_tickets  tenure_months  customer_id  churn_risk
+0                0             36          101          10
+1                1             30          102          22
+2                2             24          103          30
+3                4             12          104          48
+4                5              8          105          62
+5                7              3          106          85</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — plain linear regression fits the junk too</div><pre>from sklearn.linear_model import LinearRegression
+# watch: customer_id earns a real coefficient, tenure's sign flips positive
+lin = LinearRegression().fit(X, y)
+print(dict(zip(X.columns, [round(float(c), 2) for c in lin.coef_])),
+      'b0 =', round(float(lin.intercept_), 2))</pre><div class="nbout">{'support_tickets': 12.73, 'tenure_months': 0.98, 'customer_id': 3.67} b0 = -396.16</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — Ridge alpha=10: shrink, fire nothing</div><pre>from sklearn.linear_model import Ridge
+ridge = Ridge(alpha=10).fit(X, y)
+print(dict(zip(X.columns, [round(float(c), 2) for c in ridge.coef_])),
+      'b0 =', round(float(ridge.intercept_), 1))
+print('penalty bill =', round(10 * (ridge.coef_ ** 2).sum(), 1))</pre><div class="nbout">{'support_tickets': 1.48, 'tenure_months': -1.64, 'customer_id': 0.77} b0 = -10.7
+penalty bill = 54.8</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — Lasso alpha=1: the junk coefficient dies</div><pre>from sklearn.linear_model import Lasso
+lasso = Lasso(alpha=1).fit(X, y)
+print(dict(zip(X.columns, [round(float(c), 2) for c in lasso.coef_])),
+      'b0 =', round(float(lasso.intercept_), 1))
+print('penalty bill =', round(abs(lasso.coef_).sum(), 2))
+new = pd.DataFrame({'support_tickets': [3], 'tenure_months': [18], 'customer_id': [777]})
+print('pred lasso:', lasso.predict(new).round(2), ' pred ridge:', ridge.predict(new).round(2))</pre><div class="nbout">{'support_tickets': 9.13, 'tenure_months': -0.24, 'customer_id': 0.0} b0 = 18.5
+penalty bill = 9.37
+pred lasso: [41.51]  pred ridge: [562.26]</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — sweep alpha and watch customer_id die</div><pre>for a in [0.1, 1, 5, 10]:
+    m = Lasso(alpha=a).fit(X, y)
+    print(f"alpha={a:>4}: customer_id coef = {round(float(m.coef_[2]), 2)}")</pre><div class="nbout">alpha= 0.1: customer_id coef = 1.71
+alpha=   1: customer_id coef = 0.0
+alpha=   5: customer_id coef = 0.0
+alpha=  10: customer_id coef = 0.0</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The problem: overfitting vs underfitting</b>
+<ul>
+<li><b>Overfitting:</b> give the model just 2 data points and a fitted line can pass through both perfectly — cost J = 0. It looks flawless in training but fails on new data. Signature: <b>low bias, high variance</b>.</li>
+<li><b>Underfitting:</b> the line is too simple to capture the pattern, so it performs badly everywhere — <b>high bias, low variance</b>.</li>
+<li><b>The goal is a generalized model</b>: low bias AND low variance — good on training data and on data it has never seen.</li>
+</ul>
+<table>
+<tr><th>Train score</th><th>Test score</th><th>Diagnosis</th></tr>
+<tr><td>90</td><td>80</td><td>Overfit — big gap between the two</td></tr>
+<tr><td>92</td><td>91</td><td>Generalized — both high, tiny gap</td></tr>
+<tr><td>70</td><td>65</td><td>Underfit — both low</td></tr>
+</table>
+<p><b>How to remember:</b> bias = too simple (wrong on train AND test); variance = too sensitive (perfect on train, wrong on test). Regularization is the dial that trades a little bias for a lot less variance.</p>
+<b>Ridge regression (L2)</b>
+<div class="formula">Cost = Σ(yᵢ − ŷᵢ)² + λ · slope²</div>
+<ul>
+<li>Steep slopes are dangerous: if the slope is huge, a tiny change in the input swings the prediction wildly — that is overfitting written in equation form.</li>
+<li>The penalty λ·slope² <b>shrinks steep slopes</b> toward flat, so predictions stop over-reacting to small input changes.</li>
+<li>λ (lambda) is a <b>hyperparameter</b>, not something the model learns: λ = 0 → plain linear regression; λ large → nearly flat line (underfit). You find the sweet spot with <b>cross-validation</b>.</li>
+<li>In the 2-point example, Ridge would refuse to bend the line fully through both points — it trades a little training error for a lot of test-time stability.</li>
+</ul>
+<b>Lasso regression (L1)</b>
+<div class="formula">Cost = Σ(yᵢ − ŷᵢ)² + λ · |slope|</div>
+<ul>
+<li>Same idea, absolute value instead of square. The superpower: the penalty can push a coefficient all the way to <b>≈ 0</b>.</li>
+<li>A zero coefficient means the feature is effectively dropped — Lasso gives you <b>feature selection</b> for free. Ridge only shrinks coefficients toward 0; it never quite reaches it.</li>
+</ul>
+<b>ELI10</b>
+<ul>
+<li>Ridge = a rubber band gently pulling every slope toward flat.</li>
+<li>Lasso = a rubber band that snaps useless features off entirely.</li>
+</ul>
+<p>💡 <b>Interview angle:</b> reach for <b>Ridge</b> when features are correlated (multicollinearity) and you want stable coefficients; reach for <b>Lasso</b> when you suspect many features are useless and want automatic feature selection.</p>
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li><b>Reco engine regularization:</b> the SVD reg_all grid in my recommender is the same λ idea — a regularization strength tuned on validation data only, so the factor model stops memorizing noisy ratings.</li>
+<li><b>Feature selection instinct:</b> pruning rare TF-IDF content features with min_df is Lasso thinking — L1 can zero a useless coefficient out entirely instead of just shrinking it.</li>
+<li><b>Reporting discipline:</b> I can recite the 90/80 vs 92/91 vs 70/65 table from memory and use it to justify why I always show validation and test scores side by side.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QUIZ_JSON = [
+{q:'A model fitted through just 2 training points reaches cost J = 0. Why is that still a bad model?',options:['Linear regression can never actually reach J = 0','It memorizes the 2 points and fails on new data — overfitting','The cost should be maximized, not minimized','J = 0 proves the model is generalized'],a:1,expl:'A perfect fit on 2 points is low bias but high variance: the line bends around those points and will not generalize to new data.'},
+{q:'Train score 90, test score 80. What is the diagnosis?',options:['Underfitting','Generalized model','Overfitting','A coding bug in the test loop'],a:2,expl:'A big gap between train and test = overfitting. Compare the table: 92/91 is generalized, 70/65 is underfit.'},
+{q:'Which penalty does Lasso (L1) add to the cost function?',options:['lambda × slope²','lambda × |slope|','lambda ÷ number of features','lambda × intercept'],a:1,expl:'L1 uses the absolute value of the slope. Ridge (L2) uses the square: lambda × slope².'},
+{q:'What happens to a Ridge model if lambda is set to a huge value?',options:['The slopes shrink toward 0, the line goes almost flat, and the model underfits','It becomes exactly plain linear regression','Coefficients get selected automatically','The cost becomes non-convex'],a:0,expl:'lambda = 0 gives plain linear regression; a huge lambda over-penalizes steepness, flattening the line into an underfit.'},
+{q:'What can Lasso do that Ridge cannot?',options:['Handle multicollinearity','Work without a lambda hyperparameter','Shrink a coefficient all the way to ≈ 0, dropping the feature entirely','Fit non-linear patterns'],a:2,expl:'The L1 penalty can zero a coefficient out — automatic feature selection. Ridge only shrinks coefficients toward 0 and never quite reaches it.'},
+{q:'Sum of squared errors = 100, slope = 3, lambda = 1. What is the Ridge cost?',options:['103','109','118','100'],a:1,expl:'Ridge adds lambda × slope² = 1 × 3² = 9, so cost = 100 + 9 = 109. Lasso would give 100 + 3 = 103.'},
+{q:'Features are highly correlated (multicollinearity) and you want stable coefficients. What do you reach for?',options:['Lasso, to delete the correlated features','Plain linear regression, it is unaffected','Ridge — L2 is the standard answer for multicollinearity','A bigger learning rate'],a:2,expl:'Interview angle: Ridge for multicollinearity and stability; Lasso when you suspect useless features and want feature selection.'},
+{q:'How do you choose the value of lambda?',options:['Gradient descent learns it automatically during training','Always set lambda = 1','It is a hyperparameter, picked via cross-validation','Set lambda equal to the number of features'],a:2,expl:'lambda is a hyperparameter, not a learned weight — try a range of values and let cross-validation pick the winner.'}
+];
+const QS = QUIZ_JSON;
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_6',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

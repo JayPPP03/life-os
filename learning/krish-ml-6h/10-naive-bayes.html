@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Naive Bayes Algorithm — Notes + Quiz</title>
+<style>
+:root{--bg:#0B1220;--bg2:#0E1728;--card:#101B2E;--border:#1E2A44;--text:#E6EDF7;--muted:#8B9BB4;--green:#34D399;--teal:#5EEAD4;--red:#F87171;--amber:#FBBF24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:28px 18px}
+.wrap{max-width:860px;margin:0 auto}
+.crumb{font-size:.8rem;margin-bottom:1rem}.crumb a{color:var(--teal)}
+h1{font-size:1.5rem;margin-bottom:.2rem}
+.meta{color:var(--muted);font-size:.85rem;margin-bottom:1.4rem}
+.meta a{color:var(--teal)}
+h2{font-size:1.05rem;margin:1.6rem 0 .6rem;color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+ul,ol{padding-left:1.2rem}li{margin:.35rem 0;font-size:.92rem}
+code,.f{background:var(--bg2);padding:.12rem .45rem;border-radius:6px;font-size:.85rem;color:var(--teal)}
+.formula{background:var(--bg2);border-left:3px solid var(--teal);padding:.6rem .9rem;border-radius:8px;margin:.6rem 0;font-family:ui-monospace,monospace;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.7rem 0}
+th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{background:var(--bg2);color:var(--muted)}
+.q{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.q b{display:block;margin-bottom:.5rem}
+.q label{display:block;padding:.4rem .6rem;border:1px solid var(--border);border-radius:8px;margin:.3rem 0;cursor:pointer;font-size:.88rem}
+.q label:hover{border-color:var(--teal)}
+.exp{display:none;margin-top:.5rem;font-size:.82rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem}
+.btn{background:var(--teal);color:var(--bg);border:0;border-radius:10px;padding:.6rem 1.2rem;font-weight:700;cursor:pointer;font-size:.95rem;margin:.8rem 0}
+.res{font-size:1rem;font-weight:700;margin:.6rem 0}
+.pass{color:var(--green)}.fail{color:var(--red)}
+.paper{background:#FBF6E9;color:#2B2B2B;border-radius:12px;padding:18px 20px;font-size:.92rem;
+  background-image:repeating-linear-gradient(transparent,transparent 27px,#d8cfb0 28px);line-height:28px;
+  font-family:'Segoe Print','Bradley Hand',Comic Sans MS,-apple-system,cursive}
+.paper h4{margin:0 0 .3rem}
+.missing{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
+.missing b.no{color:var(--red)}
+.missing b.ok{color:var(--green)}
+.nbcell{background:#fff;color:#111;border:1px solid #d0d0d0;border-radius:8px;margin:10px 0;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+.nbcell .nbhead{background:#e8e8e8;padding:3px 10px;font-size:.7rem;color:#444}
+.nbcell pre{padding:12px 14px;white-space:pre-wrap;margin:0}
+.nbcell .nbout{border-top:1px solid #d0d0d0;background:#f7f7f7;padding:12px 14px;white-space:pre-wrap;color:#222}
+.editable{min-height:120px;border:1.5px dashed var(--muted);border-radius:10px;padding:12px;outline:none}
+.editable:focus{border-color:var(--teal)}
+</style></head>
+<body><div class="wrap">
+<div class="crumb"><a href="index.html">← All topics</a> · <a href="https://youtu.be/JxgmHe2NyeY?t=11762" target="_blank">▶ Watch this section</a></div>
+<h1>Naive Bayes Algorithm</h1>
+<div class="meta">Krish Naik — Complete ML in 6 Hours · starts at 03:16:02 · approx 8 min · pass bar 80%</div>
+
+<h2>✍️ My Notes</h2>
+<div class="card">
+<p class="mini" style="margin-bottom:.6rem">Coach's rule: your own words beat any textbook. This is your notebook paper — it stays editable, your edits save automatically.</p>
+<div class="paper editable" contenteditable="true" data-noteskey="mynotes_10"><b>NAIVE BAYES — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
+</div>
+
+<h2>📋 Coach's Review</h2>
+<div class="card">
+<p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>
+<ul>
+<li><b>Multiplying likelihoods without the prior.</b> P(free|spam) alone is NOT the answer — the posterior needs P(spam) × P(free|spam). Skipping the prior is the #1 exam mistake.</li>
+<li><b>Confusing the direction.</b> From labeled data you can measure P(word|class), but the question you need is P(class|word) — Bayes theorem is the flip. Writing the fraction backwards is the #2 exam mistake.</li>
+<li><b>Dropping the denominator, then reporting raw scores as probabilities.</b> Dropping P(word) is fine for picking the winner, but a real percentage needs the normalization step: divide each score by the sum of all scores.</li>
+<li><b>The zero-frequency trap.</b> One word never seen in spam makes P(word|spam) = 0 and the whole product collapses — the fix is Laplace (add-1) smoothing.</li>
+<li><b>Forgetting what "naive" buys and costs.</b> It pretends 'free' and 'meeting' never co-occur; real words correlate, yet the class ranking usually stays right — which is why NB is still the text/spam baseline.</li>
+<li><b>Trusting the probabilities blindly.</b> NB posteriors are overconfident and poorly calibrated — threshold and rank them, don't read them as true odds.</li>
+</ul>
+</div>
+
+<h2>🧮 Worked Mini-Project — Spam filter: does this email reach the inbox?</h2>
+<div class="card">
+<p><b>Business problem:</b> a support inbox drowning in junk. We label just 8 past emails and count two giveaway words — 'free' (spam smell) and 'meeting' (work smell). A new email arrives containing <b>'free'</b>. Inbox or spam folder?</p>
+<table>
+<tr><th>Email</th><th>'free' count</th><th>'meeting' count</th><th>Label</th></tr>
+<tr><td>1</td><td>3</td><td>0</td><td>spam</td></tr>
+<tr><td>2</td><td>2</td><td>0</td><td>spam</td></tr>
+<tr><td>3</td><td>1</td><td>1</td><td>spam</td></tr>
+<tr><td>4</td><td>2</td><td>1</td><td>spam</td></tr>
+<tr><td>5</td><td>0</td><td>3</td><td>ham</td></tr>
+<tr><td>6</td><td>0</td><td>2</td><td>ham</td></tr>
+<tr><td>7</td><td>1</td><td>2</td><td>ham</td></tr>
+<tr><td>8</td><td>0</td><td>3</td><td>ham</td></tr>
+</table>
+<p><b>Step 1 — priors from the labels:</b></p>
+<div class="formula">P(spam) = 4/8 = 0.5 &nbsp;&nbsp;·&nbsp;&nbsp; P(ham) = 4/8 = 0.5</div>
+<p><b>Step 2 — likelihoods from the word counts</b> (count each word across that class's emails). Spam words: free 3+2+1+2 = 8, meeting 0+0+1+1 = 2 → 10 words total. Ham words: free 0+0+1+0 = 1, meeting 3+2+2+3 = 10 → 11 words total.</p>
+<div class="formula">P(free|spam) = 8/10 = 0.8 &nbsp;&nbsp; P(meeting|spam) = 2/10 = 0.2<br>P(free|ham) = 1/11 ≈ 0.0909 &nbsp;&nbsp; P(meeting|ham) = 10/11 ≈ 0.9091</div>
+<p><b>Step 3 — Bayes for the new email (contains 'free'):</b> multiply prior × likelihood for each class. The evidence P(free) is identical for both classes, so it gets dropped — the video's trick.</p>
+<div class="formula">score(spam) = P(spam) × P(free|spam) = 0.5 × 0.8 = <b>0.4</b><br>score(ham) &nbsp;= P(ham) × P(free|ham) &nbsp;= 0.5 × 1/11 ≈ <b>0.0455</b></div>
+<p><b>Step 4 — normalize both posteriors</b> (total = 0.4 + 0.0455 = 0.4455 — this total IS the dropped evidence P(free)):</p>
+<div class="formula">P(spam|free) = 0.4 / 0.4455 ≈ <b>89.8%</b> &nbsp;&nbsp;·&nbsp;&nbsp; P(ham|free) = 0.0455 / 0.4455 ≈ <b>10.2%</b> → <b>route to SPAM</b></div>
+<p><b>Step 5 — flip the evidence, flip the answer.</b> Email containing only 'meeting': score(spam) = 0.5 × 0.2 = 0.1, score(ham) = 0.5 × 10/11 ≈ 0.4545 → P(spam|meeting) = 0.1/0.5545 ≈ <b>18%</b> → inbox. And 'free free meeting' (counts 2,1): spam = 0.5 × 0.8² × 0.2 = 0.064 vs ham = 0.5 × (1/11)² × (10/11) ≈ 0.0038 → ≈ <b>94.5% spam</b>. One 'free' next to 'meeting' loses; two 'free's win — word frequency matters.</p>
+<p>💡 <b>Business read:</b> a single word swings the routing 90/10, and the posterior is a tunable dial — auto-route only when P(spam) &gt; 0.9 so a real client email mentioning a discount never disappears.</p>
+</div>
+
+<h2>🐍 Python Lab — Jupyter style</h2>
+<div class="card">
+<p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>
+
+<div class="nbcell"><div class="nbhead">In [1] — the 8 labeled emails</div><pre>import pandas as pd
+df = pd.DataFrame({
+    'free':    [3, 2, 1, 2, 0, 0, 1, 0],
+    'meeting': [0, 0, 1, 1, 3, 2, 2, 3],
+    'label':   ['spam', 'spam', 'spam', 'spam', 'ham', 'ham', 'ham', 'ham']})
+df</pre><div class="nbout">   free  meeting label
+0     3        0  spam
+1     2        0  spam
+2     1        1  spam
+3     2        1  spam
+4     0        3   ham
+5     0        2   ham
+6     1        2   ham
+7     0        3   ham</div></div>
+
+<div class="nbcell"><div class="nbhead">In [2] — priors and likelihoods from word counts</div><pre>print(df.label.value_counts(), "\n")
+for c in ['spam', 'ham']:
+    sub = df[df.label == c]
+    tot = sub.free.sum() + sub.meeting.sum()
+    print(f"{c}: words={tot}  P(free|{c})={sub.free.sum()}/{tot}={sub.free.sum()/tot:.4f}"
+          f"  P(meeting|{c})={sub.meeting.sum()}/{tot}={sub.meeting.sum()/tot:.4f}")</pre><div class="nbout">label
+spam    4
+ham     4
+Name: count, dtype: int64 
+
+spam: words=10  P(free|spam)=8/10=0.8000  P(meeting|spam)=2/10=0.2000
+ham: words=11  P(free|ham)=1/11=0.0909  P(meeting|ham)=10/11=0.9091</div></div>
+
+<div class="nbcell"><div class="nbhead">In [3] — Bayes for the new email (word 'free')</div><pre>s_spam, s_ham = 0.5 * 8/10, 0.5 * 1/11   # prior x likelihood
+print(f"score(spam) = 0.5 x 0.8  = {s_spam}")
+print(f"score(ham)  = 0.5 x 1/11 = {s_ham:.4f}")
+tot = s_spam + s_ham                      # this total IS the dropped evidence P(free)
+print(f"P(spam|free) = {s_spam:.4f}/{tot:.4f} = {s_spam/tot:.4f}")
+print(f"P(ham|free)  = {s_ham:.4f}/{tot:.4f} = {s_ham/tot:.4f}")
+print("-> predict SPAM" if s_spam > s_ham else "-> predict HAM")</pre><div class="nbout">score(spam) = 0.5 x 0.8  = 0.4
+score(ham)  = 0.5 x 1/11 = 0.0455
+P(spam|free) = 0.4000/0.4455 = 0.8980
+P(ham|free)  = 0.0455/0.4455 = 0.1020
+-> predict SPAM</div></div>
+
+<div class="nbcell"><div class="nbhead">In [4] — other emails: change the evidence, same recipe</div><pre>def nb(counts):   # counts = (free, meeting) word counts
+    sp = 0.5 * (0.8)**counts[0] * (0.2)**counts[1]
+    ha = 0.5 * (1/11)**counts[0] * (10/11)**counts[1]
+    return sp / (sp + ha)
+
+for email, counts in [("only 'meeting'", (0, 1)), ("'free free meeting'", (2, 1))]:
+    p = nb(counts)
+    print(f"{email:20s} P(spam) = {p:.4f} -> {'SPAM' if p > .5 else 'HAM'}")</pre><div class="nbout">only 'meeting'       P(spam) = 0.1803 -> HAM
+'free free meeting'  P(spam) = 0.9446 -> SPAM</div></div>
+
+<div class="nbcell"><div class="nbhead">In [5] — scikit-learn confirms it</div><pre>from sklearn.naive_bayes import MultinomialNB
+m = MultinomialNB(alpha=0).fit(df[['free', 'meeting']].values, df.label)  # alpha=0: no smoothing, matches the hand math
+print("classes:", m.classes_)
+print("P(word|class):")
+print(m.feature_count_ / m.feature_count_.sum(axis=1, keepdims=True))
+print("predict (1,0):", m.predict([[1, 0]])[0], "proba:", m.predict_proba([[1, 0]]).round(4))</pre><div class="nbout">classes: ['ham' 'spam']
+P(word|class):
+[[0.09090909 0.90909091]
+ [0.8        0.2       ]]
+predict (1,0): spam proba: [[0.102 0.898]]   <- identical to our from-scratch answer</div></div>
+</div>
+
+<h2>📝 Notes</h2>
+<div class="card">
+<b>The big idea</b>
+<ul><li>Naive Bayes is a classification algorithm built entirely on <b>conditional probability</b> and <b>Bayes theorem</b>: given some evidence (the feature values of a row), update how likely each class is, and predict the class with the highest updated probability.</li></ul>
+
+<b>Step 1 · Independent events — the dice example</b>
+<ul><li>Roll two dice. The second die knows nothing about the first, so the two events are <b>independent</b>: the joint probability is simply the product. P(two sixes) = 1/6 × 1/6 = 1/36.</li></ul>
+<div class="formula">Independent events: P(A∩B) = P(A) · P(B)</div>
+
+<b>Step 2 · Dependent events — the marbles example</b>
+<ul><li>Now draw two marbles from a bag without putting the first one back. The first draw changes the bag, so the events are <b>dependent</b>: multiply the first probability by the probability of the second event given the first.</li></ul>
+<div class="formula">Dependent events: P(A∩B) = P(A) · P(B|A)</div>
+
+<b>Step 3 · Deriving Bayes theorem</b>
+<ul><li>Write the joint probability two ways: P(A∩B) = P(B|A)·P(A) and also P(A∩B) = P(A|B)·P(B). Set them equal and rearrange:</li></ul>
+<div class="formula">P(A|B) = P(B|A) · P(A) / P(B)</div>
+<ul><li>Read it as: posterior = (likelihood × prior) / evidence. It reverses the conditioning — from P(B|A) we get P(A|B).</li></ul>
+
+<b>Naive Bayes for machine learning</b>
+<ul>
+<li>Goal: given features x1…xn, find the most probable class: P(y|x1,…,xn).</li>
+<li>Bayes theorem flips it around: numerator = P(y) · Π P(xi|y), denominator = P(x1,…,xn). The denominator is the same for every class — a constant — so it is dropped:</li>
+</ul>
+<div class="formula">P(y|x1,…,xn) ∝ P(y) · Π P(xi|y)</div>
+<ul><li><b>Naive</b> = the model assumes all features are independent of each other given the class, so it just multiplies per-feature likelihoods and ignores feature interactions.</li></ul>
+
+<b>Worked example — the tennis dataset</b>
+<ul>
+<li>14 rows: 9-yes / 5-no → P(Yes) = 9/14, P(No) = 5/14. Every categorical feature gets its own little count table.</li>
+<li>Outlook count table: Sunny 2-yes / 3-no · Overcast 4-yes / 0-no · Rain 3-yes / 2-no.</li>
+<li>Query (Sunny, Hot): multiply prior × likelihoods → unnormalized score Yes ≈ 0.31, score No ≈ 0.857.</li>
+<li>Normalize: 0.31 / (0.31 + 0.857) ≈ <b>27%</b> vs ≈ <b>73%</b> → predict <b>No</b>. Same dropped-denominator trick: only the relative size of the two scores matters.</li>
+<li>Homework assigned in the video: repeat the same calculation for (Overcast, Mild).</li>
+</ul>
+
+💡 <b>Interview angle:</b> why is it called naive? Because the feature-independence assumption is almost never true in real data — yet the classifier still works remarkably well, which is exactly why it remains the classic baseline for text and spam problems.
+</div>
+<h2>🎯 Prove it with your projects</h2>
+<div class="card"><ul>
+<li>I default to a Naive Bayes baseline first on any spam/text-style problem before reaching for heavier models — cheap to train, and surprisingly hard to beat on bag-of-words features.</li>
+<li>The MyOperator churn story is precision-led (+18% QoQ), and NB-style per-class probability scores are exactly what I would threshold and calibrate against for a precision-first metric.</li>
+<li>I can whiteboard the tennis count tables and the 27% vs 73% normalization live in an interview — it proves I understand the arithmetic behind predict_proba, not just the API call.</li>
+</ul></div>
+<h2>🧪 Quiz — 8 questions</h2>
+<div id="quiz"></div>
+<button class="btn" onclick="check()">Check answers</button>
+<div class="res" id="res"></div>
+<div class="crumb" style="margin-top:1.5rem"><a href="index.html">← All topics</a></div>
+</div>
+<script>
+const QS = /* QUIZ_JSON */ [
+{q:'Naive Bayes is built directly on which mathematical foundation?',options:['Fitting a line through all points by gradient descent','Conditional probability and Bayes theorem','Eigendecomposition of the feature covariance matrix','Maximizing the margin between classes'],a:1,expl:'Everything in this section — dice, marbles, tennis — is conditional probability rearranged through Bayes theorem.'},
+{q:'Two fair dice are rolled. For independent events A and B, P(A∩B) equals:',options:['P(A) + P(B)','P(A) · P(B|A)','P(A) · P(B)','P(B|A) · P(A) / P(B)'],a:2,expl:'Dice rolls do not influence each other, so the joint is the product of the marginals: 1/6 × 1/6 = 1/36.'},
+{q:'Drawing two marbles from a bag WITHOUT replacement is an example of:',options:['Dependent events: P(A∩B) = P(A) · P(B|A)','Independent events: P(A∩B) = P(A) · P(B)','Mutually exclusive events: P(A∩B) = 0','Uncomputable probability without a simulation'],a:0,expl:'The first draw changes what is left in the bag, so the second factor is a conditional probability.'},
+{q:'In P(y|x1,…,xn) ∝ P(y) · Π P(xi|y), why is the denominator dropped?',options:['It is always equal to 1','It cannot be estimated from training data','It is identical for every class, so it never changes which class wins','Naive Bayes never outputs probabilities'],a:2,expl:'We only compare scores across classes; a constant positive factor does not affect the ranking, so the evidence term is skipped.'},
+{q:'For (Sunny, Hot) the unnormalized scores are Yes ≈ 0.31 and No ≈ 0.857. After normalization:',options:['Yes ≈ 73% vs No ≈ 27% → predict Yes','Yes ≈ 27% vs No ≈ 73% → predict No','Predict Yes — only 0.31 is a valid probability','Undecidable because the denominator was dropped'],a:1,expl:'0.31/(0.31+0.857) ≈ 27% and 0.857/(0.31+0.857) ≈ 73%; the larger posterior wins → No.'},
+{q:'Homework case (Overcast, Mild): the Outlook count table says Overcast has 4-yes / 0-no. The prediction:',options:['Depends only on the temperature value Mild','No — a zero count means that class is the most likely','The model refuses to answer when a count is 0','Yes — the No score collapses to 0 because P(Overcast|No) = 0/5'],a:3,expl:'One zero factor makes the whole No product 0, so Yes wins regardless of the remaining features.'},
+{q:'In Naive Bayes, the word naive refers to:',options:['It only works for two classes','It never uses the prior P(y)','The assumption that features are independent of each other given the class','The assumption that all classes are equally likely'],a:2,expl:'P(y) · Π P(xi|y) multiplies per-feature likelihoods as if features were independent once the class is known.'},
+{q:'Interview classic: the independence assumption is almost never true, yet Naive Bayes is still widely used because:',options:['It makes zero errors on text data','Independence violations cancel out in every dataset','Deep learning made accuracy irrelevant','It still performs surprisingly well on text/spam, is fast, and is the go-to baseline'],a:3,expl:'Real features are correlated, but the relative ranking of class scores is usually still right for bag-of-words problems — fast, simple, effective.'}
+];
+const box = document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<b>'+(i+1)+'. '+q.q+'</b>'+q.options.map((o,j)=>'<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join('')+'<div class="exp" id="e'+i+'">✅ Correct: '+q.options[q.a]+' — '+q.expl+'</div>';
+  box.appendChild(d);
+});
+function check(){let s=0;QS.forEach((q,i)=>{const ch=document.querySelector('input[name=q'+i+']:checked');document.getElementById('e'+i).style.display='block';if(ch&&+ch.value===q.a)s++;});const pct=Math.round(100*s/QS.length);const r=document.getElementById('res');r.innerHTML='Score: '+s+' / '+QS.length+' ('+pct+'%) — '+(pct>=80?'✅ PASS. Solid — move to the next topic.':'❌ Below 80% — rewatch this section and retry.');r.className='res '+(pct>=80?'pass':'fail');try{localStorage.setItem('km6h_10',pct)}catch(e){}window.scrollTo({top:document.getElementById('quiz').offsetTop-20,behavior:'smooth'});}
+</script>
+<script>
+document.querySelectorAll('.editable[data-noteskey]').forEach(el => {
+  const key = 'mynotes_' + el.dataset.noteskey;
+  try { const v = localStorage.getItem(key); if (v !== null) el.innerHTML = v; } catch(e) {}
+  let tId = null;
+  el.addEventListener('input', () => { clearTimeout(tId); tId = setTimeout(() => { try { localStorage.setItem(key, el.innerHTML); } catch(e) {} }, 400); });
+});
+</script>
+</body></html>

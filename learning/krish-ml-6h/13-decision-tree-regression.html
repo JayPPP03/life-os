@@ -86,6 +86,45 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business read:</b> the tree just priced the sales incentive — moving a customer past the 12-month threshold is worth ≈ ₹8.7k/mo more (12.667 vs 4). Grow the tree deeper and it starts memorizing individual customers (train MSE → 0); that is exactly what depth/leaf-size limits are for.</p>
 </div>
 
+<h2>✍️ Solve on Paper — MSE Splits by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li>Write the (x, y) pairs sorted by x.</li>
+<li>Root = no split: predict the mean of ALL y and compute its MSE — the baseline to beat.</li>
+<li>Pick a threshold between two consecutive x values; split the rows into left / right.</li>
+<li>Per side: mean = Σy ÷ n, then MSE = Σ(y − mean)² ÷ n — show every subtraction and square.</li>
+<li>Weighted MSE = (n_left ÷ 6)·MSE_left + (n_right ÷ 6)·MSE_right.</li>
+<li>Improvement = root MSE − weighted MSE. The best improvement wins; each leaf stores its own mean.</li>
+</ol>
+<p><b>Worked practice — customer tenure → monthly revenue:</b> six accounts at a new SaaS desk:</p>
+<table>
+<tr><th>Customer</th><th>Tenure (months)</th><th>Revenue (₹k/mo)</th></tr>
+<tr><td>P1</td><td>1</td><td>8</td></tr>
+<tr><td>P2</td><td>2</td><td>10</td></tr>
+<tr><td>P3</td><td>3</td><td>12</td></tr>
+<tr><td>P4</td><td>7</td><td>20</td></tr>
+<tr><td>P5</td><td>8</td><td>22</td></tr>
+<tr><td>P6</td><td>9</td><td>24</td></tr>
+</table>
+<p><b>Step 1 — the root: one constant for everyone.</b></p>
+<div class="formula">mean = (8+10+12+20+22+24)/6 = 96/6 = <b>16</b><br>errors: 8−16=−8 · 10−16=−6 · 12−16=−4 · 20−16=+4 · 22−16=+6 · 24−16=+8<br>squares: 64 · 36 · 16 · 16 · 36 · 64<br>MSE = (64+36+16+16+36+64)/6 = 232/6 ≈ <b>38.67</b> ← the baseline to beat</div>
+<p><b>Step 2 — candidate split "tenure ≤ 3" vs "&gt; 3":</b> left {8, 10, 12}, right {20, 22, 24}.</p>
+<div class="formula">left: mean = (8+10+12)/3 = 30/3 = <b>10</b> → errors −2, 0, +2 → squares 4, 0, 4 → MSE = 8/3 ≈ <b>2.667</b><br>right: mean = (20+22+24)/3 = 66/3 = <b>22</b> → errors −2, 0, +2 → squares 4, 0, 4 → MSE = 8/3 ≈ <b>2.667</b><br><br>weighted = (3/6)×2.667 + (3/6)×2.667 = 1.333 + 1.333 = <b>2.667</b></div>
+<p><b>Step 3 — the improvement:</b></p>
+<div class="formula">improvement = 38.667 − 2.667 = <b>36.0</b> ← one question cut the MSE by ~93%</div>
+<p><b>Step 4 — read the tree:</b> the short-tenure leaf predicts <b>₹10k</b>, the long-tenure leaf predicts <b>₹22k</b>. A new customer with 5 months lands right of the split → <b>₹22k</b> — the identical answer a 9-month veteran gets. The model is piecewise-constant: it stores two means, nothing more.</p>
+<p><b>Your turn:</b> the same desk proposes the lazier split <b>"tenure ≤ 7"</b> (left {8, 10, 12, 20}, right {22, 24}). Compute its weighted MSE and improvement. Does it beat "tenure ≤ 3"?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p><b>Left (4 rows):</b> mean = (8+10+12+20)/4 = 50/4 = <b>12.5</b> → errors −4.5, −2.5, −0.5, +7.5 → squares 20.25, 6.25, 0.25, 56.25 → MSE = 83/4 = <b>20.75</b></p>
+<p><b>Right (2 rows):</b> mean = (22+24)/2 = <b>23</b> → errors −1, +1 → squares 1, 1 → MSE = 2/2 = <b>1.0</b></p>
+<div class="formula">weighted = (4/6)×20.75 + (2/6)×1.0 = 13.833 + 0.333 = <b>14.167</b><br>improvement = 38.667 − 14.167 = <b>24.5</b></div>
+<p><b>Verdict:</b> 14.167 ≫ 2.667, so <b>"tenure ≤ 3" wins</b> (improvement 36.0 vs 24.5). The ≤ 7 split drags the 20 into a group it doesn't fit (+7.5 error), and one misplaced row in a small leaf is expensive. Scanning every candidate threshold and keeping the best is exactly what scikit-learn automates.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>

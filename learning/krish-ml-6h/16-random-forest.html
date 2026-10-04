@@ -77,6 +77,45 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business reading:</b> the lone tree is low-bias/high-variance — it hugs its training rows. Averaging 500 decorrelated votes keeps the low bias and kills the variance: fewer missed churners at the same headcount. No scaling was used anywhere — threshold splits are scale-invariant (the KNN contrast from the notes).</p>
 </div>
 
+<h2>✍️ Solve on Paper — Random Forest</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Bootstrap the rows:</b> draw 6 rows WITH replacement — duplicates are allowed, some rows are never drawn.</li>
+<li><b>Restrict the features:</b> hand each tree only a random subset of the columns.</li>
+<li><b>Grow the tree</b> on exactly what it received: the split that best separates churn/stay on ITS rows and columns.</li>
+<li><b>Repeat</b> for every tree in the forest — different rows, different columns.</li>
+<li><b>Predict with every tree</b>, then take the <b>majority vote</b>.</li>
+</ol>
+<p><b>Worked practice — churn desk, 6 customers, 2 features (complaints 0–5, tenure in months):</b></p>
+<table>
+<tr><th>Customer</th><th>Complaints</th><th>Tenure (months)</th><th>Label</th></tr>
+<tr><td>C1</td><td>4</td><td>2</td><td>churn</td></tr>
+<tr><td>C2</td><td>1</td><td>10</td><td>stay</td></tr>
+<tr><td>C3</td><td>5</td><td>11</td><td>churn</td></tr>
+<tr><td>C4</td><td>0</td><td>12</td><td>stay</td></tr>
+<tr><td>C5</td><td>3</td><td>3</td><td>churn</td></tr>
+<tr><td>C6</td><td>2</td><td>9</td><td>stay</td></tr>
+</table>
+<p><b>Tree 1 — bootstrap [C1, C2, C2, C4, C5, C6] · sees ONLY complaints.</b> C3 was never drawn (out-of-bag for this tree). Best split its rows allow: <b>'complaints ≥ 3 → churn'</b>. Check every drawn row:</p>
+<div class="formula">C1: 4 ≥ 3 → churn, actual churn ✓ · C5: 3 ≥ 3 → churn, actual churn ✓<br>C2: 1 &lt; 3 → stay ✓ (drawn TWICE — counts twice) · C4: 0 &lt; 3 → stay ✓ · C6: 2 &lt; 3 → stay ✓ → <b>0 errors</b></div>
+<p><b>Tree 2 — bootstrap [C1, C3, C4, C5, C5, C6] · sees ONLY tenure.</b> Its best tenure split: <b>'tenure ≤ 6 → churn'</b>. Now the sample bites back:</p>
+<div class="formula">C1: 2 ≤ 6 → churn ✓ · C5: 3 ≤ 6 → churn ✓ (twice) · C4: 12 &gt; 6 → stay ✓ · C6: 9 &gt; 6 → stay ✓<br>C3: 11 &gt; 6 → stay ✗ — actually CHURNED → <b>1 error</b> on its own sample</div>
+<p>Tenure alone cannot separate C3 — a long-tenure customer who churned anyway; complaints alone never stumbles on this data. That disagreement between columns is exactly what the forest exploits.</p>
+<p><b>Tree 3 — bootstrap [C1, C2, C3, C3, C5, C6] · sees BOTH features.</b> Complaints splits its sample perfectly (C1, C3 ×2, C5 on the churn side; C2, C6 on the stay side — 0 errors) while tenure cannot, so the tree splits on <b>'complaints ≥ 3 → churn'</b>.</p>
+<p><b>Test customer T — complaints 4, tenure 10</b> (a 10-month veteran suddenly complaining). Each tree argues from its own split:</p>
+<div class="formula">tree 1 (complaints ≥ 3): 4 ≥ 3 → <b>churn</b><br>tree 2 (tenure ≤ 6):&nbsp;&nbsp;&nbsp;10 &gt; 6 → <b>stay</b> ← tenure alone calls a 10-month veteran 'safe'<br>tree 3 (complaints ≥ 3): 4 ≥ 3 → <b>churn</b><br>MAJORITY: churn 2 : 1 stay → <b>FOREST: CHURN — call them today</b></div>
+<p><b>Thought experiment — what if all 3 trees were IDENTICAL?</b> Same rows (no bootstrap) + same columns (no feature sampling) → every tree learns the same split 'complaints ≥ 3' and the vote is 3–0 <i>every single time</i>. Three copies of one opinion ≈ one tree: variance never drops, and wherever the lone tree is wrong, the forest is wrong in unison. The row bootstrap + feature subset make the trees DISAGREE — and the majority of disagreeing voters is what cancels errors.</p>
+<p><b>Your turn:</b> With the same three trees, predict customer <b>U — complaints 2, tenure 1</b>. Write each tree's vote from its split, take the majority, and sanity-check against the complaints column of the full table.</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p><b>Full solution:</b></p>
+<div class="formula">tree 1 (complaints ≥ 3): 2 &lt; 3 → <b>stay</b><br>tree 2 (tenure ≤ 6):&nbsp;&nbsp;&nbsp;1 ≤ 6 → <b>churn</b> ← tenure alone panics on a 1-month-old account<br>tree 3 (complaints ≥ 3): 2 &lt; 3 → <b>stay</b><br>MAJORITY: stay 2 : 1 churn → <b>FOREST: STAY</b></div>
+<p>Sanity check: C6 (complaints 2, tenure 9) stayed, and no low-complaints customer in the table ever churned — 'stay' matches the data. Note what happened: tree 2 voted churn on tenure alone; the two complaint-seeing trees outvoted it. One blinded voter cannot derail the majority — that is the whole point of decorrelated trees.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Synthetic churn data (600 customers, 30.5% churn rate). Every accuracy and vote below is a real seeded run.</p>

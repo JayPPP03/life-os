@@ -84,6 +84,45 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> asked 'why 100–200 models?' — not accuracy-for-free: with that many voters a tie is practically impossible, so the aggregated verdict is stable.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Bagging by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li>Write the n training rows. Draw a bootstrap sample of n draws WITH replacement — duplicates allowed, and some rows will be missed.</li>
+<li>Train member 1 on its sample only; write down what it answers.</li>
+<li>Draw fresh samples and train members 2, 3, … — every draw independent, all members in parallel.</li>
+<li>Aggregate: classification = majority vote; regression = average of the numbers.</li>
+<li>Boosting contrast: same rows, but SEQUENTIAL — each new weak learner concentrates on the rows the members before it got wrong.</li>
+</ol>
+<p><b>Worked practice — a promo desk with 6 customers A–F:</b> one dataset, two aggregations. Class target = clicked the promo? Regression target = watch-minutes/week.</p>
+<table>
+<tr><th>Customer</th><th>Clicked?</th><th>Watch-min/wk</th></tr>
+<tr><td>A</td><td>Yes</td><td>4</td></tr>
+<tr><td>B</td><td>No</td><td>25</td></tr>
+<tr><td>C</td><td>Yes</td><td>10</td></tr>
+<tr><td>D</td><td>No</td><td>4</td></tr>
+<tr><td>E</td><td>Yes</td><td>20</td></tr>
+<tr><td>F</td><td>No</td><td>6</td></tr>
+</table>
+<p><b>Step 1 — three bootstrap samples (with replacement, written out draw by draw):</b></p>
+<div class="formula">S1 = A, C, C, C, E, F → C drawn 3×; B and D never drawn<br>S2 = B, B, D, D, E, F → B and D 2× each; A and C never drawn<br>S3 = A, D, D, E, E, E → E drawn 3×; B, C, F never drawn</div>
+<p>Both bagging signatures by hand: rows REPEAT inside a sample (with replacement), and roughly a third of the rows miss each draw.</p>
+<p><b>Step 2 — each member answers for a new customer G.</b> Our members are one-leaf trees: each answers with the majority class it drew (class case) or the mean of its drawn targets (regression case).</p>
+<div class="formula">Member 1 (S1): 5 Yes / 1 No → votes <b>Yes</b> &nbsp;·&nbsp; mean = (4+10+10+10+20+6)/6 = 60/6 = <b>10</b><br>Member 2 (S2): 1 Yes / 5 No → votes <b>No</b> &nbsp;·&nbsp; mean = (25+25+4+4+20+6)/6 = 84/6 = <b>14</b><br>Member 3 (S3): 4 Yes / 2 No → votes <b>Yes</b> &nbsp;·&nbsp; mean = (4+4+4+20+20+20)/6 = 72/6 = <b>12</b></div>
+<p><b>Step 3 — aggregate:</b></p>
+<div class="formula">classification: Yes : No = 2 : 1 → MAJORITY <b>Yes</b> (member 2 is outvoted — its error gets cancelled)<br>regression: (10 + 14 + 12)/3 = 36/3 = <b>12.0 min/wk</b></div>
+<p><b>Boosting in one line:</b> run the members sequentially instead — member 2 re-weights the rows member 1 got wrong, member 3 re-weights member 2's mistakes — a chain of weak specialists, not a parallel vote.</p>
+<p><b>Your turn:</b> a 4th draw arrives: <b>S4 = A, A, B, C, E, F</b>. Which rows repeat, which row is never drawn, how does member 4 vote, what does it predict, and do the 4-member verdict and average change?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<div class="formula">S4 = A, A, B, C, E, F → A drawn 2×; D never drawn<br>class: A, A, C, E = Yes (4) vs B, F = No (2) → votes <b>Yes</b><br>regression: (4+4+25+10+20+6)/6 = 69/6 = <b>11.5</b></div>
+<p><b>New aggregates:</b></p>
+<div class="formula">classification: Yes : No = 3 : 1 → still <b>Yes</b><br>regression: (10 + 14 + 12 + 11.5)/4 = 47.5/4 = <b>11.875 min/wk</b></div>
+<p><b>Verdict:</b> the class verdict is unchanged — a 4th voter made the majority safer (2-1 → 3-1) — and the average barely moved (12.0 → 11.875). That stability is exactly why the video recommends 100–200 members: more voters ⇒ ties practically impossible ⇒ stable aggregate.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Every bootstrap draw, stump vote and accuracy below is a real run (seed fixed) — rerun to reproduce.</p>

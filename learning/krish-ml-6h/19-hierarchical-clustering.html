@@ -93,6 +93,61 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> '500 rows, unknown K — what do you run?' Agglomerative, then cut at the longest un-crossed vertical stretch. '1M rows?' K-means — hierarchical merging is too slow at scale.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Hierarchical Clustering</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe (agglomerative, single linkage):</b></p>
+<ol>
+<li><b>Start:</b> n points = n clusters; fill the n×n distance matrix (on a number line: d = |xᵢ − xⱼ|).</li>
+<li><b>Merge</b> the pair with the SMALLEST off-diagonal distance.</li>
+<li><b>Update the matrix:</b> single linkage — distance to the new cluster = MIN distance from any of its members.</li>
+<li><b>Repeat</b> merge → update until one cluster; write down every merge height.</li>
+<li><b>Read the dendrogram:</b> cut through the longest un-crossed stretch; vertical lines crossed = number of clusters.</li>
+</ol>
+<p><b>Worked practice — 5 orders from one dark-kitchen, delivery time in minutes (a number line):</b></p>
+<table>
+<tr><th>Order</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr>
+<tr><td><b>Minutes</b></td><td>2</td><td>4</td><td>14</td><td>17</td><td>23</td></tr>
+</table>
+<p><b>Step 1 — the initial 5×5 matrix</b> (each cell = |xᵢ − xⱼ|, e.g. d(P2,P5) = |4 − 23| = 19):</p>
+<table>
+<tr><th></th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th></tr>
+<tr><td><b>P1</b></td><td>.</td><td>2</td><td>12</td><td>15</td><td>21</td></tr>
+<tr><td><b>P2</b></td><td>2</td><td>.</td><td>10</td><td>13</td><td>19</td></tr>
+<tr><td><b>P3</b></td><td>12</td><td>10</td><td>.</td><td>3</td><td>9</td></tr>
+<tr><td><b>P4</b></td><td>15</td><td>13</td><td>3</td><td>.</td><td>6</td></tr>
+<tr><td><b>P5</b></td><td>21</td><td>19</td><td>9</td><td>6</td><td>.</td></tr>
+</table>
+<p><b>Merge 1 — smallest entry = 2 (P1–P2)</b> → cluster {P1,P2}. Single-linkage update — distance to the pair = MIN over its two members:</p>
+<div class="formula">d({P1,P2},P3) = min(12, 10) = <b>10</b> · d({P1,P2},P4) = min(15, 13) = <b>13</b> · d({P1,P2},P5) = min(21, 19) = <b>19</b></div>
+<table>
+<tr><th></th><th>{P1,P2}</th><th>P3</th><th>P4</th><th>P5</th></tr>
+<tr><td><b>{P1,P2}</b></td><td>.</td><td>10</td><td>13</td><td>19</td></tr>
+<tr><td><b>P3</b></td><td>10</td><td>.</td><td>3</td><td>9</td></tr>
+<tr><td><b>P4</b></td><td>13</td><td>3</td><td>.</td><td>6</td></tr>
+<tr><td><b>P5</b></td><td>19</td><td>9</td><td>6</td><td>.</td></tr>
+</table>
+<p><b>Merge 2 — smallest = 3 (P3–P4)</b> → {P3,P4}. Update again:</p>
+<div class="formula">d({P1,P2},{P3,P4}) = min(10, 13) = <b>10</b> · d({P3,P4},P5) = min(9, 6) = <b>6</b> · d({P1,P2},P5) = 19 (unchanged)</div>
+<table>
+<tr><th></th><th>{P1,P2}</th><th>{P3,P4}</th><th>P5</th></tr>
+<tr><td><b>{P1,P2}</b></td><td>.</td><td>10</td><td>19</td></tr>
+<tr><td><b>{P3,P4}</b></td><td>10</td><td>.</td><td>6</td></tr>
+<tr><td><b>P5</b></td><td>19</td><td>6</td><td>.</td></tr>
+</table>
+<p><b>Merge 3 — smallest = 6 ({P3,P4}–P5)</b> → {P3,P4,P5}. One pair of clusters remains:</p>
+<div class="formula">d({P1,P2},{P3,P4,P5}) = min(12, 15, 21, 10, 13, 19) = <b>10</b> ← the final merge height</div>
+<p><b>Merge 4 — everything joins at 10.</b> The merge history — the dendrogram — has heights <b>2 → 3 → 6 → 10</b>: each merge happens FARTHER out than the last, and that rising sequence is what makes the tree readable.</p>
+<p><b>Read it:</b> the gaps between consecutive merge heights are 1 (2→3), 3 (3→6), <b>4 (6→10) ← biggest</b>. Cut through the 6→10 stretch: the cut crosses <b>2 vertical lines → 2 clusters</b>: {P1,P2} = express deliveries, {P3,P4,P5} = standard. (Cut a little lower, between 3 and 6, and you get 3: {P1,P2}, {P3,P4}, {P5} — the 23-minute order becomes its own anomaly cluster.)</p>
+<p><b>Your turn:</b> Three new orders arrive: <b>6, 16 and 40 minutes</b>. WITHOUT re-running the whole algorithm, attach each to its nearest of the two final clusters — remember, single linkage means distance to a CLUSTER = min distance to any of its members.</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p><b>Full solution:</b></p>
+<div class="formula">6:&nbsp;&nbsp;d to {P1,P2} = min(|6−2|, |6−4|) = 2 · d to {P3,P4,P5} = min(8, 11, 17) = 8 → <b>express {P1,P2}</b><br>16: d to {P1,P2} = min(14, 12) = 12 · d to {P3,P4,P5} = min(|16−14|, |16−17|, |16−23|) = min(2, 1, 7) = 1 → <b>standard {P3,P4,P5}</b><br>40: d to {P1,P2} = min(38, 36) = 36 · d to {P3,P4,P5} = min(26, 23, 17) = 17 → <b>standard {P3,P4,P5}</b></div>
+<p>Check the mins for 16 and 40: to {P3,P4,P5} the member distances are |16−14| = 2, |16−17| = 1, |16−23| = 7 → min 1; |40−14| = 26, |40−17| = 23, |40−23| = 17 → min 17. Note the 40-minute order: nowhere near anything, yet single linkage still pins it to the nearer cluster — the 'this is an outlier' signal lives in the dendrogram height (the final merge at 10), not in the assignment itself.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same 5 customers, same hand merges — every output below is from a real run.</p>

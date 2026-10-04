@@ -81,6 +81,59 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> 'A point has silhouette −0.3. What does that mean and what do you do?' → b &lt; a: it fits a neighboring cluster better; treat it as a misassignment signal and re-examine K/init, not as an outlier to delete.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Silhouette by hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Draw the points and their assigned clusters.</b> Every cluster needs ≥ 2 points, or a(i) is undefined.</li>
+<li><b>For each point i compute a(i):</b> the mean distance to the OTHER points of its OWN cluster (cohesion).</li>
+<li><b>Then b(i):</b> the mean distance to the points of the nearest OTHER cluster (separation).</li>
+<li><b>Then s(i) = (b − a)/max(a, b)</b> — do the division every time; the sign is the whole story.</li>
+<li><b>Average:</b> per cluster for the bars, across all points for the headline score. Any negative = a misassignment alarm.</li>
+</ol>
+<p><b>Worked practice — 4 app users, 2 engagement segments (cluster 1 = {A, B}, cluster 2 = {C, D}):</b></p>
+<table>
+<tr><th>User</th><th>x</th><th>y</th><th>Assigned cluster</th></tr>
+<tr><td>A</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>B</td><td>2</td><td>0</td><td>1</td></tr>
+<tr><td>C</td><td>8</td><td>1</td><td>2</td></tr>
+<tr><td>D</td><td>2.5</td><td>0.5</td><td>2</td></tr>
+</table>
+<p><b>Given distance table</b> (Euclidean, all six pairs — verify one or two yourself: d(A,C) = √(8²+1²) = √65 = 8.0623):</p>
+<table>
+<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+<tr><td><b>A</b></td><td>—</td><td>2.0000</td><td>8.0623</td><td>2.5495</td></tr>
+<tr><td><b>B</b></td><td></td><td>—</td><td>6.0828</td><td>0.7071</td></tr>
+<tr><td><b>C</b></td><td></td><td></td><td>—</td><td>5.5227</td></tr>
+<tr><td><b>D</b></td><td></td><td></td><td></td><td>—</td></tr>
+</table>
+<p><b>Every point, every division:</b> in cluster 1, A's only mate is B (and vice versa); in cluster 2, C pairs with D.</p>
+<div class="formula">A: a = d(A,B) = 2.0000 · b = (d(A,C)+d(A,D))/2 = (8.0623+2.5495)/2 = 5.3059<br>
+s(A) = (5.3059 − 2.0000)/max(2.0000, 5.3059) = 3.3059/5.3059 = <b>+0.6231</b><br><br>
+B: a = d(B,A) = 2.0000 · b = (d(B,C)+d(B,D))/2 = (6.0828+0.7071)/2 = 3.3949<br>
+s(B) = (3.3949 − 2.0000)/3.3949 = 1.3949/3.3949 = <b>+0.4109</b><br><br>
+C: a = d(C,D) = 5.5227 · b = (d(C,A)+d(C,B))/2 = (8.0623+6.0828)/2 = 7.0725<br>
+s(C) = (7.0725 − 5.5227)/7.0725 = 1.5498/7.0725 = <b>+0.2191</b><br><br>
+D: a = d(D,C) = 5.5227 · b = (d(D,A)+d(D,B))/2 = (2.5495+0.7071)/2 = 1.6283<br>
+s(D) = (1.6283 − 5.5227)/5.5227 = −3.8944/5.5227 = <b>−0.7052</b> ⚠️ NEGATIVE</div>
+<div class="formula">cluster 1 average = (0.6231+0.4109)/2 = <b>0.5170</b> — healthy segment<br>
+cluster 2 average = (0.2191−0.7052)/2 = <b>−0.2430</b> — this bar would scream<br>
+overall silhouette = (0.6231+0.4109+0.2191−0.7052)/4 = 0.5479/4 = <b>0.1370</b> (sklearn: 0.137)</div>
+<p><b>Interpret the negative:</b> D's b (1.6283 — its mean distance to cluster 1) is about 3.4× SMALLER than its a (5.5227 — its distance to its own cluster-mate C). D lives next to A and B but was filed under C's segment: b &lt; a ⇔ misassigned. Note the headline 0.1370 is still "positive" — the average alone hides the problem, which is exactly why the video reads per-cluster bars before believing any score. The fix is a refit/reassignment, never a deletion.</p>
+<p><b>Your turn:</b> a 5th user <b>E(3, 0.5)</b> arrives and the clustering puts E in cluster 1 (with A and B). Working only from E: compute the four distances d(E,A), d(E,B), d(E,C), d(E,D), then a(E), b(E), and s(E) — with the division.</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p>Distances from E(3, 0.5):</p>
+<div class="formula">d(E,A) = √(3²+0.5²) = √9.25 = 3.0414 · d(E,B) = √(1²+0.5²) = √1.25 = 1.1180<br>
+d(E,C) = √(5²+0.5²) = √25.25 = 5.0249 · d(E,D) = √(0.5²+0²) = 0.5000</div>
+<div class="formula">a(E) = (3.0414+1.1180)/2 = 2.0797 (A and B are E's cluster-1 mates)<br>
+b(E) = (5.0249+0.5000)/2 = 2.7625 (C and D are the nearest other cluster)<br>
+s(E) = (2.7625 − 2.0797)/max(2.0797, 2.7625) = 0.6828/2.7625 = <b>+0.2472</b></div>
+<p>Positive, but the weakest in cluster 1 (A: 0.6231, B: 0.4109, E: 0.2472): E sits toward the fence between the segments. Fine to keep — just don't be surprised if a refit shuffles it.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same 4 customers, same hand numbers — every output below is from a real run.</p>

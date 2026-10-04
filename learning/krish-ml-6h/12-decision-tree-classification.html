@@ -86,6 +86,51 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business read:</b> complaints are the retention alarm — call complainers first. Contract type barely separates (gain 0.082): it is a second-order follow-up question, not the root.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Entropy &amp; Information Gain by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li>Write the table. Count the classes at the root (churn vs stay) and compute the root entropy H(S).</li>
+<li>Pick one feature and split the rows into branches — one branch per value.</li>
+<li>Per branch: count churn/stay and compute H = −p·log₂(p) − (1−p)·log₂(1−p). A pure branch has H = 0.</li>
+<li>Weight the branch entropies by size: weighted = Σ (branch rows ÷ total) × H(branch).</li>
+<li>Gain = H(root) − weighted. The feature with the biggest gain becomes the root question.</li>
+<li>Repeat inside each impure branch until every leaf is pure (or you run out of features).</li>
+</ol>
+<p><b>Worked practice — an 8-customer churn desk:</b> 8 customers, 4 churned / 4 stayed — a fully mixed root. Two candidate questions: <b>Complained?</b> and <b>Refund?</b> (a third column waits for you below).</p>
+<table>
+<tr><th>#</th><th>Complained?</th><th>Refund?</th><th>Tenure &lt; 12 mo?</th><th>Churned?</th></tr>
+<tr><td>1</td><td>Yes</td><td>Yes</td><td>Yes</td><td><b>Yes</b></td></tr>
+<tr><td>2</td><td>Yes</td><td>Yes</td><td>Yes</td><td><b>Yes</b></td></tr>
+<tr><td>3</td><td>No</td><td>Yes</td><td>Yes</td><td><b>Yes</b></td></tr>
+<tr><td>4</td><td>No</td><td>No</td><td>Yes</td><td><b>Yes</b></td></tr>
+<tr><td>5</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+<tr><td>6</td><td>Yes</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>7</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>8</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+</table>
+<p>Handy log₂ values: log₂(0.5) = 1 · log₂(0.25) = 2 · log₂(0.75) ≈ 0.415 &nbsp;(a fraction's log₂ is negative — the minus sign in H = −Σp·log₂p flips it back to positive).</p>
+<p><b>Step 1 — root entropy</b> (8 rows: 4 churn / 4 stay → p = 0.5 each):</p>
+<div class="formula">H(S) = −0.5·log₂(0.5) − 0.5·log₂(0.5) = −0.5(−1) − 0.5(−1) = 0.5 + 0.5 = <b>1.0</b> ← maximum impurity</div>
+<p><b>Step 2 — split on "Complained?"</b> (Yes: rows 1, 2, 5, 6 → 2 churn / 2 stay; No: rows 3, 4, 7, 8 → 2 churn / 2 stay):</p>
+<div class="formula">Yes branch (p = 0.5): H = −0.5·log₂(0.5) − 0.5·log₂(0.5) = <b>1.0</b><br>No branch (p = 0.5): same 2/2 mix → H = <b>1.0</b><br><br>weighted = (4/8)×1.0 + (4/8)×1.0 = 0.5 + 0.5 = <b>1.0</b><br>Gain(S, Complained) = 1.0 − 1.0 = <b>0</b> ← this question tells you NOTHING</div>
+<p>Both branches are exactly as mixed as the parent. A feature can exist and still be worthless — entropy proves it with one number, no vibes needed.</p>
+<p><b>Step 3 — split on "Refund?"</b> (Yes: rows 1, 2, 3, 5 → 3 churn / 1 stay; No: rows 4, 6, 7, 8 → 1 churn / 3 stay):</p>
+<div class="formula">Yes branch (p = 0.75 / 0.25): H = −0.75·log₂(0.75) − 0.25·log₂(0.25)<br>&nbsp;&nbsp;&nbsp;&nbsp;= −0.75(−0.415) − 0.25(−2) = 0.311 + 0.5 = <b>0.811</b><br>No branch (p = 0.25 / 0.75): mirror image → H = <b>0.811</b><br><br>weighted = (4/8)×0.811 + (4/8)×0.811 = <b>0.811</b><br>Gain(S, Refund) = 1.0 − 0.811 = <b>0.189</b></div>
+<p><b>Step 4 — the root decision:</b> Gain(Refund) = 0.189 &gt; Gain(Complained) = 0 → <b>the tree asks "did we issue a refund?" first.</b> Both branches are still impure (0.811 each), so each keeps splitting — which is where the third column earns its keep.</p>
+<p><b>Your turn:</b> compute the information gain of <b>Tenure &lt; 12 mo?</b> — Yes branch: rows 1–5 (4 churn / 1 stay, so p = 0.8; use log₂(0.8) ≈ 0.322 and log₂(0.2) ≈ 2.322); No branch: rows 6–8 (0 churn / 3 stay). Mind the branch sizes — they are NOT 50/50 this time. Does it beat Refund's 0.189?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p><b>Step 1 — Yes branch (5 rows: 4 churn / 1 stay, p = 0.8):</b></p>
+<div class="formula">H = −0.8·log₂(0.8) − 0.2·log₂(0.2) = 0.8×0.322 + 0.2×2.322 = 0.258 + 0.464 = <b>0.722</b></div>
+<p><b>Step 2 — No branch (3 rows: 0 churn / 3 stay):</b> pure node → <b>H = 0</b>.</p>
+<p><b>Step 3 — weight by size (5 of 8 vs 3 of 8):</b></p>
+<div class="formula">weighted = (5/8)×0.722 + (3/8)×0 = 0.451 + 0 = <b>0.451</b><br>Gain(S, Tenure &lt; 12 mo) = 1.0 − 0.451 = <b>0.549</b></div>
+<p><b>Verdict:</b> 0.549 &gt; 0.189 &gt; 0 — full ranking: <b>Tenure &lt; 12 mo ≫ Refund ≫ Complained</b>. The tenure split wins the root, and its No branch is already a pure stay-leaf; only the 5-row Yes branch (H = 0.722) needs more questions. And note the trap you just avoided: weighting by 0.5/0.5 instead of 5/8 and 3/8 is the classic entropy mistake.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>

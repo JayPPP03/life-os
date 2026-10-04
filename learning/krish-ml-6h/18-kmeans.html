@@ -92,6 +92,53 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> 'Why k-means++ over random init?' — far-apart starting centroids avoid two centers landing in one dense region and splitting a real cluster; 'why not hierarchical on 100K+ profiles?' — speed (topic 19).</p>
 </div>
 
+<h2>✍️ Solve on Paper — K-Means</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe (K=2):</b></p>
+<ol>
+<li><b>Place 2 starting centroids.</b></li>
+<li><b>Assign:</b> Euclidean distance d = √((x₂−x₁)² + (y₂−y₁)²) from every point to BOTH centroids — nearest wins.</li>
+<li><b>Update:</b> each centroid = the MEAN of its assigned points.</li>
+<li><b>Reassign</b> against the moved centroids; note who switched.</li>
+<li><b>Repeat</b> until assignments stop changing → converged.</li>
+</ol>
+<p><b>Worked practice — 6 app customers (spend ₹k/yr, visits/month):</b></p>
+<table>
+<tr><th>Customer</th><th>Spend (₹k)</th><th>Visits/mo</th></tr>
+<tr><td>M1</td><td>12</td><td>3</td></tr>
+<tr><td>M2</td><td>15</td><td>4</td></tr>
+<tr><td>M3</td><td>14</td><td>2</td></tr>
+<tr><td>M4</td><td>40</td><td>20</td></tr>
+<tr><td>M5</td><td>45</td><td>22</td></tr>
+<tr><td>M6</td><td>38</td><td>18</td></tr>
+</table>
+<p><b>Initial centroids:</b> c1 = (12, 3), c2 = (45, 22).</p>
+<p><b>Iteration 1 — all 12 distances, √ shown:</b></p>
+<div class="formula">d(M1,c1) = √(0²+0²) = <b>0.00</b> &nbsp;·&nbsp; d(M1,c2) = √(33²+19²) = √1450 ≈ <b>38.08</b> → A<br>d(M2,c1) = √(3²+1²) = √10 ≈ <b>3.16</b> &nbsp;·&nbsp; d(M2,c2) = √(30²+18²) = √1224 ≈ <b>34.99</b> → A<br>d(M3,c1) = √(2²+1²) = √5 ≈ <b>2.24</b> &nbsp;·&nbsp; d(M3,c2) = √(31²+20²) = √1361 ≈ <b>36.89</b> → A<br>d(M4,c1) = √(28²+17²) = √1073 ≈ <b>32.76</b> &nbsp;·&nbsp; d(M4,c2) = √(5²+2²) = √29 ≈ <b>5.39</b> → B<br>d(M5,c1) = √(33²+19²) = √1450 ≈ <b>38.08</b> &nbsp;·&nbsp; d(M5,c2) = <b>0.00</b> → B<br>d(M6,c1) = √(26²+15²) = √901 ≈ <b>30.02</b> &nbsp;·&nbsp; d(M6,c2) = √(7²+4²) = √65 ≈ <b>8.06</b> → B</div>
+<p><b>Update — centroids become the means of their members:</b></p>
+<div class="formula">c1 = ((12+15+14)/3, (3+4+2)/3) = <b>(13.67, 3.00)</b><br>c2 = ((40+45+38)/3, (20+22+18)/3) = <b>(41.00, 20.00)</b></div>
+<p><b>Iteration 2 — reassign against the moved centroids.</b> Example expansion: d(M3, c1) = √((14−13.67)² + (2−3)²) = √(0.33² + 1²) = √(0.11 + 1) = √1.11 ≈ <b>1.05</b>. All twelve (centroids carried at full precision, shown to 2 dp):</p>
+<table>
+<tr><th>Customer</th><th>d to c1 (13.67, 3.00)</th><th>d to c2 (41.00, 20.00)</th><th>Assigned</th><th>Was</th></tr>
+<tr><td>M1 (12, 3)</td><td><b>1.67</b></td><td>√(29²+17²) ≈ 33.62</td><td>A</td><td>A</td></tr>
+<tr><td>M2 (15, 4)</td><td><b>1.67</b></td><td>√(26²+16²) ≈ 30.53</td><td>A</td><td>A</td></tr>
+<tr><td>M3 (14, 2)</td><td><b>1.05</b></td><td>√(27²+18²) ≈ 32.45</td><td>A</td><td>A</td></tr>
+<tr><td>M4 (40, 20)</td><td>√(26.33²+17²) ≈ 31.34</td><td><b>1.00</b></td><td>B</td><td>B</td></tr>
+<tr><td>M5 (45, 22)</td><td>√(31.33²+19²) ≈ 36.64</td><td>√(4²+2²) ≈ <b>4.47</b></td><td>B</td><td>B</td></tr>
+<tr><td>M6 (38, 18)</td><td>√(24.33²+15²) ≈ 28.59</td><td>√(3²+2²) ≈ <b>3.61</b></td><td>B</td><td>B</td></tr>
+</table>
+<div class="formula">nobody moved → recompute: same members → same (13.67, 3.00) and (41.00, 20.00) → <b>CONVERGED</b> (WCSS = 40.67)</div>
+<p><b>Business reading:</b> cluster A ≈ ₹13.7k spend, 3 visits/month → light users → <b>nurture</b> push notifications. Cluster B ≈ ₹41k, 20 visits/month → power users → <b>VIP</b> retention perks. Two lists, two messages.</p>
+<p><b>Your turn:</b> A new customer lands at <b>(30, 10)</b>. Compute both distances against the converged centroids and assign the cluster — which campaign list? Is the answer obvious before you compute?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p><b>Full solution:</b></p>
+<div class="formula">d((30,10), c1) = √((30−13.67)² + (10−3)²) = √(16.33² + 7²) = √(266.8 + 49) = √315.8 ≈ <b>17.77</b><br>d((30,10), c2) = √((30−41)² + (10−20)²) = √(11² + 10²) = √(121 + 100) = √221 ≈ <b>14.87</b><br>14.87 &lt; 17.77 → <b>cluster B — the VIP list</b></div>
+<p>Not obvious: (30, 10) is a middling customer, yet it genuinely sits closer to the power-user centroid. Assignment is by DISTANCE TO THE CENTROID, not by eyeballing the spend value — which is exactly why the update step (moving the centroid) matters as much as the assignment step.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same 6 customers, same hand numbers — every output below is from a real run. Paste each cell into a notebook and compare.</p>

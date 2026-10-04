@@ -95,6 +95,53 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> 'Heavy outliers in customer data — why does that hurt k-means specifically?' → every point must join a cluster, so outliers move the mean-based centroids; DBSCAN just labels them noise.</p>
 </div>
 
+<h2>✍️ Solve on Paper — DBSCAN by hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>List the ε-neighborhood of EVERY point</b> — all points within distance ε. The count INCLUDES the point itself.</li>
+<li><b>Count ≥ MinPts → CORE.</b> Cores live in dense regions and anchor clusters.</li>
+<li><b>Not core, but within ε of a core → BORDER</b> — it joins that core's cluster from the edge.</li>
+<li><b>Neither → NOISE</b> — left unclustered, label −1.</li>
+<li><b>Connect cores</b> that lie within ε of each other, then hang their borders on. K is never chosen — it falls out of the density.</li>
+</ol>
+<p><b>Worked practice — 8 pickup points on a delivery grid, ε = 1.5, MinPts = 3:</b></p>
+<table>
+<tr><th>Point</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th></tr>
+<tr><td><b>(x, y)</b></td><td>(0,0)</td><td>(1,0)</td><td>(2,0)</td><td>(3,0)</td><td>(7,0)</td><td>(8,0)</td><td>(8,1)</td><td>(5,3)</td></tr>
+</table>
+<p><b>Grid subtlety before the census:</b> the diagonal neighbor sits at √2 ≈ 1.4142, and 1.4142 ≤ 1.5 — so at THIS ε diagonals COUNT. (The mini-project's ε = 1.1 excluded them. Distance decides, never board-game adjacency.)</p>
+<div class="formula">worked checks: d(E,G) = √(1²+1²) = √2 ≈ 1.4142 ≤ 1.5 → neighbors ✓ · d(B,D) = 2 &gt; 1.5 → NOT neighbors<br>d(H,D) = √(2²+3²) = √13 ≈ 3.6056 — H is far from everything on the grid</div>
+<p><b>The census — every point listed and counted:</b></p>
+<table>
+<tr><th>Point</th><th>Neighbors within ε = 1.5 (self + …)</th><th>Count</th><th>Verdict</th></tr>
+<tr><td>A (0,0)</td><td>self + B</td><td>2</td><td>not core</td></tr>
+<tr><td>B (1,0)</td><td>self + A, C</td><td>3</td><td><b>CORE</b></td></tr>
+<tr><td>C (2,0)</td><td>self + B, D</td><td>3</td><td><b>CORE</b></td></tr>
+<tr><td>D (3,0)</td><td>self + C</td><td>2</td><td>not core</td></tr>
+<tr><td>E (7,0)</td><td>self + F, G (the diagonal!)</td><td>3</td><td><b>CORE</b></td></tr>
+<tr><td>F (8,0)</td><td>self + E, G</td><td>3</td><td><b>CORE</b></td></tr>
+<tr><td>G (8,1)</td><td>self + E, F</td><td>3</td><td><b>CORE</b></td></tr>
+<tr><td>H (5,3)</td><td>self only</td><td>1</td><td>not core</td></tr>
+</table>
+<p><b>Then connect and classify:</b></p>
+<div class="formula">connect cores: d(B,C) = 1 ≤ 1.5 → B and C form one cluster · d(E,F) = d(F,G) = 1 and d(E,G) = √2 ≤ 1.5 → E, F, G form another<br>
+borders: A is within ε of core B → joins B's cluster · D is within ε of core C → joins C's cluster<br>
+noise: H is not core, and the nearest CORE (E or G) is √13 ≈ 3.6056 away — far outside ε → <b>NOISE, label −1</b></div>
+<div class="formula">final clusters: {A, B, C, D} = cluster 0 (cores B, C; borders A, D) · {E, F, G} = cluster 1 (all three core) · H = −1<br>
+sklearn DBSCAN(eps=1.5, min_samples=3) returns exactly this: labels 0,0,0,0,1,1,1,−1 — two clusters + noise, K never given</div>
+<p><b>Read it like the business problem:</b> the west chain A–D is one dense pickup zone, the east triangle E–G is a second, and H (a lone pickup at (5,3)) gets no zone at all — it routes to the review queue instead of polluting a segment.</p>
+<p><b>Your turn:</b> same 8 points, same ε = 1.5 — but <b>MinPts = 4</b>. Recount the census and classify every point. What does DBSCAN return?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<p>The counts do not change — only the bar does:</p>
+<div class="formula">A: 2 &lt; 4 · B: 3 &lt; 4 · C: 3 &lt; 4 · D: 2 &lt; 4 · E: 3 &lt; 4 · F: 3 &lt; 4 · G: 3 &lt; 4 · H: 1 &lt; 4<br>
+→ <b>zero core points</b> → no cluster can form → <b>ALL 8 points become noise</b> (sklearn: every label −1)</div>
+<p>One hyperparameter notch erased the entire structure. That is the ε/MinPts trade-off from the Coach's review in action: MinPts too high brands everything noise, ε too large merges everything into one blob — tune the pair together, and let the census (not hope) decide.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same 8 accounts, same census — every output below is from a real run.</p>

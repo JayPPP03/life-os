@@ -82,6 +82,47 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> contrast the twins in one breath: "classifier starts at 0.5 and ends in a sigmoid; regressor starts at the mean and adds α×leaf directly — the shared skeleton is residuals → similarity → gain → sequential correction."</p>
 </div>
 
+<h2>✍️ Solve on Paper — XGBoost regressor by hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Base = the MEAN of all targets.</b> Residual = y − mean.</li>
+<li><b>For each candidate split:</b> similarity per leaf and for the root = Σres²/(n+λ), with λ = 1.</li>
+<li><b>Gain = sim(left) + sim(right) − sim(root)</b> — compute it for every candidate; the highest wins.</li>
+<li><b>Leaf value = Σres/(n+λ)</b> — the leaf's shrunken mean residual.</li>
+<li><b>Inference: base + α × leaf</b>, with α = 0.5.</li>
+</ol>
+<p><b>Worked practice — price a flat (₹ lakh) from its bedroom count, 4 listings, λ = 1:</b></p>
+<table>
+<tr><th>Flat</th><th>Bedrooms</th><th>Price y (₹L)</th><th>Base = 55.5</th><th>Residual y−55.5</th></tr>
+<tr><td>F1</td><td>1</td><td>50</td><td>55.5</td><td>−5.5</td></tr>
+<tr><td>F2</td><td>2</td><td>51</td><td>55.5</td><td>−4.5</td></tr>
+<tr><td>F3</td><td>3</td><td>60</td><td>55.5</td><td>+4.5</td></tr>
+<tr><td>F4</td><td>4</td><td>61</td><td>55.5</td><td>+5.5</td></tr>
+</table>
+<p><b>Step 1 — base = (50+51+60+61)/4 = 222/4 = 55.5.</b> Residuals −5.5, −4.5, +4.5, +5.5 — they sum to 0 (the mean is the balance point).</p>
+<p><b>Step 2 — root similarity first:</b></p>
+<div class="formula">sim(root) = (30.25 + 20.25 + 20.25 + 30.25)/(4+1) = 101/5 = <b>20.2</b></div>
+<p><b>Step 3 — all three candidate splits; gain picks the winner:</b></p>
+<div class="formula">bedrooms ≤ 2.5: left {−5.5, −4.5} → 50.5/3 = <b>16.8333</b> · right {+4.5, +5.5} → 50.5/3 = <b>16.8333</b><br>
+&nbsp;&nbsp;gain = 16.8333 + 16.8333 − 20.2 = <b>13.4667</b> ← WINNER<br><br>
+bedrooms ≤ 1.5: left {−5.5} → 30.25/2 = 15.125 · right {−4.5, +4.5, +5.5} → 70.75/4 = 17.6875<br>
+&nbsp;&nbsp;gain = 15.125 + 17.6875 − 20.2 = <b>12.6125</b><br><br>
+bedrooms ≤ 3.5: left {−5.5, −4.5, +4.5} → 17.6875 · right {+5.5} → 15.125 → gain = <b>12.6125</b></div>
+<div class="formula">leaf values: left = (−5.5 + −4.5)/(2+1) = −10/3 = <b>−3.3333</b> · right = (+4.5 + +5.5)/(2+1) = +10/3 = <b>+3.3333</b></div>
+<p><b>Step 4 — inference for a NEW 2-bedroom flat:</b></p>
+<div class="formula">prediction = 55.5 + 0.5×(−3.3333) = 55.5 − 1.6667 = <b>53.83 ₹L</b></div>
+<p><b>Step 5 — tree 2 attacks the leftovers:</b> round-1 predictions are 53.83, 53.83, 57.17, 57.17, so the fresh residuals are −3.83, −2.83, +2.83, +3.83 → root similarity collapses 20.2 → <b>9.09</b>. Sequential correction, visible in one number.</p>
+<p><b>Your turn:</b> a new <b>3-bedroom</b> flat walks in. Which leaf catches it, and what is the predicted price?</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<div class="formula">is 3 ≤ 2.5? No → right leaf (bedrooms &gt; 2.5) → leaf value +3.3333<br>
+prediction = 55.5 + 0.5×(+3.3333) = 55.5 + 1.6667 = <b>57.17 ₹L</b></div>
+<p>The same leaf catches the 4-bedroom flat too — one boosting round can only say "small side vs large side". More trees = finer steps (each damped by α = 0.5), which is exactly why the real model uses hundreds of rounds.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
 <div class="card">
 <p class="mini">The video's numbers, recomputed end to end. Every output below is pasted from a real run of these exact cells.</p>

@@ -82,6 +82,47 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> "Walk me through your XGBoost churn model" → base 0.5 → residuals → similarity → gain → log-odds + sigmoid, in that order, then pivot to production: retraining cadence, drift monitoring, safe rollbacks.</p>
 </div>
 
+<h2>✍️ Solve on Paper — XGBoost classifier by hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Base prediction:</b> 0.5 for EVERY row. Residual = y − 0.5, so every residual is ±0.5.</li>
+<li><b>Pick a split</b> and drop the rows into two leaves.</li>
+<li><b>Similarity for each leaf AND the root:</b> Σres² / (Σp(1−p) + λ). All three, every time.</li>
+<li><b>Gain = sim(left) + sim(right) − sim(root)</b> — this number picks the split.</li>
+<li><b>Leaf output = Σres / (Σp(1−p) + λ).</b></li>
+<li><b>Inference per row:</b> log-odds 0 + α × leaf output → sigmoid → probability.</li>
+</ol>
+<p><b>Worked practice — a toy spam filter: 4 emails, one feature (links in the body), λ = 1:</b></p>
+<table>
+<tr><th>Email</th><th>Links</th><th>Spam y</th><th>Base pred</th><th>Residual y−0.5</th></tr>
+<tr><td>E1</td><td>1</td><td>0</td><td>0.5</td><td>−0.5</td></tr>
+<tr><td>E2</td><td>3</td><td>0</td><td>0.5</td><td>−0.5</td></tr>
+<tr><td>E3</td><td>8</td><td>1</td><td>0.5</td><td>+0.5</td></tr>
+<tr><td>E4</td><td>10</td><td>1</td><td>0.5</td><td>+0.5</td></tr>
+</table>
+<p><b>Split: links ≤ 5</b> → left leaf {E1, E2}, right leaf {E3, E4}. Round 1: every p is still 0.5, so p(1−p) = 0.25 per row.</p>
+<div class="formula">sim(left) = (0.25+0.25)/(0.25+0.25+1) = 0.5/1.5 = <b>0.3333</b><br>
+sim(right) = (0.25+0.25)/(0.25+0.25+1) = 0.5/1.5 = <b>0.3333</b><br>
+sim(root) = (0.25×4)/(0.25×4+1) = 1.0/2.0 = <b>0.5</b><br>
+gain = 0.3333 + 0.3333 − 0.5 = <b>0.1667</b> — positive, so the split earns its place</div>
+<div class="formula">leaf output (left) = (−0.5 + −0.5)/1.5 = −1.0/1.5 = <b>−0.6667</b><br>
+leaf output (right) = (+0.5 + +0.5)/1.5 = +1.0/1.5 = <b>+0.6667</b></div>
+<p><b>Inference — every row, sigmoids included</b> (α = 0.5):</p>
+<div class="formula">E1, E2 (links ≤ 5): log-odds = 0 + 0.5×(−0.6667) = −0.3333 → sigmoid(−0.3333) = 1/(1+e^0.3333) = <b>0.4174</b> spam risk<br>
+E3, E4 (links &gt; 5): log-odds = 0 + 0.5×(+0.6667) = +0.3333 → sigmoid(+0.3333) = 1/(1+e^−0.3333) = <b>0.5826</b> spam risk<br>
+round-2 residuals: y=0 rows: 0 − 0.4174 = −0.4174 · y=1 rows: 1 − 0.5826 = +0.4174 (shrunk from ±0.5 — tree 2 attacks what is left)</div>
+<p><b>Your turn:</b> would the competing split <b>links ≤ 2</b> (left {E1}, right {E2, E3, E4}) have been better? Compute its two leaf similarities and its gain, then compare with 0.1667.</p>
+<div class="missing"><details><summary>Attempt first, then open the full solution</summary>
+<div class="formula">left leaf {−0.5}: sim = 0.25/(0.25+1) = 0.25/1.25 = <b>0.2</b><br>
+right leaf {−0.5, +0.5, +0.5}: sim = (0.25×3)/(0.25×3+1) = 0.75/1.75 = <b>0.4286</b><br>
+gain = 0.2 + 0.4286 − 0.5 = <b>0.1286</b></div>
+<p>0.1286 &lt; 0.1667 → links ≤ 5 stays the winner: letting a −0.5 hide inside the spam leaf diluted its purity, and the gain formula SAW it. That is what "gain picks the split" means — no eyeballing, just subtraction.</p>
+</details></div>
+<p class="mini">💡 Solve twice from memory — mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
 <div class="card">
 <p class="mini">The video's numbers, recomputed. Every output below is pasted from a real run of these exact cells.</p>

@@ -93,6 +93,55 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Keep the video's closing line too:</b> even tuned, the linear model stays capped — the next real gain comes from non-linear models (XGBoost), which is exactly where my churn and forecasting projects went.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Ridge &amp; Lasso Cost by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Pick a candidate slope θ1</b> (any number).</li>
+<li><b>Refit the intercept honestly for THAT slope:</b> θ0 = ȳ − θ1·x̄ — every slope deserves its own best intercept.</li>
+<li><b>SSE:</b> predict all rows with (θ0, θ1), square each residual, sum them.</li>
+<li><b>Add the tax:</b> Ridge J = SSE + λ·θ1² &nbsp;·&nbsp; Lasso J = SSE + λ·|θ1|.</li>
+<li><b>Repeat per slope, tabulate, mark the smallest J.</b></li>
+</ol>
+<p><b>Worked practice — the same flat data</b> (rooms x = 1..5, price y = 30, 35, 50, 55, 65 ₹L; x̄ = 3, ȳ = 47; plain least squares said θ1 = 9, θ0 = 20). Now tax the slope.</p>
+<p><b>Ridge, λ = 10</b> — one row fully worked (θ1 = 8): θ0 = 47 − 8×3 = 23 → predictions 31, 39, 47, 55, 63 → residuals −1, −4, 3, 0, 2 → SSE = 1+16+9+0+4 = 30. Then the tax: 10×8² = 640 → J = 670. Same arithmetic for every row:</p>
+<table>
+<tr><th>θ1</th><th>θ0 = 47−3θ1</th><th>SSE</th><th>10·θ1²</th><th>J = SSE + 10θ1²</th></tr>
+<tr><td><b>8.00</b></td><td>23.00</td><td>30.000</td><td>640.00</td><td><b>670.00</b> ← min of the grid</td></tr>
+<tr><td>8.25</td><td>22.25</td><td>25.625</td><td>680.625</td><td>706.25</td></tr>
+<tr><td>8.50</td><td>21.50</td><td>22.500</td><td>722.50</td><td>745.00</td></tr>
+<tr><td>8.75</td><td>20.75</td><td>20.625</td><td>765.625</td><td>786.25</td></tr>
+<tr><td>9.00</td><td>20.00</td><td>20.000</td><td>810.00</td><td>830.00</td></tr>
+</table>
+<p>On this grid the cost only climbs → 8.0 wins. But be honest: the λ = 10 tax is <b>quadratic</b>, so it keeps rewarding smaller slopes. Extend the grid and the true bottom appears:</p>
+<div class="formula">J(4.0) = 430.0 &nbsp;&nbsp; J(<b>4.5</b>) = <b>425.0</b> ← true minimum &nbsp;&nbsp; J(5.0) = 430.0</div>
+<p>The tax dragged the slope from 9 all the way to <b>4.5</b>: SSE tripled (20 → 222.5), but the penalty saving (810 → 202.5) more than paid for it. That is Ridge's character — <b>strong L2 crushes big coefficients</b>.</p>
+<p><b>Lasso, λ = 5</b> — same SSE column, flat tax λ·|θ1|:</p>
+<table>
+<tr><th>θ1</th><th>SSE</th><th>5·|θ1|</th><th>J = SSE + 5|θ1|</th></tr>
+<tr><td>8.00</td><td>30.000</td><td>40.00</td><td>70.00</td></tr>
+<tr><td>8.25</td><td>25.625</td><td>41.25</td><td>66.875</td></tr>
+<tr><td>8.50</td><td>22.500</td><td>42.50</td><td>65.00</td></tr>
+<tr><td><b>8.75</b></td><td>20.625</td><td>43.75</td><td><b>64.375</b> ← minimum</td></tr>
+<tr><td>9.00</td><td>20.000</td><td>45.00</td><td>65.00</td></tr>
+</table>
+<p>Lasso lands <b>inside</b> the grid at <b>8.75</b> — the |·| tax is flat per unit, so it only <b>shaves</b> the slope (9 → 8.75) instead of crushing it. The two λ's aren't comparable; the lesson is the <b>shape</b> of the penalty: squared grows with the slope, absolute stays flat.</p>
+<p><b>Your turn:</b> switch Lasso to <b>λ = 10</b>. Compute J = SSE + 10·|θ1| at the same five slopes (reuse the SSE column — that's the point of tabulating), find the winning slope and its J.</p>
+<div class="missing"><details><summary>Attempt it, then open the full solution</summary>
+<table>
+<tr><th>θ1</th><th>SSE</th><th>10·|θ1|</th><th>J</th></tr>
+<tr><td>8.00</td><td>30.000</td><td>80.0</td><td>110.000</td></tr>
+<tr><td>8.25</td><td>25.625</td><td>82.5</td><td>108.125</td></tr>
+<tr><td><b>8.50</b></td><td>22.500</td><td>85.0</td><td><b>107.500</b> ← winner</td></tr>
+<tr><td>8.75</td><td>20.625</td><td>87.5</td><td>108.125</td></tr>
+<tr><td>9.00</td><td>20.000</td><td>90.0</td><td>110.000</td></tr>
+</table>
+<p><b>Answer: θ1 = 8.5, J = 107.5.</b> Note the symmetry — 8.0 and 9.0 tie at 110, 8.25 and 8.75 tie at 108.125: the minimum sits exactly halfway. Doubling the flat tax doubled the shrinkage (λ=5 shaved 9→8.75; λ=10 shaved 9→8.5).</p>
+</details></div>
+<p class="mini">💡 Solve it twice from memory — that is mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>

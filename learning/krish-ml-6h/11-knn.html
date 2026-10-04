@@ -84,6 +84,41 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business read:</b> G sits exactly on the churn boundary — the single most-similar customer churned, two close stayers outvote at k=3, and the wider neighborhood tips back to churn at k=5. That flip-flopping is exactly why the video says to sweep k and keep the one with the lowest validation error, never gut feel — and why G belongs in the "monitor closely" bucket, not the safe list. (On real MyOperator data you'd standardize both features first; here the two axes have similar ranges, so raw distances are fair.)</p>
 </div>
 
+<h2>✍️ Solve on Paper — KNN by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Subtract</b> the new point's coordinates from every training point, feature by feature.</li>
+<li><b>Square</b> each difference (kills the minus signs).</li>
+<li><b>Sum the squares, take the square root</b> — Euclidean distance.</li>
+<li><b>Sort ascending</b>, keep the k nearest.</li>
+<li><b>Majority vote</b> of their labels = prediction.</li>
+</ol>
+<p><b>Worked practice — churn desk:</b> six known customers (support_calls, months_active); new customer <b>C at (2, 6)</b>:</p>
+<table>
+<tr><th>Customer</th><th>support_calls</th><th>months_active</th><th>Label</th></tr>
+<tr><td>A</td><td>3</td><td>5</td><td>churn</td></tr>
+<tr><td>B</td><td>2</td><td>4</td><td>churn</td></tr>
+<tr><td>D</td><td>0</td><td>7</td><td>stay</td></tr>
+<tr><td>E</td><td>1</td><td>9</td><td>stay</td></tr>
+<tr><td>F</td><td>0</td><td>4</td><td>stay</td></tr>
+<tr><td>G</td><td>5</td><td>2</td><td>churn</td></tr>
+</table>
+<p><b>Step 1 — Euclidean distance from C(2,6) to every customer, each √ worked:</b></p>
+<div class="formula">d(C,A) = √((2−3)² + (6−5)²) = √(1+1) &nbsp; = √2 &nbsp; ≈ <b>1.414</b> (churn)<br>d(C,B) = √((2−2)² + (6−4)²) = √(0+4) &nbsp; = √4 &nbsp; = <b>2.000</b> (churn)<br>d(C,D) = √((2−0)² + (6−7)²) = √(4+1) &nbsp; = √5 &nbsp; ≈ <b>2.236</b> (stay)<br>d(C,F) = √((2−0)² + (6−4)²) = √(4+4) &nbsp; = √8 &nbsp; ≈ <b>2.828</b> (stay)<br>d(C,E) = √((2−1)² + (6−9)²) = √(1+9) &nbsp; = √10 ≈ <b>3.162</b> (stay)<br>d(C,G) = √((2−5)² + (6−2)²) = √(9+16) = √25 = <b>5.000</b> (churn)</div>
+<p><b>Step 2 — sorted:</b> A 1.414 → B 2.000 → D 2.236 → F 2.828 → E 3.162 → G 5.000.</p>
+<p><b>Step 3 — k = 3 vote:</b> {A churn, B churn, D stay} → <b>2 churn vs 1 stay → CHURN</b>. Call the retention team.</p>
+<p><b>Step 4 — k = 5 vote:</b> {A, B, D, F, E} → 2 churn vs 3 stay → <b>STAY — the vote flipped.</b> The two extra neighbors are both stayers, and they outvote the two close churners. C is a genuine boundary customer: one k-value is not an answer, sweep k and judge on validation error.</p>
+<p><b>Your turn:</b> a new customer arrives at <b>(3, 4)</b>. Compute all six Euclidean distances, take k = 3, vote.</p>
+<div class="missing"><details><summary>Attempt it, then open the full solution</summary>
+<div class="formula">d((3,4),A) = √((3−3)² + (4−5)²) = √(0+1) &nbsp; = √1 &nbsp; = <b>1.000</b> (churn)<br>d((3,4),B) = √((3−2)² + (4−4)²) = √(1+0) &nbsp; = √1 &nbsp; = <b>1.000</b> (churn)<br>d((3,4),D) = √((3−0)² + (4−7)²) = √(9+9) &nbsp; = √18 ≈ <b>4.243</b> (stay)<br>d((3,4),E) = √((3−1)² + (4−9)²) = √(4+25) = √29 ≈ <b>5.385</b> (stay)<br>d((3,4),F) = √((3−0)² + (4−4)²) = √(9+0) &nbsp; = √9 &nbsp; = <b>3.000</b> (stay)<br>d((3,4),G) = √((3−5)² + (4−2)²) = √(4+4) &nbsp; = √8 &nbsp; ≈ <b>2.828</b> (churn)</div>
+<p><b>Sorted:</b> A 1.000 → B 1.000 → G 2.828 → F 3.000 → D 4.243 → E 5.385.</p>
+<p><b>k = 3: {A, B, G} → 3 churn vs 0 stay → unanimous CHURN.</b> A and B tie for nearest at 1.000 — same label, so the tie breaks itself. (k = 5 would add F and D: 3 churn vs 2 stay → still churn.)</p>
+</details></div>
+<p class="mini">💡 Solve it twice from memory — that is mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>

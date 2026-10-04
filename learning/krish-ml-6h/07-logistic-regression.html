@@ -96,6 +96,38 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Interview angle:</b> 'walk me through logistic regression' → linear fails (outputs leave [0,1]) → sigmoid squashes (by hand: 0.5 / 0.881 / 0.119) → threshold 0.5 ⇔ z = 0 → boundary becomes a one-line business rule anyone can act on.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Logistic Regression</h2>
+<div class="card">
+<p class="mini">Close the laptop. This is the pen-and-paper version — the code only works because THIS math works.</p>
+<p><b>The recipe (do these steps, in order, every time):</b></p>
+<ol>
+<li><b>Linear part:</b> z = θ0 + θ1·x.</li>
+<li><b>Probability:</b> p = 1/(1 + e^(−z)) — first compute e^(−z), then one division. Handy: e⁰ = 1, e¹ ≈ 2.718, e⁻¹ ≈ 0.368, e² ≈ 7.389 (and for below: e^1.2 ≈ 3.320, e^3.6 ≈ 36.60).</li>
+<li><b>Decide:</b> p ≥ 0.5 → class 1 (PASS), else class 0 (FAIL) — the same rule as z ≥ 0.</li>
+<li><b>Log-loss per row:</b> −[y·ln(p) + (1−y)·ln(1−p)], then average over all m rows.</li>
+</ol>
+<p><b>Worked practice — exam pass/fail from study hours.</b> The model is already trained: <b>θ0 = −6, θ1 = 0.8</b>. Run it BY HAND on four students:</p>
+<table>
+<tr><th>Student</th><th>hours x</th><th>actual y (1 = passed)</th></tr>
+<tr><td>s1</td><td>3</td><td>0</td></tr>
+<tr><td>s2</td><td>6</td><td>0</td></tr>
+<tr><td>s3</td><td>9</td><td>1</td></tr>
+<tr><td>s4</td><td>12</td><td>1</td></tr>
+</table>
+<div class="formula">s1: z = −6 + 0.8×3 = −3.6 → e^(−z) = e^3.6 ≈ 36.60 → p = 1/(1+36.60) = 1/37.60 ≈ <b>0.0266</b> → predict FAIL — matches y = 0 ✓<br>log-loss = −[0·ln(0.0266) + 1·ln(1−0.0266)] = −ln(0.9734) ≈ <b>0.0270</b> — nearly free: confident and right</div>
+<div class="formula">s2: z = −6 + 0.8×6 = −1.2 → e^(−z) = e^1.2 ≈ 3.320 → p = 1/(1+3.320) = 1/4.320 ≈ <b>0.2315</b> → predict FAIL — matches y = 0 ✓<br>log-loss = −[0·ln(0.2315) + 1·ln(1−0.2315)] = −[0 + ln(0.7685)] = −(−0.2633) ≈ <b>0.2633</b><br>(0·ln(0.2315) = 0 — the dead branch contributes nothing)</div>
+<div class="formula">s3: z = −6 + 0.8×9 = 1.2 → e^(−z) = e^−1.2 ≈ 0.301 → p = 1/(1+0.301) = 1/1.301 ≈ <b>0.7685</b> → predict PASS — matches y = 1 ✓<br>log-loss = −[1·ln(0.7685) + 0·ln(0.2315)] = −(−0.2633) ≈ <b>0.2633</b> — identical to s2!</div>
+<div class="formula">s4: z = −6 + 0.8×12 = 3.6 → e^(−z) = e^−3.6 ≈ 0.027 → p = 1/(1+0.027) = 1/1.027 ≈ <b>0.9734</b> → predict PASS — matches y = 1 ✓<br>log-loss = −[1·ln(0.9734) + 0] = −(−0.0270) ≈ <b>0.0270</b></div>
+<div class="formula">average log-loss J = (0.0270 + 0.2633 + 0.2633 + 0.0270)/4 = 0.5806/4 ≈ <b>0.145</b></div>
+<p>Two things the arithmetic just showed you: (1) confident-and-right is nearly free (0.027) while a confident wrong answer would have been brutally expensive — that asymmetry is exactly what MSE can't express; (2) s2/s3 are mirror images (z = −1.2 vs +1.2), so their probabilities sum to 1 (0.2315 + 0.7685) and their losses are identical — the sigmoid's symmetry, seen in numbers.</p>
+<p><b>Your turn</b> — solve this yourself before opening:</p>
+<div class="missing"><details><summary><b>z = 0.5.</b> Compute p = 1/(1 + e^(−z)) by hand (hint: e^0.5 ≈ 1.649, so e^−0.5 = 1/1.649 ≈ 0.607) and classify the prediction. Show solution</summary>
+<div class="formula">e^(−0.5) = 1/e^0.5 ≈ 1/1.649 ≈ 0.607<br>p = 1/(1 + 0.607) = 1/1.607 ≈ <b>0.622</b></div>
+<p><b>0.622 ≥ 0.5 → class 1.</b> Cross-check with the z-rule: z = 0.5 ≥ 0 → class 1 — same verdict, as it must be, because g(0) = 0.5 makes the two rules one rule.</p>
+</details></div>
+<p class="mini">💡 If you can do this on paper twice from memory, you own the algorithm better than most candidates.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>

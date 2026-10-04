@@ -144,6 +144,60 @@ J must AVERAGE the squared error over ALL m points. With m = 0.5, c = −1 on po
 <p>🎙️ <b>Mini-check:</b> your loss curve after 5 iterations: 100 → 90 → 110 → 60 → 130. What do you do to α?</p>
 </div>
 
+<h2>✍️ Solve on Paper — Linear Regression</h2>
+<div class="card">
+<p class="mini">Close the laptop. This is the pen-and-paper version — the code only works because THIS math works.</p>
+<p><b>The recipe (do these steps, in order, every time):</b></p>
+<ol>
+<li><b>Hypothesis:</b> write the line you are hunting: ŷ = θ0 + θ1·x.</li>
+<li><b>Cost:</b> score any candidate pair with J(θ0,θ1) = (1/2m)·Σ(ŷ−y)².</li>
+<li><b>Gradients:</b> ∂J/∂θ0 = (1/m)·Σ(ŷ−y) &nbsp;and&nbsp; ∂J/∂θ1 = (1/m)·Σ(ŷ−y)·x.</li>
+<li><b>Update both:</b> θj := θj − α·gradient.</li>
+<li><b>Repeat 2–4</b> until J stops falling; judge the final line with R² = 1 − SSres/SStot.</li>
+</ol>
+<p><b>Worked practice — study hours → exam marks (fresh data, m = 4):</b></p>
+<table>
+<tr><th>Student</th><th>hours x</th><th>marks y</th></tr>
+<tr><td>P1</td><td>1</td><td>3</td></tr>
+<tr><td>P2</td><td>2</td><td>4</td></tr>
+<tr><td>P3</td><td>3</td><td>6</td></tr>
+<tr><td>P4</td><td>4</td><td>7</td></tr>
+</table>
+<p><b>Part A — best line by the closed form.</b> Means first: x̄ = (1+2+3+4)/4 = <b>2.5</b>, ȳ = (3+4+6+7)/4 = <b>5</b>.</p>
+<table>
+<tr><th>x</th><th>y</th><th>x−x̄</th><th>y−ȳ</th><th>(x−x̄)(y−ȳ)</th><th>(x−x̄)²</th></tr>
+<tr><td>1</td><td>3</td><td>−1.5</td><td>−2</td><td>(−1.5)(−2) = 3</td><td>2.25</td></tr>
+<tr><td>2</td><td>4</td><td>−0.5</td><td>−1</td><td>(−0.5)(−1) = 0.5</td><td>0.25</td></tr>
+<tr><td>3</td><td>6</td><td>0.5</td><td>1</td><td>(0.5)(1) = 0.5</td><td>0.25</td></tr>
+<tr><td>4</td><td>7</td><td>1.5</td><td>2</td><td>(1.5)(2) = 3</td><td>2.25</td></tr>
+<tr><td><b>SUM</b></td><td></td><td></td><td></td><td><b>7</b></td><td><b>5</b></td></tr>
+</table>
+<div class="formula">θ1 = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)² = 7/5 = <b>1.4</b><br>θ0 = ȳ − θ1·x̄ = 5 − 1.4×2.5 = 5 − 3.5 = <b>1.5</b><br>line: marks = 1.4·hours + 1.5</div>
+<p><b>Part A2 — R² for that line.</b> Predictions ŷᵢ = 1.4x + 1.5 → 2.9, 4.3, 5.7, 7.1.</p>
+<table>
+<tr><th>y</th><th>ŷ</th><th>y−ŷ</th><th>(y−ŷ)²</th><th>y−ȳ</th><th>(y−ȳ)²</th></tr>
+<tr><td>3</td><td>2.9</td><td>0.1</td><td>0.01</td><td>−2</td><td>4</td></tr>
+<tr><td>4</td><td>4.3</td><td>−0.3</td><td>0.09</td><td>−1</td><td>1</td></tr>
+<tr><td>6</td><td>5.7</td><td>0.3</td><td>0.09</td><td>1</td><td>1</td></tr>
+<tr><td>7</td><td>7.1</td><td>−0.1</td><td>0.01</td><td>2</td><td>4</td></tr>
+<tr><td><b>SUM</b></td><td></td><td></td><td><b>SSres = 0.2</b></td><td></td><td><b>SStot = 10</b></td></tr>
+</table>
+<div class="formula">R² = 1 − SSres/SStot = 1 − 0.2/10 = 1 − 0.02 = <b>0.98</b></div>
+<p><b>Part B — two gradient-descent iterations by hand</b> (start θ0 = 0, θ1 = 0, α = 0.1):</p>
+<div class="formula">START: both θ are 0 → every prediction is 0 → errors ŷ−y = −3, −4, −6, −7<br>J(0,0) = (9+16+36+49)/(2×4) = 110/8 = <b>13.75</b></div>
+<div class="formula">ITERATION 1:<br>∂J/∂θ0 = (−3−4−6−7)/4 = −20/4 = <b>−5</b><br>∂J/∂θ1 = [(−3)(1)+(−4)(2)+(−6)(3)+(−7)(4)]/4 = (−3−8−18−28)/4 = −57/4 = <b>−14.25</b><br>θ0 := 0 − 0.1×(−5) = <b>0.5</b> &nbsp;·&nbsp; θ1 := 0 − 0.1×(−14.25) = <b>1.425</b></div>
+<div class="formula">ITERATION 2 — recompute with the new θ's:<br>ŷ = 0.5 + 1.425x → 1.925, 3.35, 4.775, 6.2 → errors ŷ−y = −1.075, −0.65, −1.225, −0.8<br>∂J/∂θ0 = (−1.075−0.65−1.225−0.8)/4 = −3.75/4 = <b>−0.9375</b><br>∂J/∂θ1 = [(−1.075)(1)+(−0.65)(2)+(−1.225)(3)+(−0.8)(4)]/4 = (−1.075−1.3−3.675−3.2)/4 = −9.25/4 = <b>−2.3125</b><br>θ0 := 0.5 − 0.1×(−0.9375) = <b>0.59375</b> &nbsp;·&nbsp; θ1 := 1.425 − 0.1×(−2.3125) = <b>1.65625</b></div>
+<p>Feel what happened: J fell 13.75 → 0.465 → 0.101, and the gradients shrank (−5 → −0.9375; −14.25 → −2.3125). Steps get smaller as the bowl flattens — keep iterating and (θ0, θ1) lands on the closed-form answer (1.5, 1.4). Gradient descent and the formula agree because they solve the SAME equations.</p>
+<p><b>Your turn</b> — solve this yourself before opening:</p>
+<div class="missing"><details><summary><b>x = [1, 2, 3], y = [2, 4, 6].</b> Find θ0 and θ1 by the closed form, compute J at your answer, then compute J at θ1 = 1.5 (θ0 = 0) and confirm it is worse. Show solution</summary>
+<div class="formula">x̄ = 2, ȳ = 4<br>Σ(x−x̄)(y−ȳ) = (−1)(−2)+(0)(0)+(1)(2) = 2+0+2 = 4<br>Σ(x−x̄)² = 1+0+1 = 2<br>θ1 = 4/2 = <b>2</b> &nbsp;·&nbsp; θ0 = 4 − 2×2 = <b>0</b> → line y = 2x</div>
+<div class="formula">J at your answer: ŷ = 2, 4, 6 → errors 0, 0, 0 → J = 0/(2×3) = <b>0</b> (perfect fit, R² = 1)</div>
+<div class="formula">J at θ1 = 1.5: ŷ = 1.5, 3, 4.5 → errors −0.5, −1, −1.5 → squares 0.25, 1, 2.25<br>J = (0.25+1+2.25)/(2×3) = 3.5/6 ≈ <b>0.583 &gt; 0</b> ✓ worse</div>
+<p>Same trap as coach's gap ①: J must average over ALL m rows. If your J(1.5) came out 0.25 you used one row; if it came out ≈ 0.583 — you own this.</p>
+</details></div>
+<p class="mini">💡 If you can do this on paper twice from memory, you own the algorithm better than most candidates.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style (run it yourself)</h2>
 <div class="card">
 <p class="mini">Same numbers as above, executable. Paste each cell into a notebook and compare outputs.</p>

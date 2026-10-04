@@ -87,6 +87,42 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business rules this buys:</b> deploy tickets + tenure only; never feed raw IDs to a linear model; reach for Lasso when you suspect dead columns, Ridge when real features are correlated and you want stable coefficients.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Ridge &amp; Lasso</h2>
+<div class="card">
+<p class="mini">Close the laptop. This is the pen-and-paper version — the code only works because THIS math works.</p>
+<p><b>The recipe (do these steps, in order, every time):</b></p>
+<ol>
+<li><b>Plain fit:</b> get (or imagine) the ordinary least-squares line and note its slope θ1.</li>
+<li><b>Penalized cost:</b> Ridge J = Σ(ŷ−y)² + λ·θ1², &nbsp;Lasso J = Σ(ŷ−y)² + λ·|θ1|.</li>
+<li><b>Compare TOTAL cost</b> at candidate slopes — the penalty tilts the contest toward the smaller slope.</li>
+<li><b>Lasso's |·| has a corner at 0</b>, so a weak slope can be pushed to EXACTLY 0 (feature removed); Ridge's square only shrinks toward 0 and never arrives.</li>
+</ol>
+<p><b>Worked practice — practice hours → queries solved (fresh data, m = 4):</b></p>
+<table>
+<tr><th>Day</th><th>hours x</th><th>queries y</th></tr>
+<tr><td>D1</td><td>1</td><td>2</td></tr>
+<tr><td>D2</td><td>2</td><td>3</td></tr>
+<tr><td>D3</td><td>3</td><td>4</td></tr>
+<tr><td>D4</td><td>4</td><td>5</td></tr>
+</table>
+<p><b>Part A — the plain line:</b> x̄ = 2.5, ȳ = 3.5.</p>
+<div class="formula">θ1 = Σ(x−x̄)(y−ȳ)/Σ(x−x̄)² = [(−1.5)(−1.5)+(−0.5)(−0.5)+(0.5)(0.5)+(1.5)(1.5)] / (2.25+0.25+0.25+2.25) = 5/5 = <b>1</b><br>θ0 = ȳ − θ1·x̄ = 3.5 − 1×2.5 = <b>1</b> → plain line: queries = hours + 1 (every residual 0)</div>
+<p><b>Part B — an outlier dragged a fit steep.</b> One nightmare session pulled a fitted line to slope θ1 = 1.6. Duel it against the tamer θ1 = 1.0 on the 4 clean rows (both with θ0 = 0 pinned, to keep the pen work small), with <b>λ = 2</b>:</p>
+<div class="formula">SLOPE 1.6: ŷ = 1.6x → 1.6, 3.2, 4.8, 6.4<br>errors ŷ−y = −0.4, 0.2, 0.8, 1.4 → squares 0.16, 0.04, 0.64, 1.96 → SSE = 2.8<br>Ridge cost = 2.8 + 2×1.6² = 2.8 + 5.12 = <b>7.92</b></div>
+<div class="formula">SLOPE 1.0: ŷ = 1.0x → 1, 2, 3, 4<br>errors ŷ−y = −1, −1, −1, −1 → squares 1, 1, 1, 1 → SSE = 4<br>Ridge cost = 4 + 2×1² = 4 + 2 = <b>6</b></div>
+<p><b>6 &lt; 7.92 — Ridge crowns the tamer slope, even though the steep one fit better on raw SSE (2.8 &lt; 4).</b> That flip IS regularization: the penalty bills (5.12 vs 2) punished the extra steepness more than its error savings. Same duel under Lasso: λ = 2 → 2.8+3.2 = 6.0 vs 4+2 = 6.0, a dead tie; λ = 3 → 2.8+4.8 = <b>7.6</b> vs 4+3 = <b>7</b>, tame slope wins. The |·| charges steeper prices per unit of slope.</p>
+<p><b>Part C — Lasso fires a weak feature (λ = 3).</b> A second feature, coffee cups ☕, fits with plain slope 0.4 on x = [1,2,3,4], y = [2,2,3,3]: x̄ = 2.5, ȳ = 2.5, Σ(x−x̄)(y−ȳ) = 0.75+0.25+0.25+0.75 = 2, Σ(x−x̄)² = 5 → θ1 = 2/5 = 0.4, θ0 = 2.5 − 0.4×2.5 = 1.5.</p>
+<div class="formula">KEEP slope 0.4: ŷ = 1.5 + 0.4x → 1.9, 2.3, 2.7, 3.1<br>errors ŷ−y = −0.1, 0.3, −0.3, 0.1 → squares 0.01, 0.09, 0.09, 0.01 → SSE = 0.2<br>Lasso keep-cost = 0.2 + 3×|0.4| = 0.2 + 1.2 = <b>1.4</b></div>
+<div class="formula">REMOVE (slope forced to 0): best flat guess = the mean ȳ = 2.5 everywhere<br>errors ŷ−y = −0.5, −0.5, 0.5, 0.5 → squares 0.25 × 4 → SSE = 1.0<br>Lasso remove-cost = 1.0 + 3×0 = <b>1.0</b></div>
+<p><b>1.0 &lt; 1.4 → Lasso zeroes the slope; the coffee feature is fired.</b> Now the same duel under Ridge λ = 3: keep = 0.2 + 3×0.4² = 0.2 + 0.48 = <b>0.68</b> vs remove = <b>1.0</b> → <b>Ridge keeps</b> the shrunken 0.4. Same data, same λ: Ridge shrinks-but-keeps, Lasso kills — that is the corner at 0 doing the work.</p>
+<p><b>Your turn</b> — solve this yourself before opening:</p>
+<div class="missing"><details><summary><b>Ridge duel, λ = 3:</b> candidate slope 1.2 has SSE = 6, candidate slope 0.8 has SSE = 7. Compute both Ridge costs — which slope wins, and what does that teach? Show solution</summary>
+<div class="formula">slope 1.2: J = 6 + 3×1.2² = 6 + 3×1.44 = 6 + 4.32 = <b>10.32</b><br>slope 0.8: J = 7 + 3×0.8² = 7 + 3×0.64 = 7 + 1.92 = <b>8.92</b></div>
+<p><b>0.8 wins (8.92 &lt; 10.32)</b> — even though slope 1.2 had the LOWER training error. The penalty gap (4.32 − 1.92 = 2.4) beat the error gap (7 − 6 = 1): Ridge happily trades a little fit for a lot less steepness. If you answered 1.2, you likely added λ·θ1 instead of λ·θ1² — the squared term is Ridge's bill, the absolute value is Lasso's.</p>
+</details></div>
+<p class="mini">💡 If you can do this on paper twice from memory, you own the algorithm better than most candidates.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>

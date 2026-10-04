@@ -89,6 +89,47 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Business read:</b> a single word swings the routing 90/10, and the posterior is a tunable dial — auto-route only when P(spam) &gt; 0.9 so a real client email mentioning a discount never disappears.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Naive Bayes by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Priors:</b> count the labels → P(class) = emails of that class / all emails.</li>
+<li><b>Likelihoods:</b> per word, per class: P(word|class) = class-emails containing the word / class-emails.</li>
+<li><b>Score each class:</b> prior × P(word1|class) × P(word2|class) × …</li>
+<li><b>Normalize:</b> divide each score by the sum of all scores.</li>
+<li><b>Bigger posterior wins.</b></li>
+</ol>
+<p><b>Worked practice — spam inbox:</b> 10 past emails, three tracked words (1 = word appears):</p>
+<table>
+<tr><th>Email</th><th>offer</th><th>win</th><th>meeting</th><th>Label</th></tr>
+<tr><td>1</td><td>1</td><td>1</td><td>0</td><td>spam</td></tr>
+<tr><td>2</td><td>1</td><td>1</td><td>0</td><td>spam</td></tr>
+<tr><td>3</td><td>1</td><td>1</td><td>0</td><td>spam</td></tr>
+<tr><td>4</td><td>0</td><td>0</td><td>1</td><td>spam</td></tr>
+<tr><td>5</td><td>1</td><td>0</td><td>1</td><td>ham</td></tr>
+<tr><td>6</td><td>0</td><td>1</td><td>1</td><td>ham</td></tr>
+<tr><td>7</td><td>0</td><td>1</td><td>1</td><td>ham</td></tr>
+<tr><td>8</td><td>0</td><td>0</td><td>1</td><td>ham</td></tr>
+<tr><td>9</td><td>0</td><td>0</td><td>1</td><td>ham</td></tr>
+<tr><td>10</td><td>0</td><td>0</td><td>1</td><td>ham</td></tr>
+</table>
+<p>A new email arrives containing <b>offer + win</b>. Spam folder or inbox?</p>
+<div class="formula">P(spam) = 4/10 = 0.4 &nbsp;&nbsp;·&nbsp;&nbsp; P(ham) = 6/10 = 0.6</div>
+<div class="formula">P(offer|spam) = 3/4 = 0.75 &nbsp;&nbsp;&nbsp; P(win|spam) = 3/4 = 0.75<br>P(offer|ham) &nbsp;= 1/6 ≈ 0.1667 &nbsp;&nbsp; P(win|ham) &nbsp;= 2/6 ≈ 0.3333</div>
+<div class="formula">score(spam) = 0.4 × 3/4 × 3/4 = 0.4 × 0.75 × 0.75 = <b>0.225</b><br>score(ham) &nbsp;= 0.6 × 1/6 × 2/6 = 0.6 × 0.1667 × 0.3333 ≈ <b>0.0333</b></div>
+<div class="formula">total = 0.225 + 0.0333 = 0.2583<br>P(spam|offer, win) = 0.225 / 0.2583 ≈ <b>0.871</b> &nbsp;·&nbsp; P(ham|offer, win) ≈ <b>0.129</b> → <b>SPAM folder</b></div>
+<p>87.1% spam — two spam-smell words beat the 60% ham prior with room to spare.</p>
+<p><b>Your turn:</b> a quiet email arrives containing only <b>'meeting'</b> (the column is already in the table). Compute both scores, normalize, classify.</p>
+<div class="missing"><details><summary>Attempt it, then open the full solution</summary>
+<div class="formula">P(meeting|spam) = 1/4 = 0.25 &nbsp;&nbsp;&nbsp; P(meeting|ham) = 5/6 ≈ 0.8333</div>
+<div class="formula">score(spam) = 0.4 × 1/4 = <b>0.1</b><br>score(ham) &nbsp;= 0.6 × 5/6 = <b>0.5</b></div>
+<div class="formula">total = 0.1 + 0.5 = 0.6<br>P(ham|meeting) = 0.5/0.6 ≈ <b>0.833</b> → <b>inbox (HAM), 83.3% confident</b></div>
+<p>Same recipe, flipped verdict: one work word beats zero spam words, and the 60% ham prior does real work. Notice each likelihood is a <b>fraction of emails</b>, not word counts — count rows, not occurrences.</p>
+</details></div>
+<p class="mini">💡 Solve it twice from memory — that is mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Same numbers as above, executable — every output below pasted from a real run.</p>

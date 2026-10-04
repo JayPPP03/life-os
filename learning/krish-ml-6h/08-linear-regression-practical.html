@@ -86,6 +86,53 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <p>💡 <b>Quote it like the video:</b> 'Five-fold CV with neg_mean_squared_error gave a mean of −12.13, so MSE ≈ 12.13, RMSE ≈ ₹3.5 lakh.' One sentence, fully defensible.</p>
 </div>
 
+<h2>✍️ Solve on Paper — Least Squares by Hand</h2>
+<div class="card">
+<p class="mini">Close the laptop. Pen and paper. The code works because this math works.</p>
+<p><b>The recipe:</b></p>
+<ol>
+<li><b>Means:</b> x̄ = Σx/n and ȳ = Σy/n.</li>
+<li><b>Deviations:</b> for every row write down (x−x̄) and (y−ȳ).</li>
+<li><b>Slope:</b> θ1 = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)².</li>
+<li><b>Intercept:</b> θ0 = ȳ − θ1·x̄.</li>
+<li><b>Check:</b> predict every training row; residual = y − ŷ.</li>
+<li><b>Grade the line:</b> R² = 1 − SSres/SStot.</li>
+</ol>
+<p><b>Worked practice — flat prices: rooms → price (₹ lakh):</b></p>
+<table>
+<tr><th>Flat</th><th>rooms x</th><th>price y (₹L)</th><th>x−x̄</th><th>y−ȳ</th><th>(x−x̄)(y−ȳ)</th><th>(x−x̄)²</th></tr>
+<tr><td>F1</td><td>1</td><td>30</td><td>−2</td><td>−17</td><td>34</td><td>4</td></tr>
+<tr><td>F2</td><td>2</td><td>35</td><td>−1</td><td>−12</td><td>12</td><td>1</td></tr>
+<tr><td>F3</td><td>3</td><td>50</td><td>0</td><td>3</td><td>0</td><td>0</td></tr>
+<tr><td>F4</td><td>4</td><td>55</td><td>1</td><td>8</td><td>8</td><td>1</td></tr>
+<tr><td>F5</td><td>5</td><td>65</td><td>2</td><td>18</td><td>36</td><td>4</td></tr>
+<tr><td><b>SUM</b></td><td><b>15</b></td><td><b>235</b></td><td>0</td><td>0</td><td><b>90</b></td><td><b>10</b></td></tr>
+</table>
+<div class="formula">x̄ = 15/5 = 3 &nbsp;&nbsp;·&nbsp;&nbsp; ȳ = 235/5 = 47</div>
+<div class="formula">θ1 = Σ(x−x̄)(y−ȳ) / Σ(x−x̄)² = (34+12+0+8+36) / (4+1+0+1+4) = 90/10 = <b>9.0</b></div>
+<div class="formula">θ0 = ȳ − θ1·x̄ = 47 − 9×3 = <b>20</b></div>
+<p>Best line: <b>price = 9 × rooms + 20</b> — every extra room adds ₹9L.</p>
+<p><b>Check — predict every row, residual = y − ŷ:</b></p>
+<table>
+<tr><th>Flat</th><th>y actual</th><th>ŷ = 9x+20</th><th>y−ŷ</th><th>(y−ŷ)²</th><th>(y−ȳ)²</th></tr>
+<tr><td>F1</td><td>30</td><td>29</td><td>1</td><td>1</td><td>289</td></tr>
+<tr><td>F2</td><td>35</td><td>38</td><td>−3</td><td>9</td><td>144</td></tr>
+<tr><td>F3</td><td>50</td><td>47</td><td>3</td><td>9</td><td>9</td></tr>
+<tr><td>F4</td><td>55</td><td>56</td><td>−1</td><td>1</td><td>64</td></tr>
+<tr><td>F5</td><td>65</td><td>65</td><td>0</td><td>0</td><td>324</td></tr>
+<tr><td><b>SUM</b></td><td></td><td></td><td></td><td><b>SSres = 20</b></td><td><b>SStot = 830</b></td></tr>
+</table>
+<div class="formula">R² = 1 − SSres/SStot = 1 − 20/830 = 1 − 0.024 = <b>0.976</b></div>
+<p><b>Plain words:</b> the line explains <b>97.6%</b> of the price variation — rooms alone nearly price this colony.</p>
+<p><b>Your turn:</b> a builder lists a 6-room flat. Predict its price with the line. A real 6-room flat nearby sold for ₹70L — compute the residual and say whether the line over- or under-priced it. Then answer: is predicting rooms = 6 interpolation or extrapolation?</p>
+<div class="missing"><details><summary>Attempt it, then open the full solution</summary>
+<p><b>Prediction:</b> ŷ = 9×6 + 20 = 54 + 20 = <b>₹74L</b>.</p>
+<p><b>Residual:</b> y − ŷ = 70 − 74 = <b>−4</b> → a negative residual means actual BELOW prediction → the line <b>over-priced</b> this flat by ₹4L.</p>
+<p><b>Interpolation vs extrapolation:</b> the data covers rooms 1–5 only, so rooms = 6 sits outside the seen range → <b>extrapolation</b>. Legal with a straight line, but the ₹9L/room slope is least trustworthy exactly there.</p>
+</details></div>
+<p class="mini">💡 Solve it twice from memory — that is mastery.</p>
+</div>
+
 <h2>🐍 Python Lab — Jupyter style</h2>
 <div class="card">
 <p class="mini">Every number above comes from this exact run. Paste each cell into a notebook and compare outputs.</p>

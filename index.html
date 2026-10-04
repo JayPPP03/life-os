@@ -314,6 +314,12 @@ body.light .bnav{background:rgba(255,255,255,.97)}
   </div>
 
   <div class="card">
+    <h3>🙂 Your mood — last 7 days</h3>
+    <div style="display:flex;gap:6px;align-items:flex-end;min-height:40px" id="mood-mini"></div>
+    <p class="mini" id="mood-mini-note">Each face = that day’s average mood. Dots = not logged.</p>
+  </div>
+
+  <div class="card">
     <h3>✅ Today’s 3 minimums — tick = good day</h3>
     <div class="mins">
       <label class="minline" id="m-study-w"><input type="checkbox" id="c-study"><span>📚 Study 25 min<small>Arena quiz or lesson — anything counts</small></span></label>
@@ -1162,8 +1168,8 @@ function renderTime(){
 /* ================= STATS ================= */
 /* ---------- 7-day mood strip ---------- */
 function renderMoodWeek(){
-  var host = document.getElementById('mood-week');
-  if (!host) return;
+  var hosts = [document.getElementById('mood-week'), document.getElementById('mood-mini')].filter(Boolean);
+  if (!hosts.length) return;
   var out = '';
   for (var i = 6; i >= 0; i--) {
     var d = new Date(Date.now() - i*86400000);
@@ -1177,7 +1183,7 @@ function renderMoodWeek(){
       + '<div style="font-size:1.2rem;line-height:1.3;color:' + col + '">' + face + '</div>'
       + '<div style="font-size:.62rem;color:var(--muted)">' + lab + '</div></div>';
   }
-  host.innerHTML = out;
+  hosts.forEach(function(h){ h.innerHTML = out; });
 }
 function renderStats(){
   renderStatCharts();

@@ -1,0 +1,18 @@
+# LIFE OS mood check-in reminders - 3x/day IST (morning, afternoon, evening)
+# Delivered via ntfy.sh -> the ntfy app on Jay's phone (subscribed to the topic below).
+name: mood-reminder
+
+on:
+  schedule:
+    - cron: '30 2 * * *'    # 08:00 IST
+    - cron: '30 8 * * *'    # 14:00 IST
+    - cron: '30 15 * * *'   # 21:00 IST
+  workflow_dispatch:         # manual test button in the Actions tab
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send mood check-in reminder
+        run: |
+          curl -s -H "Title: LIFE OS - how are you feeling? 🌱"                -H "Tags: mood,jay"                -H "Priority: default"                -d "One tap: open LIFE OS -> TODAY -> tap your mood. (30 sec)"                https://ntfy.sh/jay-lifeos-7d412432cdc5

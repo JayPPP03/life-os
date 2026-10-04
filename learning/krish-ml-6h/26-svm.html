@@ -50,6 +50,49 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_26"><b>SVM — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> separate high-value customers from at-risk ones on two axes (complaint intensity, usage drop) — and do it so the verdict on the customer standing NEAR the border is trustworthy. SVM's answer: don't draw just any line — draw the line with the WIDEST possible street between the groups. Every formula below is that one idea in math.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Hyperplane wᵀx + b = 0, class = sign(wᵀx + b):</b> one linear rule — the sign picks the side, the SIZE is only your confidence (distance from the boundary). <b>Why this form:</b> the same equation is a line in 2D and a plane in 100 features — the formula never changes with dimension. <b>Alternative:</b> classify by distance to group averages → the boundary sags wherever the averages happen to sit, ignoring exactly the edge customers who are the expensive decisions. <b>Business consequence:</b> borderline customers — the ones retention money is actually spent on — get decided by accident.</li>
+<li><b>Marginal planes at ±1, margin = 2/||w||:</b> the street. Maximizing 2/||w|| ⇔ minimizing ||w|| — build the most conservative boundary, so a new customer must be REALLY different before it flips sides. <b>What breaks with the alternative</b> (any separating line): a merely-separating line can sit millimeters from a point — one noisy month and that customer flips class. <b>Business consequence:</b> the widest street keeps the churn/stay ranking stable when next month's data wobbles — that stability is what "confident near the boundary" means.</li>
+<li><b>Support vectors — only the border points matter:</b> in the mini-project, just (2,2) and (5,5) out of six customers pin the street; delete the interior four and nothing moves. <b>Why care:</b> the model is literally built from the customers you are UNSURE about; the obvious ones are free. <b>Business consequence:</b> you know exactly which rows to audit and defend — the frontier, not the crowd.</li>
+<li><b>Soft margin: minimize ½||w||² + C·Σξ:</b> real data overlaps — one mislabelled customer at (4.5, 4.7). Slack ξ measures each violation; C is the PRICE of violations, turning "how perfect must the boundary be" into ONE tunable business dial. Big C = strict street → narrow, memorizes the outlier (train 100% / test 88% in the lab); small C = tolerant → wide street, better test (83% / 100%). <b>Business consequence:</b> C is literally the cost of grabbing a wrong retention offer vs missing a real churner — you'd tune it like any budget.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Six customers split by a hyperplane with dashed margin planes and two circled support vectors" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:.4rem 0">
+<defs>
+<marker id="ah26" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#FBBF24"/></marker>
+</defs>
+<line x1="40" y1="180" x2="340" y2="180" stroke="#1E2A44" stroke-width="1"/>
+<line x1="40" y1="20" x2="40" y2="180" stroke="#1E2A44" stroke-width="1"/>
+<text x="300" y="193" fill="#8B9BB4" font-size="8.5">complaints x₁ →</text>
+<text x="26" y="34" fill="#8B9BB4" font-size="8.5">usage-drop x₂</text>
+<line x1="40" y1="116" x2="180" y2="180" stroke="#8B9BB4" stroke-width="1.2" stroke-dasharray="5 4"/>
+<line x1="40" y1="20" x2="340" y2="157" stroke="#8B9BB4" stroke-width="1.2" stroke-dasharray="5 4"/>
+<line x1="40" y1="68" x2="285" y2="180" stroke="#34D399" stroke-width="2"/>
+<text x="52" y="112" fill="#8B9BB4" font-size="8.5">−1</text>
+<text x="290" y="146" fill="#8B9BB4" font-size="8.5">+1</text>
+<line x1="174" y1="175" x2="210" y2="97" stroke="#FBBF24" stroke-width="1.4" marker-start="url(#ah26)" marker-end="url(#ah26)"/>
+<text x="216" y="94" fill="#FBBF24" font-size="8.5">margin = 2/||w||</text>
+<circle cx="75" cy="164" r="4" fill="#5EEAD4"/>
+<circle cx="75" cy="148" r="4" fill="#5EEAD4"/>
+<circle cx="110" cy="148" r="4" fill="#5EEAD4"/>
+<circle cx="250" cy="84" r="4" fill="#F87171"/>
+<circle cx="250" cy="100" r="4" fill="#F87171"/>
+<circle cx="215" cy="100" r="4" fill="#F87171"/>
+<circle cx="110" cy="148" r="9" fill="none" stroke="#FBBF24" stroke-width="1.5"/>
+<circle cx="215" cy="100" r="9" fill="none" stroke="#FBBF24" stroke-width="1.5"/>
+<text x="120" y="132" fill="#FBBF24" font-size="8.5">support vectors — the only points that matter</text>
+<text x="218" y="164" fill="#34D399" font-size="9">wᵀx + b = 0</text>
+<text x="252" y="72" fill="#F87171" font-size="9">churned</text>
+<text x="46" y="140" fill="#5EEAD4" font-size="9">stayed</text>
+</svg>
+<p><b>💬 Feel it:</b> routing a road between two rival parades. Don't hug either crowd — claim the widest no-man's-land you can. And when drawing it, only the people at the FRONT LINE matter (support vectors); the spectators three rows back could go home and the road wouldn't move an inch.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p>Common learner gaps in this topic — these are the six places SVM interviews most often go wrong.</p>

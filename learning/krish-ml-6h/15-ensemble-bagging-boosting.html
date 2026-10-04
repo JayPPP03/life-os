@@ -50,6 +50,57 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_15"><b>BAGGING &amp; BOOSTING — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+  <p><b>🎯 The business problem:</b> A hot caller is on the line right now — 10 calls last week, Pro plan. Pitch the upgrade or not? One analyst = one opinion, and opinions miss. A ROOM of analysts voting — Yes, Yes, No → 2:1 — is right far more often, but ONLY if their mistakes are uncorrelated. Bagging and boosting are the two recipes for building that room.</p>
+  <p><b>🧠 Why THIS formula:</b></p><ul>
+    <li><b>Bootstrap: rows drawn WITH replacement.</b> n draws cover only ~63% unique rows — repeats happen (C5 drawn 3×) and ~37% of rows are never drawn (P(row never drawn) → 1/e). Why this form: replacement is what makes the three case files DIFFERENT while staying full-size. What breaks with the alternative — giving every model the identical data: three clones, three unanimous votes, zero new information. Business consequence: a room that always agrees carries the wisdom of exactly one analyst.</li>
+    <li><b>Aggregate: majority vote (classification) / mean (regression) — averaging cancels independent errors.</b> Tree 1's +error lands on tree 2's −error and both vanish; the variance of the mean of n independent trees falls like variance/n. Why this form: you want the consensus signal, not any single noisy opinion. What breaks with the alternative — keeping the single 'best' tree: you keep 100% of its variance, and 'best' was judged on its own sample. Business consequence: agent 3 alone sends the 10-caller away; the 2:1 room closes the upsell.</li>
+    <li><b>Boosting = SEQUENTIAL — each model studies what the previous ones got WRONG.</b> Errors become the curriculum: model 2's training brief is literally model 1's miss list, and a chain of weak specialists becomes one strong learner. Why this form and not parallel: parallel members cannot hand mistakes forward — nobody ever studies them. Business consequence: every failed save-call becomes the next caller's briefing, so the desk stops repeating the same miss.</li>
+  </ul>
+  <p><b>📈 See it:</b></p>
+  <svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three mini decision trees vote Yes, Yes, No on one caller and the committee gavel rules 2 to 1 Yes">
+    <text x="180" y="12" text-anchor="middle" font-size="10" fill="#E6EDF7">One caller, three analysts: the vote beats the loner</text>
+    <circle cx="36" cy="92" r="17" fill="#101B2E" stroke="#5EEAD4"/>
+    <text x="36" y="90" text-anchor="middle" font-size="7.5" fill="#E6EDF7">C-new</text>
+    <text x="36" y="100" text-anchor="middle" font-size="7" fill="#8B9BB4">10 calls</text>
+    <text x="36" y="124" text-anchor="middle" font-size="8" fill="#8B9BB4">hot caller</text>
+    <line x1="54" y1="86" x2="102" y2="70" stroke="#8B9BB4" stroke-dasharray="3,2"/>
+    <line x1="54" y1="92" x2="166" y2="72" stroke="#8B9BB4" stroke-dasharray="3,2"/>
+    <line x1="54" y1="98" x2="228" y2="72" stroke="#8B9BB4" stroke-dasharray="3,2"/>
+    <text x="118" y="40" text-anchor="middle" font-size="8" fill="#8B9BB4">Tree 1</text>
+    <polygon points="118,46 105,68 131,68" fill="#34D399" opacity="0.85"/>
+    <rect x="116" y="68" width="4" height="12" fill="#8B9BB4"/>
+    <rect x="101" y="90" width="34" height="16" rx="8" fill="#34D399"/>
+    <text x="118" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">Yes</text>
+    <text x="180" y="40" text-anchor="middle" font-size="8" fill="#8B9BB4">Tree 2</text>
+    <polygon points="180,46 167,68 193,68" fill="#34D399" opacity="0.85"/>
+    <rect x="178" y="68" width="4" height="12" fill="#8B9BB4"/>
+    <rect x="163" y="90" width="34" height="16" rx="8" fill="#34D399"/>
+    <text x="180" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">Yes</text>
+    <text x="242" y="40" text-anchor="middle" font-size="8" fill="#8B9BB4">Tree 3</text>
+    <polygon points="242,46 229,68 255,68" fill="#34D399" opacity="0.85"/>
+    <rect x="240" y="68" width="4" height="12" fill="#8B9BB4"/>
+    <rect x="225" y="90" width="34" height="16" rx="8" fill="#F87171"/>
+    <text x="242" y="101" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">No</text>
+    <line x1="118" y1="106" x2="118" y2="128" stroke="#8B9BB4"/>
+    <line x1="180" y1="106" x2="180" y2="128" stroke="#8B9BB4"/>
+    <line x1="242" y1="106" x2="242" y2="128" stroke="#8B9BB4"/>
+    <line x1="118" y1="128" x2="322" y2="128" stroke="#8B9BB4"/>
+    <line x1="322" y1="128" x2="322" y2="116" stroke="#8B9BB4"/>
+    <text x="322" y="68" text-anchor="middle" font-size="8" fill="#8B9BB4">committee</text>
+    <rect x="308" y="44" width="26" height="9" rx="2" fill="#FBBF24" transform="rotate(-25 321 48)"/>
+    <line x1="321" y1="48" x2="333" y2="36" stroke="#FBBF24" stroke-width="3"/>
+    <rect x="294" y="72" width="56" height="42" rx="8" fill="#101B2E" stroke="#FBBF24"/>
+    <text x="322" y="89" text-anchor="middle" font-size="11" font-weight="bold" fill="#E6EDF7">2 : 1</text>
+    <text x="322" y="106" text-anchor="middle" font-size="11" font-weight="bold" fill="#34D399">YES</text>
+    <text x="180" y="158" text-anchor="middle" font-size="8.5" fill="#8B9BB4">Tree 3's lone No is outvoted — independent mistakes cancel in the vote</text>
+    <text x="180" y="172" text-anchor="middle" font-size="8.5" fill="#8B9BB4">same data for all three → cloned votes → the vote tells you nothing</text>
+  </svg>
+  <p><b>💬 Feel it:</b> One analyst is a single weather forecast — sometimes wrong, and you never know when. Bagging is the forecaster panel: their wrong guesses point in different directions and average out to a decent forecast. Boosting is the panel where forecaster 2 is handed forecaster 1's busted predictions every evening — and graded ONLY on those.</p>
+  <p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — your notes above are still blank, so treat this as the pre-watch checklist: anything you couldn't have written from memory is your rewatch list.</p>

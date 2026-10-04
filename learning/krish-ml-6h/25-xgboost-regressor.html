@@ -50,6 +50,51 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_25"><b>XGBoost Regressor — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> forecast a listing's weekly bookings (or a flat's price) from its size. After just TWO trees, the prediction for a small flat moved from 55.5 toward its real range — you can WATCH the model learn, one damped correction at a time. Every formula below is one step of that visible climb, and each exists because the obvious alternative breaks.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Base model = the MEAN of all targets (55.5):</b> the best possible zero-feature guess — Σ(y−c)² is minimized at exactly the mean, so the model starts from the balance point, not from zero. Bonus: residuals from the mean always sum to 0 — a sanity check you can do in your head. <b>Alternative:</b> start at 0 (the classifier's 0.5 habit) → the first tree burns its entire capacity just re-learning the average level. <b>Business consequence:</b> slower learning, more trees for the same accuracy.</li>
+<li><b>Similarity = Σres² / (n + λ):</b> a purity score that RANKS candidate splits. n (row count) replaces the classifier's p(1−p) because with squared error there is no probability to be uncertain ABOUT — every row counts equally. λ in the denominator shrinks every score: the same leaf scored 121 at λ=0 and 60.5 at λ=1. <b>Alternative:</b> no λ → a single-row leaf scores monstrous → the tree chases individual flats. <b>Business consequence:</b> a price model that memorizes 4 listings and misprices the 10,000th.</li>
+<li><b>Leaf value = Σres / (n + λ) — the leaf's mean residual:</b> the average correction its members need, because one leaf speaks for ALL its rows at once. <b>Alternative:</b> the SUM → bigger leaves correct harder → double-counted corrections → every small flat overshoots downward. <b>Business consequence:</b> systematically mispriced inventory.</li>
+<li><b>Prediction = base + α × leaf:</b> start from the average, take a SMALL damped step toward the correction, then re-measure. Tree 2's fresh residuals (−6.6, −5.2, +2.8, +6.8) dropped root similarity 47.2 → 24.9 — correction you can see in one number. <b>Alternative:</b> α = 1 → each tree overcorrects into the previous round's noise. <b>Business consequence:</b> jumpy forecasts the ops team stops trusting.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four residuals as arrows from the mean line at 51: two down (minus 11, minus 3), two up (plus 5, plus 9)" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:.4rem 0">
+<line x1="40" y1="170" x2="340" y2="170" stroke="#1E2A44" stroke-width="1"/>
+<line x1="40" y1="20" x2="40" y2="170" stroke="#1E2A44" stroke-width="1"/>
+<text x="190" y="188" fill="#8B9BB4" font-size="8.5" text-anchor="middle">listing size →</text>
+<text x="14" y="32" fill="#8B9BB4" font-size="8.5">bookings ↑</text>
+<line x1="40" y1="96" x2="340" y2="96" stroke="#5EEAD4" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="44" y="90" fill="#5EEAD4" font-size="9">base = mean = 51</text>
+<text x="340" y="28" fill="#8B9BB4" font-size="8.5" text-anchor="end">each arrow = residual y − 51</text>
+<text x="340" y="40" fill="#8B9BB4" font-size="8.5" text-anchor="end">tree 1's entire job is to learn these</text>
+<line x1="60" y1="96" x2="60" y2="126" stroke="#F87171" stroke-width="1.6"/>
+<polygon points="56,126 64,126 60,135" fill="#F87171"/>
+<text x="66" y="122" fill="#F87171" font-size="9">−11</text>
+<line x1="140" y1="96" x2="140" y2="97" stroke="#F87171" stroke-width="1.6"/>
+<polygon points="136,96 144,96 140,104" fill="#F87171"/>
+<text x="148" y="103" fill="#F87171" font-size="9">−3</text>
+<line x1="220" y1="96" x2="220" y2="81" stroke="#34D399" stroke-width="1.6"/>
+<polygon points="216,81 224,81 220,72" fill="#34D399"/>
+<text x="228" y="84" fill="#34D399" font-size="9">+5</text>
+<line x1="300" y1="96" x2="300" y2="65" stroke="#34D399" stroke-width="1.6"/>
+<polygon points="296,65 304,65 300,56" fill="#34D399"/>
+<text x="308" y="66" fill="#34D399" font-size="9">+9</text>
+<circle cx="60" cy="136" r="4" fill="#E6EDF7"/>
+<circle cx="140" cy="104" r="4" fill="#E6EDF7"/>
+<circle cx="220" cy="72" r="4" fill="#E6EDF7"/>
+<circle cx="300" cy="56" r="4" fill="#E6EDF7"/>
+<text x="60" y="152" fill="#8B9BB4" font-size="8" text-anchor="middle">800 sqft</text>
+<text x="140" y="120" fill="#8B9BB4" font-size="8" text-anchor="middle">1200</text>
+<text x="220" y="64" fill="#8B9BB4" font-size="8" text-anchor="middle">1500</text>
+<text x="300" y="47" fill="#8B9BB4" font-size="8" text-anchor="middle">1800</text>
+</svg>
+<p><b>💬 Feel it:</b> GPS rerouting. Your first ETA is the straight average — deliberately bland. Every tree looks ONLY at "how late or early am I running right now?" (the residual) and nudges the ETA by a small damped step. Nobody recalculates the whole trip from scratch — the corrections stack until the ETA is honest.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p>Common learner gaps in this topic — nail these and the classifier/regressor contrast becomes your easiest interview win.</p>

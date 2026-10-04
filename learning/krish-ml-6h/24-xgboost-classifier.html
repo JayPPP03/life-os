@@ -50,6 +50,38 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_24"><b>XGBoost Classifier — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> your churn model scores 100K+ users and the retention team spends real money on the top ranks. When the CEO asks "how does it actually decide?", the honest answer is five small formulas that each do ONE humble job. This is your churn model's engine, part by part — and why each part looks the way it does.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Base model = 0.5 for everyone:</b> before any feature is read, every customer is a coin flip — humility as a design choice. Every tree that follows only has to explain the SURPRISE (residuals ±0.5), not relearn the whole problem. <b>Alternative:</b> start confident (say 0.9) → first residuals are huge and biased in one direction → training chases the starting guess instead of the customers. <b>Business consequence:</b> a model that argues with itself in round 1.</li>
+<li><b>Residual = y − prediction:</b> the ERROR becomes the next tree's TARGET. Each tree corrects the last — that is gradient boosting in one sentence. <b>Alternative:</b> build trees in parallel (that's random forest) → no tree ever sees another's mistakes, so the same errors survive to the end. <b>Business consequence:</b> sequential correction is exactly why precision climbed QoQ — round 2 attacks residuals already shrunk to ±0.417.</li>
+<li><b>Similarity = Σres² / (Σp(1−p) + λ):</b> a purity score per leaf. The squares reward leaves where same-sign residuals group together; p(1−p) is the curvature of the logistic loss — confident rows (p near 0 or 1) get LESS say, uncertain rows get more; λ in the denominator shrinks every leaf — regularization INSIDE the tree. <b>Alternative:</b> drop λ → a leaf built on one lucky row scores huge → overconfident leaf → one weird customer re-routes the whole retention offer. <b>Business consequence:</b> λ is why the model stays calm on 100K users instead of memorizing 100K quirks.</li>
+<li><b>Gain = sim(left) + sim(right) − sim(root):</b> a split earns its place only if the purity it creates beats the parent — the subtraction charges it for what it cost. <b>Alternative:</b> split always, or eyeball it → you grow noise; splitting an already-pure leaf scored gain 0.0667 — the machine itself saying "stop". <b>Business consequence:</b> smaller honest trees → fewer crazy leaves → a ranking the retention team can trust.</li>
+<li><b>Log-odds + sigmoid:</b> trees speak log-odds because log-odds ADD cleanly — unbounded, no ceiling — so tree after tree just keeps adding evidence (0 + α×0.667 + …), and the sigmoid converts the final sum to a probability in (0,1). <b>Alternative:</b> adding probabilities directly → 0.5 + 0.67 &gt; 1, nonsense. <b>Business consequence:</b> after one round your customers sit at 0.583 vs 0.417 — a usable ranking, sharpened round by round.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="One XGBoost split: root similarity 0.50, two pure leaves 0.33 each, gain plus 0.17 keeps the split" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:.4rem 0">
+<line x1="180" y1="70" x2="95" y2="128" stroke="#8B9BB4" stroke-width="1.5"/>
+<line x1="180" y1="70" x2="265" y2="128" stroke="#8B9BB4" stroke-width="1.5"/>
+<rect x="110" y="28" width="140" height="42" rx="8" fill="#0B1220" stroke="#8B9BB4"/>
+<text x="180" y="45" text-anchor="middle" fill="#E6EDF7" font-size="10">ROOT — all 4 customers</text>
+<text x="180" y="59" text-anchor="middle" fill="#8B9BB4" font-size="8.5">sim = 1.0 / 2.0 = 0.50 (λ = 1)</text>
+<rect x="55" y="103" width="250" height="15" rx="4" fill="#0B1220"/>
+<text x="180" y="114" text-anchor="middle" fill="#FBBF24" font-size="9.5">gain = 0.33 + 0.33 − 0.50 = +0.17 → keep the split</text>
+<rect x="20" y="128" width="150" height="46" rx="8" fill="#0B1220" stroke="#34D399"/>
+<text x="95" y="146" text-anchor="middle" fill="#34D399" font-size="9.5">churn leaf · res +0.5, +0.5</text>
+<text x="95" y="160" text-anchor="middle" fill="#8B9BB4" font-size="8.5">sim 0.33 → output +0.67</text>
+<rect x="190" y="128" width="150" height="46" rx="8" fill="#0B1220" stroke="#5EEAD4"/>
+<text x="265" y="146" text-anchor="middle" fill="#5EEAD4" font-size="9.5">stay leaf · res −0.5, −0.5</text>
+<text x="265" y="160" text-anchor="middle" fill="#8B9BB4" font-size="8.5">sim 0.33 → output −0.67</text>
+<text x="180" y="192" text-anchor="middle" fill="#8B9BB4" font-size="8.5">split: support calls ≥ 4 → churners left, stayers right (leaf outputs are log-odds)</text>
+</svg>
+<p><b>💬 Feel it:</b> a newsroom corrections desk. Draft 1 (base 0.5) is deliberately bland. Each editor (tree) reads ONLY the corrections still outstanding (the residuals) and writes the smallest fix that clears them (leaf output, damped by α). A supervisor (gain + λ) rejects any edit that doesn't clearly improve the story. Nobody rewrites from scratch — the corrections stack until the story is right.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p>Common learner gaps in this topic — and every one of them is fair game for YOU, because XGBoost churn model is on your resume. Make sure your notes cover all six.</p>

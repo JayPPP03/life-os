@@ -50,6 +50,48 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_11"><b>KNN — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> a new customer lands on the churn desk — 2 support calls, 6 months active. Not a statistic: a person the retention team must call or skip today. There is no time to fit anything. The honest answer is to make them like the customers you already know.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Euclidean distance d = √((x2−x1)² + (y2−y1)²) is "similarity" turned into a number.</b> Each feature is a step along one axis; the formula is plain Pythagoras — the straight line between two customers in feature space. Squares kill the sign of each gap, the root puts the answer back in real units. Why a straight line and nothing fancier: with 2-3 features you can literally draw it, and "closest" is what a human means by "most like us".</li>
+<li><b>Scale breaks it — standardize first.</b> Distance ADDS feature gaps, so a column running 0-10000 (call seconds) drowns a column running 0-5 (complaints): whoever owns the biggest units silently picks the neighbors. Skip scaling and d is not closeness at all — it is one feature wearing a costume. That is why KNN must standardize while trees never bother.</li>
+<li><b>The k vote is the humility dial.</b> k=1 copies one customer — one mislabeled weirdo becomes your retention decision (overfit). k = everyone and the answer flattens to "always predict the majority class" (underfit — far strangers outvote the actual neighborhood). In between, close neighbors outvote noise while staying local. Sweep k = 1..50, keep the lowest validation error — never gut feel.</li>
+</ul>
+<p><b>📈 See it:</b> customer C asks: who in our history is most like me? The dashed rings mark the k=3 answer.</p>
+<svg viewBox="0 0 360 200" width="100%" role="img" aria-label="Scatter plot of six labeled customers and new customer C with dashed rings around the three nearest neighbors">
+<text x="180" y="12" text-anchor="middle" fill="#E6EDF7" font-size="10">New customer C: the k=3 nearest past customers decide</text>
+<rect x="70" y="17" width="8" height="8" fill="#F87171"/><text x="82" y="25" fill="#8B9BB4" font-size="8">churned</text>
+<rect x="135" y="17" width="8" height="8" fill="#34D399"/><text x="147" y="25" fill="#8B9BB4" font-size="8">stayed</text>
+<polygon points="203,17 209,23 203,29 197,23" fill="#FBBF24"/><text x="214" y="25" fill="#8B9BB4" font-size="8">new customer C</text>
+<line x1="40" y1="34" x2="40" y2="170" stroke="#8B9BB4"/>
+<line x1="40" y1="170" x2="350" y2="170" stroke="#8B9BB4"/>
+<text transform="rotate(-90 14 102)" x="14" y="102" text-anchor="middle" fill="#8B9BB4" font-size="8">months active →</text>
+<text x="349" y="183" text-anchor="end" fill="#8B9BB4" font-size="8">support calls →</text>
+<circle cx="195" cy="100" r="12" fill="none" stroke="#5EEAD4" stroke-dasharray="4 3"/>
+<circle cx="147" cy="114" r="12" fill="none" stroke="#5EEAD4" stroke-dasharray="4 3"/>
+<circle cx="50" cy="72" r="12" fill="none" stroke="#5EEAD4" stroke-dasharray="4 3"/>
+<circle cx="195" cy="100" r="4" fill="#F87171"/>
+<circle cx="147" cy="114" r="4" fill="#F87171"/>
+<circle cx="50" cy="72" r="4" fill="#34D399"/>
+<circle cx="98" cy="44" r="4" fill="#34D399"/>
+<circle cx="50" cy="114" r="4" fill="#34D399"/>
+<circle cx="292" cy="142" r="4" fill="#F87171"/>
+<polygon points="147,78 155,86 147,94 139,86" fill="#FBBF24"/>
+<text x="209" y="104" fill="#E6EDF7" font-size="9">A</text>
+<text x="161" y="120" fill="#E6EDF7" font-size="9">B</text>
+<text x="66" y="68" fill="#E6EDF7" font-size="9">D</text>
+<text x="104" y="40" fill="#E6EDF7" font-size="9">E</text>
+<text x="58" y="110" fill="#E6EDF7" font-size="9">F</text>
+<text x="298" y="138" fill="#E6EDF7" font-size="9">G</text>
+<text x="157" y="82" fill="#FBBF24" font-size="9">C (new)</text>
+<text x="195" y="196" text-anchor="middle" fill="#8B9BB4" font-size="9">rings = 3 nearest {A, B, D} → vote 2 churn vs 1 stay → CHURN</text>
+</svg>
+<p><b>💬 Feel it:</b> pricing a flat. Nobody fits a line through every sale in the city before answering "what is MY flat worth?" You find the three most similar flats that actually sold, and average. KNN is that instinct, formalized: similarity in, majority/average out — and if you searched for "similar" using only price per square foot while ignoring location, you already understand why scaling matters.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>

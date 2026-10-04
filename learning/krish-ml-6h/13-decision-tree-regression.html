@@ -50,6 +50,42 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_13"><b>DECISION TREE REGRESSION — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> the campaign team needs a number for the landing page: "an 18-month contract customer generates about ₹X per month." Not a class, not a probability — revenue. And the number has to survive a sales meeting: where did it come from?</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>The leaf stores the MEAN of its training rows.</b> Revenue is continuous — no single value ever repeats, so the classification trick of "majority class" is impossible. You must summarize, and the mean is not arbitrary: it is the one constant that minimizes squared error for the rows in that leaf. (Switch the loss to MAE and the leaf would store the median instead — the choice of loss dictates the leaf.) Business version: "this leaf's customers average ₹12.6k — that is the number that goes to the campaign team."</li>
+<li><b>Split quality = variance drop: MSE before vs (|left|/n)·MSE_left + (|right|/n)·MSE_right after.</b> Every candidate threshold is asked: how internally consistent do the two children become? Here 23.22 → 4.44 at "months &lt; 12" — an 81% cut from one question. The weighting is the anti-fraud clause: without it, a split that perfects one row while leaving five messy would look like a win, and your forecast error for MOST customers stays huge.</li>
+<li><b>The output is piecewise-constant — a feature and a boundary.</b> A 13-month and a 24-month customer both get ₹12.67k: everything landing in a leaf gets that leaf's mean. No line is fitted, so nothing can be extrapolated — a 36-month contract can never earn a prediction beyond what the training leaves have seen. That is exactly why depth is capped: grow forever and every leaf holds one row, train MSE hits 0, and the model memorizes customers instead of pricing segments.</li>
+</ul>
+<p><b>📈 See it:</b> one question — "months &lt; 12?" — collapses the error:</p>
+<svg viewBox="0 0 360 200" width="100%" role="img" aria-label="Bar chart of mean squared error falling from 23.22 at the root to 4.44 weighted after the split, with leaf errors 2.67 and 6.22">
+<text x="180" y="12" text-anchor="middle" fill="#E6EDF7" font-size="10">MSE before vs after the best split (months &lt; 12)</text>
+<line x1="40" y1="40" x2="40" y2="165" stroke="#8B9BB4"/>
+<line x1="40" y1="165" x2="350" y2="165" stroke="#8B9BB4"/>
+<rect x="60" y="55" width="52" height="110" fill="#FBBF24"/>
+<rect x="135" y="144" width="52" height="21" fill="#5EEAD4"/>
+<rect x="210" y="152" width="52" height="13" fill="#34D399"/>
+<rect x="285" y="136" width="52" height="29" fill="#34D399"/>
+<text x="86" y="51" text-anchor="middle" fill="#E6EDF7" font-size="10">23.22</text>
+<text x="161" y="140" text-anchor="middle" fill="#E6EDF7" font-size="10">4.44</text>
+<text x="236" y="148" text-anchor="middle" fill="#E6EDF7" font-size="10">2.67</text>
+<text x="311" y="132" text-anchor="middle" fill="#E6EDF7" font-size="10">6.22</text>
+<text x="86" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Root</text>
+<text x="86" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">one mean for all</text>
+<text x="161" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">After split</text>
+<text x="161" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">weighted</text>
+<text x="236" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Leaf &lt; 12 mo</text>
+<text x="236" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">mean ₹4k</text>
+<text x="311" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Leaf ≥ 12 mo</text>
+<text x="311" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">mean ₹12.67k</text>
+<text x="180" y="199" text-anchor="middle" fill="#8B9BB4" font-size="8">one split cut error 81% — the tree repeats this comparison at every level</text>
+</svg>
+<p><b>💬 Feel it:</b> a property appraiser with sticky notes. One sticky note for the whole city (the root mean) prices every flat badly. So she splits: old town vs new town — one average per sticky note, and the error inside each neighborhood shrinks. More cuts, finer neighborhoods, less error — until each note covers exactly one house and predicts nothing about the next buyer. Knowing where to STOP splitting is the whole skill.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>

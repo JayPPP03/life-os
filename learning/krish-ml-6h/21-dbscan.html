@@ -50,6 +50,51 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_21"><b>DBSCAN — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> Among 100K+ customer profiles there are always a few junk accounts — bots, test entries, one whale who is not really a segment. K-means must place every point somewhere, so those outliers get absorbed and drag the mean-based centroids off target: every persona shifts a little toward the junk, so every campaign aims slightly wrong. DBSCAN is built for exactly this: it refuses to assign what does not belong, so segments stay honest and the junk gets flagged for review instead of mailed a campaign.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Core / border / noise — density, not distance-to-a-center</b> — a point is CORE if its ε-neighborhood holds ≥ MinPts points (it lives in a dense region and anchors a cluster); not core but within ε of a core → BORDER (joins that cluster from the edge); neither → NOISE (label −1, no cluster, ever). A cluster here is literally a DENSE REGION grown outward from cores — not "everything near a center". That is also why it finds arbitrary shapes (moons, rings) that k-means shatters: k-means assigns to the NEAREST CENTER, so its clusters are always convex blobs, while DBSCAN chains density point to point and traces the shape as it lies.</li>
+<li><b>Why ε and MinPts replace K</b> — "dense enough to count as a group" is a criterion the business can reason about ("at least 3 neighbors within this radius = a real behavior pattern"), while K is a pure guess you must feed k-means. Set the density bar and the cluster count falls out of the data — the hand run produced 2 clusters + noise with K never given. But the knobs bite: raise MinPts one notch (3 → 4) and that same data becomes ALL noise. Tune the pair together, on scaled features, or one radius means different things on each axis.</li>
+<li><b>Why refusing to assign is a feature</b> — a forced outlier gets a campaign it will never answer, and (in k-means) it also moved the centroid so the real members get a slightly wrong message too. The noise label costs one account routed to the review queue and buys clean segments — the same mechanism makes DBSCAN a free anomaly detector.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two moon-shaped clusters and red noise points that DBSCAN refuses to assign">
+<text x="185" y="12" fill="#8B9BB4" font-size="9.5" text-anchor="middle">a cluster = a dense region — lonely points stay noise</text>
+<circle cx="97" cy="62" r="28" fill="none" stroke="#E6EDF7" stroke-width="1" stroke-opacity="0.6" stroke-dasharray="4,3"/>
+<text x="97" y="27" fill="#E6EDF7" font-size="9" text-anchor="middle">ε</text>
+<circle cx="50" cy="115" r="4" fill="#5EEAD4"/>
+<circle cx="58" cy="92" r="4" fill="#5EEAD4"/>
+<circle cx="75" cy="73" r="4" fill="#5EEAD4"/>
+<circle cx="97" cy="62" r="4" fill="#5EEAD4"/>
+<circle cx="122" cy="60" r="4" fill="#5EEAD4"/>
+<circle cx="145" cy="68" r="4" fill="#5EEAD4"/>
+<circle cx="163" cy="85" r="4" fill="#5EEAD4"/>
+<circle cx="172" cy="106" r="4" fill="#5EEAD4"/>
+<circle cx="150" cy="135" r="4" fill="#FBBF24"/>
+<circle cx="160" cy="155" r="4" fill="#FBBF24"/>
+<circle cx="180" cy="168" r="4" fill="#FBBF24"/>
+<circle cx="205" cy="172" r="4" fill="#FBBF24"/>
+<circle cx="230" cy="168" r="4" fill="#FBBF24"/>
+<circle cx="250" cy="155" r="4" fill="#FBBF24"/>
+<circle cx="262" cy="137" r="4" fill="#FBBF24"/>
+<circle cx="266" cy="115" r="4" fill="#FBBF24"/>
+<circle cx="115" cy="132" r="4" fill="#F87171"/>
+<circle cx="215" cy="58" r="4" fill="#F87171"/>
+<circle cx="300" cy="62" r="4" fill="#F87171"/>
+<circle cx="310" cy="148" r="4" fill="#F87171"/>
+<circle cx="122" cy="176" r="4" fill="#F87171"/>
+<circle cx="45" cy="170" r="4" fill="#F87171"/>
+<circle cx="240" cy="38" r="4" fill="#F87171"/>
+<circle cx="95" cy="152" r="4" fill="#F87171"/>
+<text x="352" y="34" fill="#F87171" font-size="9" text-anchor="end">noise → label −1</text>
+<text x="185" y="193" fill="#8B9BB4" font-size="8.5" text-anchor="middle"><tspan fill="#5EEAD4">● dense group 1</tspan> · <tspan fill="#FBBF24">● dense group 2</tspan> · <tspan fill="#F87171">● noise</tspan></text>
+</svg>
+<p><b>💬 Feel it:</b> A party: a huddle of five people is a group (cores); the person standing at the huddle's edge still belongs to it (border); the loner by the snack table joins nobody (noise). It would be absurd to seat the loner "with the nearest huddle" just because a rulebook says everyone must join a group — that rulebook is k-means. DBSCAN lets the loner stand alone.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against each before the quiz:</p>

@@ -50,6 +50,42 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_23"><b>Bias &amp; Variance — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> your churn model scored 95% on last year's customers and 60% on this quarter's new ones. The CEO asks why. Bias-variance is not a definition to recite — it IS the answer: the 95/60 gap means the model memorized old customers' quirks instead of learning the churn pattern. This section is the diagnosis tool that tells you WHICH knob to turn before you waste a retraining cycle.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>The 2×2 (train score × test score):</b> high bias = systematically wrong even on data it SAW (underfit — model too simple to hold the pattern, the 60/55 box). High variance = chases noise (overfit — memorized training quirks that don't exist in new customers, the 90/75 box). The sweet spot is low bias + low variance (90/92). <b>Why two axes:</b> "did it fit?" and "did it transfer?" are independent — a model can fail either way, or both. <b>What breaks with the alternative</b> (judging by training accuracy alone): in the mini-project, degree 3 AND degree 9 both hit train MSE ≈ 0 — train score cannot tell the learner from the memorizer. <b>Business consequence:</b> ship the memorizer and it predicts a 551 sales lift where reality is 7.8 — retention budget poured into the wrong users.</li>
+<li><b>MSE averaged over held-out rows:</b> one comparable number per candidate model, computed on data the model never saw. <b>Why average over ALL rows:</b> so one lucky or unlucky prediction can't decide the verdict. <b>Alternative:</b> eyeballing fits or trusting the train score → you ship degree 9. <b>Business consequence:</b> the forecast the CEO sees at the board meeting is fiction.</li>
+<li><b>The fix menu — diagnosis BEFORE knob:</b> overfit → more data, regularization (Ridge/Lasso λ), simpler model; underfit → richer features, bigger model, train longer. <b>Why this order:</b> the wrong knob moves you the wrong way — more capacity on an overfit model makes it worse; more regularization on an underfit one freezes the mistake. Proof the right knob works: Ridge on the degree-9 model took test MSE 147,735 → 0.11 — same model, correct diagnosis.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Same six data points fitted three ways: straight line underfits, degree-9 curve overfits and explodes, smooth curve generalizes" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin:.4rem 0">
+<line x1="52" y1="14" x2="72" y2="14" stroke="#F87171" stroke-width="2"/>
+<text x="76" y="17" fill="#F87171" font-size="8">underfit (deg 1)</text>
+<line x1="152" y1="14" x2="172" y2="14" stroke="#FBBF24" stroke-width="2" stroke-dasharray="4 3"/>
+<text x="176" y="17" fill="#FBBF24" font-size="8">overfit (deg 9)</text>
+<line x1="256" y1="14" x2="276" y2="14" stroke="#34D399" stroke-width="2.4"/>
+<text x="280" y="17" fill="#34D399" font-size="8">right (deg 3)</text>
+<line x1="40" y1="170" x2="340" y2="170" stroke="#1E2A44" stroke-width="1"/>
+<line x1="40" y1="20" x2="40" y2="170" stroke="#1E2A44" stroke-width="1"/>
+<text x="190" y="188" fill="#8B9BB4" font-size="9" text-anchor="middle">discount % →</text>
+<text x="14" y="32" fill="#8B9BB4" font-size="9">lift ↑</text>
+<circle cx="50" cy="134" r="3.2" fill="#E6EDF7"/>
+<circle cx="106" cy="150" r="3.2" fill="#E6EDF7"/>
+<circle cx="162" cy="151" r="3.2" fill="#E6EDF7"/>
+<circle cx="218" cy="132" r="3.2" fill="#E6EDF7"/>
+<circle cx="274" cy="97" r="3.2" fill="#E6EDF7"/>
+<circle cx="330" cy="36" r="3.2" fill="#E6EDF7"/>
+<line x1="50" y1="157" x2="330" y2="59" stroke="#F87171" stroke-width="1.8"/>
+<path d="M50,134 C75,142 90,152 106,150 C130,147 145,128 162,151 C178,168 198,186 218,132 C233,95 248,-25 274,97 C292,172 308,72 330,36" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-dasharray="4 3"/>
+<path d="M50,134 C95,150 130,153 162,151 C205,148 242,122 274,97 C296,80 312,55 330,36" fill="none" stroke="#34D399" stroke-width="2.4"/>
+<text x="60" y="34" fill="#FBBF24" font-size="8">deg 9 predicts 551 at x=4 — reality is 7.8</text>
+</svg>
+<p><b>💬 Feel it:</b> hiring analysts. The high-bias intern answers every question with the same average — "sales lift? about 51" — never wrong-shaped, never right. The high-variance one recites every past case verbatim and panics on anything new. You want the senior who learned the PATTERN, not the episodes — that's the degree-3 curve.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p>Common learner gaps in this topic — make sure YOUR notes above end up covering all six.</p>

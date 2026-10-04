@@ -50,6 +50,42 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_12"><b>DECISION TREE CLASSIFICATION — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> the COO will not read a model — but she WILL act on a rule she can say out loud: "IF the customer complained AND tenure &lt; 12 months THEN flag them high risk." A decision tree promises exactly that. The entire game reduces to one question: which question do we ask first?</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Entropy H = −Σ p·log₂p is a surprise meter.</b> Open a pure node (all churners) and nothing can surprise you → H = 0. Open a 50/50 node and every draw is a coin flip → maximum confusion, H = 1. The minus sign is bookkeeping: logs of fractions are negative, the minus flips them positive. Without a single number for "how mixed is this pile?", picking the first question is vibes — entropy turns "which feature first?" into arithmetic.</li>
+<li><b>Information gain = parent H − Σ (|child|/|parent|)·H(child): how much uncertainty THIS question removes.</b> The size-weighting is not decoration: a split producing one tiny pure branch and one huge messy branch must NOT look good — those are the 47-vs-1 memorization splits that train perfectly and predict garbage. Skip the weights and you promote exactly that fraud. In our table: "Complained?" removes 0.459 of entropy, "Contract" removes 0.082 — so the root asks about complaints, and retention calls complainers first.</li>
+<li><b>Why log₂ specifically: entropy is measured in BITS — the currency of information.</b> A 50/50 node holds exactly 1 bit: one good yes/no question could resolve it. Gain = 0.459 literally means this question hands back about half a bit. Any other log base would rank splits identically — log₂ just makes the number read as "yes/no questions saved".</li>
+</ul>
+<p><b>📈 See it:</b> the best split drains surprise out of the pile — one branch nearly solved, one solved completely.</p>
+<svg viewBox="0 0 360 200" width="100%" role="img" aria-label="Bar chart of entropy dropping from 1.0 at the root to 0.811 on the yes branch and 0 on the pure no branch">
+<text x="180" y="12" text-anchor="middle" fill="#E6EDF7" font-size="10">Entropy falls when the best question is asked</text>
+<line x1="45" y1="45" x2="345" y2="45" stroke="#1E2A44"/>
+<line x1="45" y1="105" x2="345" y2="105" stroke="#1E2A44"/>
+<line x1="45" y1="40" x2="45" y2="165" stroke="#8B9BB4"/>
+<line x1="45" y1="165" x2="345" y2="165" stroke="#8B9BB4"/>
+<text x="41" y="49" text-anchor="end" fill="#8B9BB4" font-size="8">1.0</text>
+<text x="41" y="109" text-anchor="end" fill="#8B9BB4" font-size="8">0.5</text>
+<rect x="70" y="45" width="56" height="120" fill="#FBBF24"/>
+<rect x="160" y="68" width="56" height="97" fill="#5EEAD4"/>
+<rect x="250" y="163" width="56" height="2" fill="#34D399"/>
+<text x="98" y="41" text-anchor="middle" fill="#E6EDF7" font-size="10">1.0</text>
+<text x="188" y="64" text-anchor="middle" fill="#E6EDF7" font-size="10">0.811</text>
+<text x="278" y="158" text-anchor="middle" fill="#34D399" font-size="10">0 pure</text>
+<text x="98" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Root</text>
+<text x="98" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">6 rows, 3-3 mix</text>
+<text x="188" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Complained = Yes</text>
+<text x="188" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">4 rows, 3-1</text>
+<text x="278" y="178" text-anchor="middle" fill="#E6EDF7" font-size="9">Complained = No</text>
+<text x="278" y="189" text-anchor="middle" fill="#8B9BB4" font-size="8">2 rows, 0-2</text>
+<text x="180" y="199" text-anchor="middle" fill="#8B9BB4" font-size="8">weighted child entropy = 0.541 → gain = 1.0 − 0.541 = 0.459</text>
+</svg>
+<p><b>💬 Feel it:</b> the game of 20 questions. Ask "is it a living thing?" and half the universe dies with one answer; ask "is it your left shoe?" and you have learned almost nothing. Entropy is how mixed your possibility pile still is; information gain is how much shuffling each question bought you. The tree is just a machine that greedily asks the best-scoring question, level after level, until the pile is pure.</p>
+<p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against every line before the quiz:</p>

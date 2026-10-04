@@ -50,6 +50,62 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_16"><b>RANDOM FOREST — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+  <p><b>🎯 The business problem:</b> Churn desk, save-team budget for ONE call today. Customer #84: short tenure, high spend, many support calls. A single deep tree that memorized its 450 training customers votes 'stay'; a forest of 500 diverse trees votes 'churn' 4:1 — and #84 really churned. The forest's edge is not more computation. It is two extra samplings that make the voters worth counting.</p>
+  <p><b>🧠 Why THIS formula:</b></p><ul>
+    <li><b>Feature sampling: each split considers only a random subset of the columns (√p of them).</b> Plain meaning: every tree must solve churn with a random handful of clues — some never even see monthly_spend, the obvious winner. Why this form: give all trees ALL columns and each grabs the same strong feature at the root → 500 near-clones echoing one opinion. What breaks with the alternative — bagging rows but keeping every feature: the trees stay correlated and the vote adds nothing. Business consequence: only DECORRELATED voters turn a majority into new information.</li>
+    <li><b>Averaging kills variance only when errors are independent: Var(mean) ≈ ρσ² + (1−ρ)σ²/n.</b> The (1−ρ)σ²/n term melts as trees are added; the ρσ² floor is whatever correlation you failed to remove — which is why the feature sampling above matters more than tree count. What breaks with the alternative — one deep tree: all variance, no averaging; train 100% / test 83% while the 500-tree forest tests 90%. Business consequence: on #84 the lone tree says 'stay' and a real churner walks; the 4:1 vote says call.</li>
+    <li><b>OOB (out-of-bag): each tree is graded on the ~37% of rows its bootstrap never drew.</b> The bootstrap accidentally manufactures a free validation set, row by row. Why this form: honest accuracy without carving a permanent holdout out of a small dataset. Business consequence: the save-team trains on all 600 customers AND still gets a credible score — zero data sacrificed.</li>
+  </ul>
+  <p><b>📈 See it:</b></p>
+  <svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A lone deep tree predicts stay and is wrong while five diverse forest trees vote churn 4 to 1 and the team calls">
+    <text x="180" y="12" text-anchor="middle" font-size="10" fill="#E6EDF7">Customer #84: clones repeat one mistake — voters cancel it</text>
+    <text x="42" y="28" text-anchor="middle" font-size="8" fill="#8B9BB4">lone deep tree</text>
+    <polygon points="42,34 29,56 55,56" fill="#5EEAD4" opacity="0.85"/>
+    <rect x="40" y="56" width="4" height="10" fill="#8B9BB4"/>
+    <rect x="25" y="74" width="34" height="16" rx="8" fill="#5EEAD4"/>
+    <text x="42" y="85" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">stay</text>
+    <text x="46" y="102" text-anchor="middle" font-size="7.5" fill="#F87171">✗ a real churner walks</text>
+    <line x1="92" y1="26" x2="92" y2="112" stroke="#1E2A44" stroke-dasharray="3,3"/>
+    <text x="196" y="28" text-anchor="middle" font-size="8" fill="#8B9BB4">the forest: different rows AND different columns</text>
+    <polygon points="130,36 120,52 140,52" fill="#34D399" opacity="0.85"/>
+    <rect x="128" y="52" width="4" height="9" fill="#8B9BB4"/>
+    <rect x="114" y="68" width="32" height="14" rx="7" fill="#F87171"/>
+    <text x="130" y="78" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#0B1220">churn</text>
+    <polygon points="163,36 153,52 173,52" fill="#34D399" opacity="0.85"/>
+    <rect x="161" y="52" width="4" height="9" fill="#8B9BB4"/>
+    <rect x="147" y="68" width="32" height="14" rx="7" fill="#F87171"/>
+    <text x="163" y="78" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#0B1220">churn</text>
+    <polygon points="196,36 186,52 206,52" fill="#34D399" opacity="0.85"/>
+    <rect x="194" y="52" width="4" height="9" fill="#8B9BB4"/>
+    <rect x="180" y="68" width="32" height="14" rx="7" fill="#F87171"/>
+    <text x="196" y="78" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#0B1220">churn</text>
+    <polygon points="229,36 219,52 239,52" fill="#34D399" opacity="0.85"/>
+    <rect x="227" y="52" width="4" height="9" fill="#8B9BB4"/>
+    <rect x="213" y="68" width="32" height="14" rx="7" fill="#F87171"/>
+    <text x="229" y="78" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#0B1220">churn</text>
+    <polygon points="262,36 252,52 272,52" fill="#34D399" opacity="0.85"/>
+    <rect x="260" y="52" width="4" height="9" fill="#8B9BB4"/>
+    <rect x="246" y="68" width="32" height="14" rx="7" fill="#5EEAD4"/>
+    <text x="262" y="78" text-anchor="middle" font-size="7.5" font-weight="bold" fill="#0B1220">stay</text>
+    <line x1="130" y1="82" x2="130" y2="94" stroke="#8B9BB4"/>
+    <line x1="163" y1="82" x2="163" y2="94" stroke="#8B9BB4"/>
+    <line x1="196" y1="82" x2="196" y2="94" stroke="#8B9BB4"/>
+    <line x1="229" y1="82" x2="229" y2="94" stroke="#8B9BB4"/>
+    <line x1="262" y1="82" x2="262" y2="94" stroke="#8B9BB4"/>
+    <line x1="130" y1="94" x2="298" y2="94" stroke="#8B9BB4"/>
+    <rect x="298" y="74" width="54" height="36" rx="8" fill="#101B2E" stroke="#34D399"/>
+    <text x="325" y="89" text-anchor="middle" font-size="11" font-weight="bold" fill="#E6EDF7">4 : 1</text>
+    <text x="325" y="103" text-anchor="middle" font-size="8" font-weight="bold" fill="#34D399">CALL</text>
+    <text x="180" y="140" text-anchor="middle" font-size="8.5" fill="#8B9BB4">lone tree: train 100% / test 83% — it memorized its rows</text>
+    <text x="180" y="154" text-anchor="middle" font-size="8.5" fill="#8B9BB4">forest 500: test 90% — decorrelated votes average the variance away</text>
+    <text x="180" y="168" text-anchor="middle" font-size="8.5" fill="#8B9BB4">OOB: each tree grades itself on the ~37% of rows it never drew</text>
+  </svg>
+  <p><b>💬 Feel it:</b> The lone deep tree is the veteran agent who 'just knows' customer #84 — because he memorized the CRM. The forest is Monday's huddle: five agents, each handed a random slice of the CRM and a different dashboard, arguing for five minutes. Four say the account is slipping; the lead dials. The one dissenter is not fired — he is exactly the error the majority just cancelled.</p>
+  <p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — your notes above are still blank, so treat this as the pre-watch checklist: anything you couldn't have written from memory is your rewatch list.</p>

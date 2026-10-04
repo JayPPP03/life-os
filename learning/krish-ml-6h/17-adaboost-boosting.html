@@ -50,6 +50,44 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_17"><b>ADABOOST — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+  <p><b>🎯 The business problem:</b> Your churn model keeps missing the same painful segment: customers who churn WITHOUT ever calling support — the silent churners. Round 1, the stump nails the loud accounts and flubs C (3 calls, churned anyway) and E (4 calls, stayed anyway). You cannot afford a model that repeats its misses. AdaBoost is the mechanism that forces the model to study its own homework mistakes, round after round.</p>
+  <p><b>🧠 Why THIS formula:</b></p><ul>
+    <li><b>Weight update: correct × e^(−α) (shrink), wrong × e^(+α) (grow), then normalize back to sum 1.</b> Plain meaning: every customer the stump misjudged gets a LOUDER voice in round 2, and the weight-proportional bucket redraw forces the next stump to draw them again and again. What breaks with the alternative — retraining on the same unchanged data: stump 2 repeats stump 1's mistakes verbatim; the model never learns. Business consequence: the silent churners go from 40% of the redraw batch to half of it — someone is finally forced to study them.</li>
+    <li><b>α = ½·ln((1−TE)/TE): the stump's microphone size in the final vote.</b> TE → 0 ⇒ α → ∞ (a near-perfect stump gets a huge say); TE = 0.5 ⇒ α = 0 (a coin flip is silenced exactly); TE &gt; 0.5 ⇒ α &lt; 0 (its vote counts AGAINST it — effectively flip its answers). Why the log form: it maps error to a smoothly growing bonus that hits exactly zero at coin-flip. What breaks with the alternative — one-stump-one-vote: a random guesser would outvote a proven specialist. Business consequence: the save-team dials based on how much say each stump EARNED.</li>
+    <li><b>TE = sum of the MISCLASSIFIED weights — not a count of rows.</b> Plain meaning: TE is how much of the room's total attention the mistakes hold. Why this form: after round 1 the weights are unequal, so 'errors ÷ n' no longer measures difficulty; the weighted sum does. Business consequence: TE falling 1/3 → 1/8 round over round is the report card proving the hard segment is being mastered.</li>
+  </ul>
+  <p><b>📈 See it:</b></p>
+  <svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Six customers as equal circles before a boosting round; after it the two misclassified circles C and E grow much larger">
+    <text x="180" y="12" text-anchor="middle" font-size="10" fill="#E6EDF7">The two the stump missed now shout loudest</text>
+    <text x="16" y="64" font-size="9" fill="#8B9BB4">before</text>
+    <text x="16" y="156" font-size="9" fill="#8B9BB4">after</text>
+    <circle cx="70" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="70" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">A</text>
+    <circle cx="120" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="120" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">B</text>
+    <circle cx="170" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="170" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">C</text>
+    <circle cx="220" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="220" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">D</text>
+    <circle cx="270" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="270" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">E</text>
+    <circle cx="320" cy="60" r="11" fill="#101B2E" stroke="#5EEAD4"/><text x="320" y="63.5" text-anchor="middle" font-size="9" fill="#E6EDF7">F</text>
+    <text x="195" y="86" text-anchor="middle" font-size="7.5" fill="#8B9BB4">all w = 1/6</text>
+    <line x1="150" y1="94" x2="150" y2="118" stroke="#8B9BB4"/>
+    <polygon points="150,124 146,116 154,116" fill="#8B9BB4"/>
+    <text x="160" y="104" font-size="8" fill="#8B9BB4">stump 1 misses C and E:</text>
+    <text x="160" y="115" font-size="8" fill="#8B9BB4">wrong × e^(+α) → louder</text>
+    <circle cx="70" cy="152" r="9" fill="#101B2E" stroke="#5EEAD4"/><text x="70" y="155.5" text-anchor="middle" font-size="8.5" fill="#E6EDF7">A</text>
+    <circle cx="120" cy="152" r="9" fill="#101B2E" stroke="#5EEAD4"/><text x="120" y="155.5" text-anchor="middle" font-size="8.5" fill="#E6EDF7">B</text>
+    <text x="170" y="128" text-anchor="middle" font-size="10" fill="#FBBF24">✗</text>
+    <circle cx="170" cy="152" r="16" fill="#FBBF24" stroke="#FBBF24"/><text x="170" y="156" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">C</text>
+    <circle cx="220" cy="152" r="9" fill="#101B2E" stroke="#5EEAD4"/><text x="220" y="155.5" text-anchor="middle" font-size="8.5" fill="#E6EDF7">D</text>
+    <text x="270" y="128" text-anchor="middle" font-size="10" fill="#FBBF24">✗</text>
+    <circle cx="270" cy="152" r="16" fill="#FBBF24" stroke="#FBBF24"/><text x="270" y="156" text-anchor="middle" font-size="9" font-weight="bold" fill="#0B1220">E</text>
+    <circle cx="320" cy="152" r="9" fill="#101B2E" stroke="#5EEAD4"/><text x="320" y="155.5" text-anchor="middle" font-size="8.5" fill="#E6EDF7">F</text>
+    <text x="180" y="192" text-anchor="middle" font-size="8.5" fill="#8B9BB4">circle size = weight · the weight-bucket redraw picks big circles more often</text>
+  </svg>
+  <p><b>💬 Feel it:</b> A teacher who only marks correct answers produces a class that repeats its errors forever. AdaBoost is the teacher who circles every wrong answer in red marker and builds tomorrow's quiz mostly from those questions — and if a student keeps answering worse than a coin flip, the class stops copying them (α &lt; 0 flips their answers).</p>
+  <p class="mini">🔗 This intuition powers everything below.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — your notes above are still blank, so treat this as the pre-watch checklist: anything you couldn't have written from memory is your rewatch list.</p>

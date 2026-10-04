@@ -50,6 +50,40 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_6"><b>Ridge &amp; Lasso — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> MyOperator hands you call logs and asks: "score every customer's churn risk so retention calls the right people first." Two signals truly matter — support tickets (more tickets → more risk) and tenure (longer stay → less risk) — but the export also carries customer_id, and tickets and call-minutes move together. Plain regression goes crazy here: it hands a huge +slope to one feature and a huge −slope to its twin as they split the credit, and leaks weight into the junk ID column. You cannot tell the COO "call_minutes has slope −79 and num_calls +80" — that is not insight, that is vertigo.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Ridge penalty λ·Σslope²</b> — measures: the SIZE of all your slopes, squared, billed on top of the normal prediction error. Why this form: a squared penalty is a rubber band — pull proportional to size, so big slopes get yanked hard and small ones barely feel it; gentle, but it never lets go, so every slope shrinks toward flat and NONE reaches exactly 0. What breaks without it: correlated features keep inflating each other and signs flip (tenure turned +0.98 in the worked project — long-tenure customers churning MORE?). Business consequence: coefficients become tellable — "each extra support ticket adds ~1.5 risk points" survives the meeting.</li>
+<li><b>Lasso penalty λ·Σ|slope|</b> — measures: the same bill, but on absolute size. Why this form: |slope| has a SHARP CORNER at 0 — slide a useless coefficient down the bill and at that corner it gets snapped OFF entirely (coefficient exactly 0 = automatic feature removal). The squared ridge penalty can only shrink it to tiny-but-alive. Business consequence: "the model fired its own useless features" — customer_id gets 0.0, so the churn score stops depending on a phone number.</li>
+<li><b>The λ dial</b> — measures: how hard the penalty pulls. λ = 0 → plain regression, overfit risk returns; λ huge → all slopes crushed to 0 and the model predicts the average for everyone (underfit); cross-validation picks the middle. Business consequence: λ is an insurance premium — too cheap and junk features wreck the score, too expensive and you have insured away the signal itself.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coefficient sizes without penalty versus with Lasso penalty">
+<text x="115" y="18" text-anchor="middle" fill="#E6EDF7" font-size="9">No penalty: slopes spike</text>
+<text x="275" y="18" text-anchor="middle" fill="#E6EDF7" font-size="9">With λ: slopes tamed</text>
+<line x1="45" y1="150" x2="185" y2="150" stroke="#8B9BB4" stroke-width="1.5"/>
+<line x1="205" y1="150" x2="345" y2="150" stroke="#8B9BB4" stroke-width="1.5"/>
+<rect x="55" y="70" width="26" height="80" fill="#5EEAD4"/>
+<rect x="97" y="144" width="26" height="6" fill="#5EEAD4"/>
+<rect x="139" y="127" width="26" height="23" fill="#F87171"/>
+<rect x="215" y="93" width="26" height="57" fill="#5EEAD4"/>
+<rect x="257" y="148" width="26" height="2" fill="#5EEAD4"/>
+<rect x="299" y="149" width="26" height="1" fill="#F87171"/>
+<text x="312" y="141" text-anchor="middle" fill="#F87171" font-size="7">0.0 — fired</text>
+<text x="68" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">tickets</text>
+<text x="110" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">tenure</text>
+<text x="152" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">junk ID</text>
+<text x="228" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">tickets</text>
+<text x="270" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">tenure</text>
+<text x="312" y="162" text-anchor="middle" fill="#8B9BB4" font-size="7">junk ID</text>
+<text x="45" y="182" fill="#8B9BB4" font-size="8">bar height = |coefficient| from the churn project below</text>
+</svg>
+<p><b>💬 Feel it:</b> Chess-coach version: Ridge is the coach's hand resting gently on every piece you lift — you can still move it, just slower and smaller. Lasso is the coach who takes the piece off the board the moment you lift it without a plan. Same penalty bill, very different personality.</p>
+<p class="mini">🔗 This intuition powers everything below: notes → worked project → solve-on-paper → code.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>

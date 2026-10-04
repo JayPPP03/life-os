@@ -50,6 +50,39 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_8"><b>Linear regression practical — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> A housing team wants an automated price estimate: rooms + age → price in ₹ lakh. Before anyone trusts the number, three boring-sounding choices decide everything: do you understand the formula you shipped, did you test it honestly, and can you decode what sklearn printed. Get any of these wrong and you quote a client a price promise that collapses on the very first new house.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Why still compute θ by hand ONCE, even though sklearn exists</b> — measures: ownership, not speed. When sklearn says price = 18.84·rooms + 0.16·age − 13.21, you know it solved exactly the closed form you did on paper — Σ(x−x̄)(y−ȳ)/Σ(x−x̄)² — so when age's sign comes out POSITIVE (older houses pricier?) you read it correctly as "5 rows, correlated features, shaky coefficients" instead of "the library is broken". Business consequence: you can defend the ₹82.9L estimate in a review with your own derivation, not with "the library said so".</li>
+<li><b>cross_val_score with cv = 5</b> — measures: how the model prices houses it has NEVER seen, five times, so no single split gets to flatter it. Why 5 folds: one split can LIE — on the colony below, one fold reports MSE 3.78 ("misses of ₹1.9L, ship it!") while another reports 34.03 (a disaster); the average 12.13 is the honest verdict, because every house takes its turn as the test jury. What breaks with a single split: you can pick — or stumble into — the lucky split and fool yourself completely. Business consequence: the promise "we miss by about ₹3.5L on average" survives contact with listings the model has never seen.</li>
+<li><b>Why sklearn reports NEG mean squared error</b> — measures: the same MSE with the sign flipped, by sklearn's convention: it maximizes scores (bigger = better), and MSE is a loss (smaller = better), so losses come out negated — −12.13 BEATS −171.68. What breaks if you forget the convention: you would see −171.68 > −12.13, declare Ridge α = 1 the "winner", and ship a model 14× worse. Business consequence: decode the sign first, then speak: "neg MSE −12.13 → MSE 12.13 → RMSE ≈ ₹3.5L average miss." One sentence, fully defensible.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Test MSE per cross-validation fold with the honest average">
+<text x="84" y="17" text-anchor="middle" fill="#F87171" font-size="7">below the training range</text>
+<line x1="50" y1="160" x2="345" y2="160" stroke="#8B9BB4" stroke-width="1.5"/>
+<line x1="50" y1="160" x2="50" y2="12" stroke="#8B9BB4" stroke-width="1.5"/>
+<rect x="67" y="23.9" width="34" height="136.1" fill="#F87171"/>
+<rect x="125" y="144.9" width="34" height="15.1" fill="#5EEAD4"/>
+<rect x="183" y="110.4" width="34" height="49.6" fill="#5EEAD4"/>
+<rect x="241" y="143.3" width="34" height="16.7" fill="#5EEAD4"/>
+<rect x="299" y="135" width="34" height="25" fill="#5EEAD4"/>
+<line x1="50" y1="111.5" x2="345" y2="111.5" stroke="#FBBF24" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="340" y="105" text-anchor="end" fill="#FBBF24" font-size="8">honest average = 12.13</text>
+<text x="84" y="172" text-anchor="middle" fill="#8B9BB4" font-size="7">H1 out</text>
+<text x="142" y="172" text-anchor="middle" fill="#8B9BB4" font-size="7">H2 out</text>
+<text x="200" y="172" text-anchor="middle" fill="#8B9BB4" font-size="7">H3 out</text>
+<text x="258" y="172" text-anchor="middle" fill="#8B9BB4" font-size="7">H4 out</text>
+<text x="316" y="172" text-anchor="middle" fill="#8B9BB4" font-size="7">H5 out</text>
+<text x="196" y="186" text-anchor="middle" fill="#8B9BB4" font-size="8">which house the jury held out</text>
+<text x="16" y="95" transform="rotate(-90 16 95)" fill="#8B9BB4" font-size="8">test MSE (price miss)</text>
+</svg>
+<p><b>💬 Feel it:</b> Picking your best batsman off ONE flashy innings is a single split — flat pitch, lucky edges, 99 not out. Picking him on his average across five matches is cv = 5: a different jury every match, and the average tells you who actually shows up. And sklearn's negative score is just the scoreboard printing "runs conceded" — lower is better; forget that and you celebrate the worst bowler on the team.</p>
+<p class="mini">🔗 This intuition powers everything below: notes → worked project → solve-on-paper → code.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>

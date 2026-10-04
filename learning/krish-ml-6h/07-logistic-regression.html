@@ -50,6 +50,33 @@ th,td{border:1px solid var(--border);padding:6px 10px;text-align:left}th{backgro
 <div class="paper editable" contenteditable="true" data-noteskey="mynotes_7"><b>Logistic regression — my own words:</b><br><br>(watch the section, then write what YOU remember — anything you cannot write here is exactly what to rewatch)</div>
 </div>
 
+<h2>🤔 Why this formula — feel the intuition</h2>
+<div class="card">
+<p><b>🎯 The business problem:</b> MyOperator asks: "which customers will churn this quarter — yes or no?" That answer is a probability, but a straight line does not know that: it happily outputs anything from −∞ to +∞. On this kind of data linear regression literally said "133.6% likely". You cannot tell the CEO a churn chance of 130% — you would be laughed out of the room. We need a machine whose output is trapped between 0 and 1, no matter how extreme the input.</p>
+<p><b>🧠 Why THIS formula:</b></p>
+<ul>
+<li><b>Sigmoid g(z) = 1/(1 + e^(−z))</b> — measures: a legal-probability converter: any score z, however extreme, gets squashed into (0, 1). Why THIS form: z = 0 → e⁰ = 1 → p = 0.5 exactly, so the tipping point is built into the formula, not tuned by hand; and the S-shape means mid-range evidence moves the probability the MOST, while extreme evidence merely confirms (a 12-link email → 0.9999, not 133%). Business consequence: every customer gets a usable churn probability, and the built-in 0.5 becomes a clean rule anyone can act on: "flag anyone above half."</li>
+<li><b>Log-loss −[y·ln p + (1−y)·ln(1−p)]</b> — measures: punishment for being wrong, weighted by how CONFIDENT you were. Why NOT squared error: squared error on a squashed sigmoid makes a BUMPY cost surface — gradient descent settles into local minima, a fake valley, and your churn threshold stays wrong forever; log-loss on the sigmoid is smooth with ONE clear bottom. Why the ln form: predict p = 0.99 when the truth is 0 → −ln(0.01) ≈ 4.6, brutally punished; a humble wrong p = 0.6 → only ≈ 0.92. Business consequence: training itself punishes overconfident wrong churn calls hardest — exactly the calls that burn retention budget on customers who were never leaving.</li>
+</ul>
+<p><b>📈 See it:</b></p>
+<svg viewBox="0 0 360 200" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sigmoid S-curve with the 0.5 decision line">
+<line x1="50" y1="160" x2="345" y2="160" stroke="#8B9BB4" stroke-width="1.5"/>
+<line x1="50" y1="160" x2="50" y2="8" stroke="#8B9BB4" stroke-width="1.5"/>
+<line x1="50" y1="85" x2="340" y2="85" stroke="#F87171" stroke-width="1.2" stroke-dasharray="5 4"/>
+<polyline points="50,159.6 74.2,159 98.3,157.3 122.5,152.9 146.7,142.1 170.8,119.7 195,85 219.2,50.3 243.3,27.9 267.5,17.1 291.7,12.7 315.8,11 340,10.4" fill="none" stroke="#5EEAD4" stroke-width="2.5"/>
+<circle cx="195" cy="85" r="3.5" fill="#FBBF24"/>
+<text x="336" y="79" text-anchor="end" fill="#F87171" font-size="8">decision line p = 0.5</text>
+<text x="195" y="99" text-anchor="middle" fill="#FBBF24" font-size="8">z = 0 → p = 0.5</text>
+<text x="195" y="30" text-anchor="middle" fill="#5EEAD4" font-size="8">mid-range evidence moves p most</text>
+<text x="56" y="136" fill="#8B9BB4" font-size="8">few hours: still ~0</text>
+<text x="282" y="45" fill="#8B9BB4" font-size="8">many hours: already ~1</text>
+<text x="196" y="178" text-anchor="middle" fill="#8B9BB4" font-size="9">Hours studied</text>
+<text x="16" y="95" transform="rotate(-90 16 95)" fill="#8B9BB4" font-size="9">P(pass)</text>
+</svg>
+<p><b>💬 Feel it:</b> A Test-match run chase. Early wickets down (z very negative): one boundary barely changes the outcome — p stays near 0. Game balanced (z near 0): every single ball swings the probability violently. Match all but won (z very positive): another boundary changes nothing. The sigmoid is that match — the drama lives in the middle.</p>
+<p class="mini">🔗 This intuition powers everything below: notes → worked project → solve-on-paper → code.</p>
+</div>
+
 <h2>📋 Coach's Review</h2>
 <div class="card">
 <p><b>Common learner gaps in this topic</b> — check yourself against these before the quiz:</p>

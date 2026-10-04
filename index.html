@@ -192,6 +192,66 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
 /* ---------- toast ---------- */
 #toast{position:fixed;left:50%;transform:translateX(-50%) translateY(8px);bottom:calc(78px + env(safe-area-inset-bottom));background:var(--card);border:1px solid var(--teal);color:var(--text);border-radius:12px;padding:10px 18px;font-size:.84rem;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:99;max-width:88vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ---------- light theme ---------- */
+body.light{--bg:#F6F8FB;--bg2:#EDF2F9;--card:#FFFFFF;--border:#E1E7F0;--text:#1A2433;--muted:#5B6B84;--teal:#0D9488;--green:#059669;--red:#DC2626;--amber:#D97706;--blue:#2563EB;--purple:#7C3AED;--cell:#E3EAF4}
+body.light .topbar{background:rgba(246,248,251,.92)}
+body.light .bnav{background:rgba(255,255,255,.97)}
+.themebtn{width:48px;height:48px;min-width:48px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:border-color .18s,transform .1s}
+.themebtn:active{transform:scale(.94)}
+/* ---------- sleep log ---------- */
+.starbtn{flex:1;min-height:48px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg2);color:var(--muted);font-size:1.35rem;transition:transform .12s,border-color .12s,background .12s,color .12s}
+.starbtn:active{transform:scale(.92)}
+.starbtn.sel{border-color:var(--amber);background:rgba(251,191,36,.12);color:var(--amber)}
+.b-sleep{background:var(--teal)}
+/* ---------- breathing ---------- */
+.breathwrap{display:flex;justify-content:center;align-items:center;height:210px;margin:4px 0 8px}
+.breathcircle{width:118px;height:118px;border-radius:50%;border:2px solid var(--teal);background:radial-gradient(circle at 35% 30%,rgba(94,234,212,.32),rgba(94,234,212,.08));display:flex;align-items:center;justify-content:center;transition:transform 4s ease-in-out;will-change:transform}
+.breathcircle span{font-size:.92rem;font-weight:800;color:var(--teal);letter-spacing:.06em}
+.breathcount{font-size:.8rem;color:var(--muted);margin-bottom:4px;min-height:1.2em}
+/* ---------- meditation timer ---------- */
+.medchips{display:flex;gap:8px;justify-content:center;margin-bottom:10px}
+.medchips .wbtn{flex:none;min-width:74px}
+.wbtn.sel{border-color:var(--teal);background:rgba(94,234,212,.12);color:var(--teal)}
+.medsvg{display:block;margin:0 auto}
+#med-ring{transition:stroke-dashoffset 1s linear}
+/* ---------- days-since counters ---------- */
+.sincenum{min-width:36px;font-weight:800;font-size:1.1rem;color:var(--teal)}
+.sincelab{display:block;color:var(--muted);font-size:.66rem;font-weight:400}
+.sreset{color:var(--teal);font-size:1.05rem;min-width:48px;min-height:44px;flex:none}
+/* ---------- reading tracker ---------- */
+.readbar{height:12px;background:var(--bg2);border-radius:8px;overflow:hidden;margin-top:8px}
+.readbar i{display:block;height:100%;width:0;background:var(--purple);border-radius:8px;transition:width .3s var(--spring)}
+.readtitle{font-weight:700;font-size:.92rem}
+/* ---------- overlays ---------- */
+.ovl{position:fixed;inset:0;background:rgba(4,8,16,.74);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px}
+.ovlbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;width:100%;max-width:420px;max-height:86vh;overflow-y:auto;animation:viewIn .3s var(--spring) both}
+.ovlabel{display:block;font-size:.8rem;font-weight:700;color:var(--teal);margin:10px 0 4px}
+.milebox{position:relative;z-index:2;text-align:center;background:var(--card);border:1px solid var(--teal);border-radius:20px;padding:28px 22px;max-width:340px;animation:pop .5s var(--spring) both}
+.mileemoji{font-size:3rem;line-height:1}
+.milet{font-size:1.25rem;font-weight:800;margin-top:10px;color:var(--teal)}
+.milem{font-size:.9rem;margin-top:6px;line-height:1.5}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.confetti i{position:absolute;top:-16px;width:9px;height:14px;border-radius:2px;animation:confall linear forwards}
+@keyframes confall{to{transform:translateY(112vh) rotate(720deg)}}
+/* ---------- wisdom library (shared with library script) ---------- */
+.gemcard{background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(94,234,212,.08));border:1px solid rgba(167,139,250,.35);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.gemdomain{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+.gemtitle{font-weight:700;margin:.3rem 0 .35rem;font-size:.95rem}
+.gemsight{font-size:.85rem}
+.gemsrc{font-size:.75rem;color:var(--muted);margin-top:.45rem}
+.gemact{font-size:.8rem;color:var(--teal);margin-top:.3rem}
+.wiscard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px}
+.wistitle{font-weight:700;margin-bottom:.5rem}
+.wchips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.wchip{background:transparent;border:1px solid var(--border);color:var(--text);border-radius:999px;padding:4px 12px;font-size:.75rem;cursor:pointer;min-height:32px}
+.wchip.on{background:rgba(94,234,212,.15);border-color:var(--teal);color:var(--teal)}
+.wlist{max-height:420px;overflow-y:auto}
+.wrow{border-bottom:1px solid var(--border);padding:10px 0}
+.wrow:last-child{border-bottom:0}
+.wtitle{font-size:.9rem}
+.wins{font-size:.83rem;margin-top:.3rem}
+.wsrc{font-size:.72rem;color:var(--muted);margin-top:.35rem}
+.wifoot{margin-top:.6rem;font-size:.72rem;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -202,7 +262,10 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <div class="tb-title">LIFE <b>OS</b></div>
     <div class="tb-date" id="tb-date"></div>
   </div>
-  <div class="tb-streak" id="tb-streak">🔥 0</div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="themebtn" id="theme-btn" onclick="toggleTheme()" aria-label="Switch between light and dark theme">☀️</button>
+    <div class="tb-streak" id="tb-streak">🔥 0</div>
+  </div>
 </header>
 
 <main>
@@ -264,6 +327,20 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <p class="mini" style="margin-top:8px"><b id="water-n">0</b> glasses today · target 8 · desk fatigue’s cheapest fix</p>
   </div>
 
+  <div class="card">
+    <h3>😴 Last night’s sleep</h3>
+    <div class="slider"><label>Hours slept 🌙 <b id="v-sleeph">7.5</b></label><input type="range" min="0" max="12" step="0.5" value="7.5" id="s-sleeph"></div>
+    <div style="display:flex;gap:6px" id="sleep-stars">
+      <button class="starbtn" data-q="1" aria-label="Sleep quality 1 of 5">★</button>
+      <button class="starbtn" data-q="2" aria-label="Sleep quality 2 of 5">★</button>
+      <button class="starbtn" data-q="3" aria-label="Sleep quality 3 of 5">★</button>
+      <button class="starbtn" data-q="4" aria-label="Sleep quality 4 of 5">★</button>
+      <button class="starbtn" data-q="5" aria-label="Sleep quality 5 of 5">★</button>
+    </div>
+    <div class="ind" id="sleep-ind"></div>
+    <p class="mini">7–9h is the dose everything else runs on (NSF/AASM). Poor sleep is the most common hidden cause of a low verdict — track it to see the pattern.</p>
+  </div>
+
   <div class="card priocard" role="button" tabindex="0" onclick="show('plan')" aria-label="Open plan to edit priority">
     <h3>🎯 This week’s ONE priority</h3>
     <p class="priotext empty" id="prio-view">Set one in the PLAN tab →</p>
@@ -300,6 +377,18 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <p class="mini">Time is the only currency you spend without getting it back. Seeing it is controlling it.</p>
   </div>
   <div class="card">
+    <h3>💸 Money quick-log</h3>
+    <div class="inrow">
+      <input type="number" id="money-amt" inputmode="decimal" min="0" step="0.01" placeholder="Amount spent">
+    </div>
+    <div class="emchips" id="money-cats">
+      <span class="emchip" data-c="wedding">💍 wedding</span><span class="emchip" data-c="work">💼 work</span><span class="emchip" data-c="food">🍛 food</span><span class="emchip" data-c="other">✨ other</span>
+    </div>
+    <button class="savebtn" onclick="logMoney()">Log expense</button>
+    <div id="money-week" style="margin-top:10px"></div>
+    <p class="mini">Logging only — no advice, no judgment. During wedding season, seeing real numbers beats anxious guessing (Monefy-style speed logging).</p>
+  </div>
+  <div class="card">
     <h3>🎯 Attention: study vs scroll · 14 days</h3>
     <div class="legend">
       <span><i class="dot" style="background:var(--purple)"></i>Study hours</span>
@@ -327,6 +416,60 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <input type="text" id="gratitude" placeholder="One good thing from today (however small)">
     <div class="ind" id="g-ind"></div>
     <p class="mini">Gratitude listing is among the most-replicated mood interventions in positive psychology (Emmons &amp; McCullough, 2003).</p>
+  </div>
+  <div class="card center">
+    <h3>🌬️ 4-7-8 breathing — built-in downshift</h3>
+    <div class="breathwrap">
+      <div class="breathcircle" id="breath-circle"><span id="breath-label">Ready</span></div>
+    </div>
+    <div class="breathcount" id="breath-count"></div>
+    <button class="savebtn" id="breath-btn" onclick="toggleBreath()">Start breathing</button>
+    <p class="mini">Inhale 4s · hold 7s · exhale 8s, four cycles. The long exhale is the body’s parasympathetic brake (Andrew Weil) — run it the moment tension spikes.</p>
+  </div>
+  <div class="card center">
+    <h3>🧘 Meditation timer</h3>
+    <div class="medchips" id="med-chips">
+      <button class="wbtn" data-min="3">3 min</button>
+      <button class="wbtn sel" data-min="5">5 min</button>
+      <button class="wbtn" data-min="10">10 min</button>
+    </div>
+    <svg class="medsvg" width="160" height="150" viewBox="0 0 120 120" role="img" aria-label="Meditation countdown ring">
+      <g transform="rotate(-90 60 60)">
+        <circle class="rt" cx="60" cy="60" r="52"></circle>
+        <circle id="med-ring" class="rp" cx="60" cy="60" r="52" stroke="#5EEAD4" stroke-dasharray="326.73" stroke-dashoffset="0" data-c="326.73"></circle>
+      </g>
+      <text x="60" y="67" text-anchor="middle" class="ring-big" id="med-time">5:00</text>
+    </svg>
+    <button class="savebtn" id="med-btn" onclick="toggleMed()">Start</button>
+    <p class="mini" id="med-week" style="margin-top:8px">Mindful minutes this week: 0</p>
+  </div>
+  <div class="card">
+    <h3>🔁 Reframe a thought — CBT in 3 lines</h3>
+    <input type="text" id="cbt-sit" maxlength="120" placeholder="Situation — what happened?">
+    <input type="text" id="cbt-th" maxlength="160" style="margin-top:8px" placeholder="Automatic thought — what did your mind say?">
+    <textarea class="journal short" id="cbt-bal" style="margin-top:8px" placeholder="Balanced thought — what would you tell a friend in the same spot?"></textarea>
+    <button class="savebtn" onclick="saveCbt()">Save reframe</button>
+    <div id="cbt-list" style="margin-top:8px"></div>
+    <p class="mini">Thought records are a first-line CBT technique — catching and balancing the thought IS the intervention (Greenberger &amp; Padesky, Mind Over Mood).</p>
+  </div>
+  <div class="card">
+    <h3>📖 Reading tracker</h3>
+    <div id="read-setup">
+      <input type="text" id="read-book" maxlength="80" placeholder="Book title">
+      <input type="number" id="read-total" inputmode="numeric" min="1" style="margin-top:8px" placeholder="Total pages in the book">
+      <button class="savebtn" onclick="setBook()">Start this book</button>
+    </div>
+    <div id="read-active" class="hidden">
+      <p class="readtitle" id="read-name"></p>
+      <div class="readbar"><i id="read-fill"></i></div>
+      <p class="mini" id="read-prog" style="margin-top:6px"></p>
+      <div class="inrow">
+        <input type="number" id="read-pages" inputmode="numeric" min="1" placeholder="Pages read today">
+        <button class="savebtn slim" onclick="logReading()">Log</button>
+      </div>
+      <button class="ghostbtn" onclick="changeBook()">Change book</button>
+    </div>
+    <p class="mini">Reading counts as legitimate REST activity on hard days — pages logged are hard evidence for the growth pillar (Bookly pattern).</p>
   </div>
   <div class="card">
     <h3>👑 Great routines (verified)</h3>
@@ -374,6 +517,11 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <p class="mini">Study minutes logged per week (last 8 weeks, Mon–Sun).</p>
   </div>
   <div class="card">
+    <h3>🌙 Sleep — last 7 nights</h3>
+    <div class="tcols" id="sleep-bars"></div>
+    <p class="mini" id="sleep7-avg"></p>
+  </div>
+  <div class="card">
     <h3>🏆 All-time</h3>
     <div class="statgrid">
       <div><b id="a-days">0</b><span>days logged</span></div>
@@ -391,6 +539,15 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
       <button class="savebtn slim" onclick="saveWeight()">Log</button>
     </div>
     <p class="mini" id="w-last"></p>
+  </div>
+  <div class="card">
+    <h3>⏳ Days-since counters</h3>
+    <div class="inrow">
+      <input type="text" id="since-in" maxlength="40" placeholder="e.g., pain-free days">
+      <button class="savebtn slim" onclick="addSince()">Add</button>
+    </div>
+    <div id="since-list" style="margin-top:8px"></div>
+    <p class="mini">Absence-based wins never fit a did-it checkbox — count them here. A reset is data, not failure (I Am Sober pattern).</p>
   </div>
   <div class="card">
     <h3>➕ Extra habits (optional)</h3>
@@ -423,10 +580,25 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <p class="mini">Planned LIGHT windows (by design, not failure): <b>Oct 15–25</b> (engagement) · <b>Dec 15 – Jan 29</b> (wedding). The career push is front-loaded into Sep–Nov on purpose.</p>
   </div>
   <div class="card">
+    <h3>💞 Weekly relationship check-in</h3>
+    <p style="font-size:.9rem;margin-bottom:10px">One undistracted hour with fiancée/family this week?</p>
+    <div style="display:flex;gap:8px">
+      <button class="wbtn" id="rel-yes" onclick="setRel(true)">Yes — done ✓</button>
+      <button class="wbtn" id="rel-no" onclick="setRel(false)">Not yet</button>
+    </div>
+    <p class="mini" id="rel-status" style="margin-top:8px"></p>
+    <p class="mini">Harvard Study of Adult Development (85+ years): relationship quality is the strongest single predictor of long-term happiness and health — more than money or fame.</p>
+  </div>
+  <div class="card">
     <h3>🧭 Vision — north star</h3>
     <textarea class="journal short" id="vision" placeholder="Where is all of this going? One honest paragraph, in your own words."></textarea>
     <button class="savebtn" onclick="saveVision()">Save vision</button>
     <button class="homebtn" style="width:100%;margin-top:8px" onclick="exportData()">⬇️ Export / backup my data (JSON)</button>
+  </div>
+  <div class="card">
+    <h3>🗓️ Weekly reflection</h3>
+    <p class="mini" id="reflect-status" style="margin-top:0"></p>
+    <button class="savebtn" onclick="openReflect()">Open weekly reflection</button>
   </div>
   <div class="card">
     <h3>🏛️ Life pillars — with a trackable signal</h3>
@@ -454,6 +626,29 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
   <button class="btab" data-view="plan" onclick="show('plan')"><span class="bi">🎯</span>PLAN</button>
 </nav>
 
+<div id="reflect-ov" class="ovl hidden" role="dialog" aria-modal="true" aria-label="Weekly reflection">
+  <div class="ovlbox">
+    <h3 style="margin-bottom:0">🗓️ Weekly reflection — week of <span id="rf-wk"></span></h3>
+    <label class="ovlabel" for="rf-a">1 · What worked this week?</label>
+    <textarea class="journal short" id="rf-a"></textarea>
+    <label class="ovlabel" for="rf-b">2 · What to drop next week?</label>
+    <textarea class="journal short" id="rf-b"></textarea>
+    <label class="ovlabel" for="rf-c">3 · One improvement for next week?</label>
+    <textarea class="journal short" id="rf-c"></textarea>
+    <button class="savebtn" onclick="saveReflect()">Save reflection</button>
+    <button class="ghostbtn" onclick="closeReflect()">Close</button>
+  </div>
+</div>
+<div id="mile-ov" class="ovl hidden" onclick="closeMile()" role="dialog" aria-modal="true" aria-label="Milestone celebration">
+  <div class="confetti" id="confetti"></div>
+  <div class="milebox">
+    <div class="mileemoji" id="mile-emoji">🎉</div>
+    <div class="milet" id="mile-title"></div>
+    <div class="milem" id="mile-msg"></div>
+    <p class="mini" style="margin-top:10px">Tap anywhere to continue</p>
+  </div>
+</div>
+
 <div id="toast" role="status"></div>
 
 <script src="learning/ai-arena/data/quotes.js"></script>
@@ -467,7 +662,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
 'use strict';
 /* ================= state (backward compatible with lifeos_save_v1) ================= */
 var KEY = 'lifeos_save_v1';
-var DEF = {days:{},priority:'',time:{},journal:{},gratitude:{},habits:[],weights:{},vision:''};
+var DEF = {days:{},priority:'',time:{},journal:{},gratitude:{},habits:[],weights:{},vision:'',mindful:{},since:[],cbt:[],relcheck:{},reading:{book:'',total:0,log:{}},money:[],reflect:{},milestones:[],theme:'dark'};
 var S = JSON.parse(JSON.stringify(DEF));
 function loadS(){
   try{
@@ -481,6 +676,18 @@ function loadS(){
   if(!Array.isArray(S.habits)) S.habits = [];
   if(!S.weights || typeof S.weights !== 'object' || Array.isArray(S.weights)) S.weights = {};
   if(typeof S.vision !== 'string') S.vision = '';
+  if(!S.mindful || typeof S.mindful !== 'object' || Array.isArray(S.mindful)) S.mindful = {};
+  if(!Array.isArray(S.since)) S.since = [];
+  if(!Array.isArray(S.cbt)) S.cbt = [];
+  if(!S.relcheck || typeof S.relcheck !== 'object' || Array.isArray(S.relcheck)) S.relcheck = {};
+  if(!S.reading || typeof S.reading !== 'object' || Array.isArray(S.reading)) S.reading = {book:'',total:0,log:{}};
+  if(!S.reading.log || typeof S.reading.log !== 'object' || Array.isArray(S.reading.log)) S.reading.log = {};
+  if(typeof S.reading.book !== 'string') S.reading.book = '';
+  if(typeof S.reading.total !== 'number') S.reading.total = 0;
+  if(!Array.isArray(S.money)) S.money = [];
+  if(!S.reflect || typeof S.reflect !== 'object' || Array.isArray(S.reflect)) S.reflect = {};
+  if(!Array.isArray(S.milestones)) S.milestones = [];
+  if(S.theme !== 'light') S.theme = 'dark';
 }
 function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 
@@ -500,6 +707,7 @@ function daysUntil(ds){
 function el(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtH(x){ return String(+(x.toFixed(1))); }
+function weekKeyOf(d){ return ymd(dateAdd(d, -((d.getDay()+6)%7))); }
 
 /* ================= day helpers (old saves without verdict still render) ================= */
 function minsMetOf(d){ if(d && typeof d.minsMet === 'number') return d.minsMet; return d ? [d.s,d.m,d.l].filter(Boolean).length : 0; }
@@ -638,9 +846,14 @@ function exportData(){
 
 /* ================= TODAY ================= */
 function currentDayFromUI(){
+  var prev = S.days[todayKey()] || {};
+  var d = {};
+  for(var k in prev){ if(Object.prototype.hasOwnProperty.call(prev, k)) d[k] = prev[k]; }
   var e = +el('s-energy').value, f = +el('s-focus').value, t = +el('s-tension').value;
   var s = el('c-study').checked, m = el('c-move').checked, l = el('c-sleep').checked;
-  return {e:e, f:f, t:t, s:s, m:m, l:l, minsMet:[s,m,l].filter(Boolean).length};
+  d.e = e; d.f = f; d.t = t; d.s = s; d.m = m; d.l = l;
+  d.minsMet = [s,m,l].filter(Boolean).length;
+  return d;
 }
 function saveDay(){
   var d = currentDayFromUI();
@@ -649,6 +862,7 @@ function saveDay(){
   saveS();
   renderTodayDynamic();
   renderTopbar();
+  checkMilestones(true);
 }
 function setRing(id, frac){
   var c = el(id);
@@ -793,6 +1007,9 @@ function renderMind(){
   var key = todayKey();
   if(document.activeElement !== el('journal')) el('journal').value = S.journal[key] || '';
   if(document.activeElement !== el('gratitude')) el('gratitude').value = S.gratitude[key] || '';
+  renderCbt();
+  renderReading();
+  renderMedWeek();
 }
 
 /* ================= TIME ================= */
@@ -882,6 +1099,7 @@ function renderTime(){
     var hc = Math.max(3, Math.round(92*sc[i]/mx));
     return `<div class='tcol'><div class='tbars' title='${ymd(d)} · study ${fmtH(st[i])}h · scroll ${fmtH(sc[i])}h'><i class='b-study' style='height:${hs}px'></i><i class='b-scroll' style='height:${hc}px'></i></div><span class='tlab${isT ? ' tnow' : ''}'>${d.getDate()}</span></div>`;
   }).join('');
+  renderMoney();
 }
 
 /* ================= STATS ================= */
@@ -889,8 +1107,10 @@ function renderStats(){
   renderHeatmap();
   renderMonth();
   renderWeeklyStudy();
+  renderSleep7();
   renderAllTime();
   renderWeight();
+  renderSince();
   renderHabits();
 }
 function renderHeatmap(){
@@ -1108,6 +1328,436 @@ function renderPlan(){
   el('sig-money').textContent = '📈 offer target in ' + Math.max(0, daysUntil('2026-12-15')) + ' days';
   el('sig-purpose').textContent = '📈 ' + stm + ' study sessions this month';
   el('sig-growth').textContent = '📈 ' + fmtH(st7) + 'h study this week · 🔥 ' + calcStreak() + '-day streak';
+  renderRelCheck();
+  renderReflectStatus();
+}
+
+/* ================= NEW FEATURES (sleep, breathing, meditation, since, cbt, rel, reading, money, reflect, milestones, theme) ================= */
+
+/* ---- 11 · dark/light theme toggle ---- */
+function applyTheme(){
+  var light = S.theme === 'light';
+  document.body.classList.toggle('light', light);
+  var m = document.querySelector('meta[name=theme-color]');
+  if(m) m.setAttribute('content', light ? '#F6F8FB' : '#0B1220');
+  var b = el('theme-btn');
+  if(b) b.textContent = light ? '🌙' : '☀️';
+}
+function toggleTheme(){
+  S.theme = S.theme === 'light' ? 'dark' : 'light';
+  saveS();
+  applyTheme();
+  toast(S.theme === 'light' ? '☀️ Light mode — good for daytime' : '🌙 Dark mode — easy on 11pm eyes');
+}
+
+/* ---- 1 · sleep log ---- */
+var sleepQSel = 0;
+function saveSleepH(){
+  var d = S.days[todayKey()] || currentDayFromUI();
+  d.sleepH = +el('s-sleeph').value;
+  S.days[todayKey()] = d;
+  saveS();
+  el('sleep-ind').textContent = 'Saved ✓';
+}
+function saveSleepQ(){
+  var d = S.days[todayKey()] || currentDayFromUI();
+  d.sleepQ = sleepQSel;
+  S.days[todayKey()] = d;
+  saveS();
+  el('sleep-ind').textContent = 'Saved ✓';
+}
+function initSleepUI(){
+  var sl = el('s-sleeph');
+  var day = S.days[todayKey()];
+  if(day && typeof day.sleepH === 'number') sl.value = day.sleepH;
+  el('v-sleeph').textContent = sl.value;
+  sl.addEventListener('input', function(){ el('v-sleeph').textContent = sl.value; });
+  sl.addEventListener('change', saveSleepH);
+  var stars = document.querySelectorAll('#sleep-stars .starbtn');
+  Array.prototype.forEach.call(stars, function(b){
+    b.addEventListener('click', function(){
+      sleepQSel = +b.getAttribute('data-q');
+      Array.prototype.forEach.call(stars, function(x){ x.classList.toggle('sel', x === b); });
+      saveSleepQ();
+    });
+  });
+  if(day && typeof day.sleepQ === 'number'){
+    sleepQSel = day.sleepQ;
+    Array.prototype.forEach.call(stars, function(x){ x.classList.toggle('sel', +x.getAttribute('data-q') === sleepQSel); });
+  }
+  if(day && (typeof day.sleepH === 'number' || typeof day.sleepQ === 'number')) el('sleep-ind').textContent = 'Saved ✓';
+}
+function renderSleep7(){
+  var days = lastNDays(7);
+  el('sleep-bars').innerHTML = days.map(function(d){
+    var day = S.days[ymd(d)] || {};
+    var h = day.sleepH || 0;
+    var hpx = Math.max(3, Math.round(92 * h / 12));
+    var q = day.sleepQ ? ' · quality ' + day.sleepQ + '/5' : '';
+    var isT = ymd(d) === todayKey();
+    return `<div class='tcol'><span class='tv'>${h ? h + 'h' : ''}</span><div class='tbars single' title='${DOW[d.getDay()]} · ${h}h${q}'><i class='b-sleep' style='height:${hpx}px'></i></div><span class='tlab${isT ? ' tnow' : ''}'>${DOW[d.getDay()].slice(0,2)}</span></div>`;
+  }).join('');
+  var hs = [];
+  days.forEach(function(d){ var day = S.days[ymd(d)]; if(day && typeof day.sleepH === 'number') hs.push(day.sleepH); });
+  var avg = hs.length ? String(+((hs.reduce(function(a,b){ return a+b; }, 0) / hs.length)).toFixed(1)) : '—';
+  el('sleep7-avg').textContent = '7-night average: ' + avg + 'h · target 7–9h';
+}
+
+/* ---- 2 · 4-7-8 breathing ---- */
+var breathOn = false, breathT = null;
+var BREATH_PHASES = [['Inhale',4,1.62],['Hold',7,1.62],['Exhale',8,1]];
+function toggleBreath(){
+  if(breathOn){ stopBreath(); return; }
+  breathOn = true;
+  el('breath-btn').textContent = 'Stop';
+  runBreath(0,0);
+}
+function runBreath(ci,pi){
+  if(!breathOn) return;
+  if(ci >= 4){ finishBreath(); return; }
+  var p = BREATH_PHASES[pi];
+  var c = el('breath-circle');
+  el('breath-label').textContent = p[0];
+  el('breath-count').textContent = 'Cycle ' + (ci+1) + ' of 4 · ' + p[1] + 's';
+  c.style.transitionDuration = p[1] + 's';
+  c.style.transform = 'scale(' + p[2] + ')';
+  breathT = setTimeout(function(){
+    var np = pi + 1, nc = ci;
+    if(np >= BREATH_PHASES.length){ np = 0; nc++; }
+    runBreath(nc, np);
+  }, p[1] * 1000);
+}
+function stopBreath(){
+  breathOn = false;
+  clearTimeout(breathT);
+  var c = el('breath-circle');
+  c.style.transitionDuration = '.6s';
+  c.style.transform = 'scale(1)';
+  el('breath-label').textContent = 'Ready';
+  el('breath-count').textContent = '';
+  el('breath-btn').textContent = 'Start breathing';
+}
+function finishBreath(){
+  breathOn = false;
+  clearTimeout(breathT);
+  var c = el('breath-circle');
+  c.style.transitionDuration = '1.2s';
+  c.style.transform = 'scale(1)';
+  el('breath-label').textContent = 'Done ✓';
+  el('breath-count').textContent = '4 full cycles — nice downshift';
+  el('breath-btn').textContent = 'Start again';
+  toast('🌬️ 4-7-8 complete — tension down');
+}
+
+/* ---- 3 · meditation timer ---- */
+var medMin = 5, medTotal = 300, medLeft = 300, medT = null, medOn = false;
+function fmtClock(s){ return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function drawMed(){
+  el('med-time').textContent = fmtClock(Math.max(0, medLeft));
+  el('med-ring').style.strokeDashoffset = String(326.73 * (1 - medLeft/medTotal));
+}
+function pickMed(m){
+  if(medOn) return;
+  medMin = m;
+  var chips = document.querySelectorAll('#med-chips .wbtn');
+  Array.prototype.forEach.call(chips, function(x){ x.classList.toggle('sel', +x.getAttribute('data-min') === m); });
+  medTotal = medLeft = m * 60;
+  drawMed();
+}
+function toggleMed(){
+  if(medOn){ stopMed(); return; }
+  medOn = true;
+  medTotal = medLeft = medMin * 60;
+  el('med-btn').textContent = 'Stop';
+  drawMed();
+  medT = setInterval(function(){
+    medLeft--;
+    drawMed();
+    if(medLeft <= 0) finishMed();
+  }, 1000);
+}
+function stopMed(){
+  var elapsed = medTotal - Math.max(0, medLeft);
+  clearInterval(medT);
+  medOn = false;
+  var mins = Math.floor(elapsed/60);
+  medTotal = medLeft = medMin * 60;
+  el('med-btn').textContent = 'Start';
+  drawMed();
+  if(mins >= 1){ logMindful(mins); toast('Stopped early — ' + mins + ' mindful min logged'); }
+  else toast('Stopped — under a minute, nothing logged');
+}
+function finishMed(){
+  clearInterval(medT);
+  medOn = false;
+  logMindful(medMin);
+  medTotal = medLeft = medMin * 60;
+  el('med-btn').textContent = 'Start';
+  drawMed();
+  toast('🧘 ' + medMin + ' mindful minutes logged');
+}
+function logMindful(mins){
+  var k = todayKey();
+  S.mindful[k] = (S.mindful[k] || 0) + mins;
+  saveS();
+  renderMedWeek();
+}
+function renderMedWeek(){
+  var t = 0;
+  lastNDays(7).forEach(function(d){ t += S.mindful[ymd(d)] || 0; });
+  el('med-week').textContent = 'Mindful minutes this week: ' + t;
+}
+function initMedUI(){
+  var chips = document.querySelectorAll('#med-chips .wbtn');
+  Array.prototype.forEach.call(chips, function(b){
+    b.addEventListener('click', function(){ pickMed(+b.getAttribute('data-min')); });
+  });
+  drawMed();
+  renderMedWeek();
+}
+
+/* ---- 4 · days-since counters ---- */
+function renderSince(){
+  if(!S.since.length){
+    el('since-list').innerHTML = `<p class='mini' style='margin-top:0'>No counters yet. Good ones: pain-free days, no late caffeine, evening stretch done.</p>`;
+    return;
+  }
+  var t = Date.parse(todayKey());
+  el('since-list').innerHTML = S.since.map(function(c,i){
+    var n = Math.max(0, Math.round((t - Date.parse(c.startDate))/86400000));
+    return `<div class='hab' title='${n} days since ${esc(c.name)}'><span class='sincenum'>${n}</span><span class='hname'>${esc(c.name)}<small class='sincelab'>days since</small></span><button class='sreset' onclick='resetSince(${i})' aria-label='Reset counter to zero'>↺</button><button class='tdel' onclick='delSince(${i})' aria-label='Delete counter'>✕</button></div>`;
+  }).join('');
+}
+function addSince(){
+  var v = el('since-in').value.trim();
+  if(!v){ toast('Name the counter first'); return; }
+  S.since.push({name:v, startDate:todayKey()});
+  el('since-in').value = '';
+  saveS();
+  renderSince();
+  toast('Counter started — today is day 0');
+}
+function resetSince(i){
+  if(!S.since[i]) return;
+  S.since[i].startDate = todayKey();
+  saveS();
+  renderSince();
+  toast('Reset logged — data, not failure');
+}
+function delSince(i){
+  S.since.splice(i,1);
+  saveS();
+  renderSince();
+}
+
+/* ---- 5 · CBT thought record ---- */
+function saveCbt(){
+  var sit = el('cbt-sit').value.trim();
+  var th = el('cbt-th').value.trim();
+  var bal = el('cbt-bal').value.trim();
+  if(!sit || !th || !bal){ toast('Fill all three lines — the balanced one is the point'); return; }
+  S.cbt.unshift({date:todayKey(), situation:sit, thought:th, balanced:bal});
+  if(S.cbt.length > 50) S.cbt.length = 50;
+  el('cbt-sit').value = '';
+  el('cbt-th').value = '';
+  el('cbt-bal').value = '';
+  saveS();
+  renderCbt();
+  toast('Reframe saved — that is the skill');
+}
+function renderCbt(){
+  var l = S.cbt.slice(0,3);
+  if(!l.length){
+    el('cbt-list').innerHTML = `<p class='mini' style='margin-top:0'>No reframes yet. Next time the inner critic pipes up, catch it here.</p>`;
+    return;
+  }
+  el('cbt-list').innerHTML = l.map(function(r){
+    return `<div class='evi'><b>${esc(r.situation)}</b><small>Automatic: ${esc(r.thought)}</small><small style='color:var(--green)'>Balanced: ${esc(r.balanced)}</small></div>`;
+  }).join('');
+}
+
+/* ---- 6 · weekly relationship check-in ---- */
+function setRel(v){
+  S.relcheck[weekKeyOf(new Date())] = v;
+  saveS();
+  renderRelCheck();
+  if(v) toast('💞 Relationship hour logged');
+}
+function renderRelCheck(){
+  var v = S.relcheck[weekKeyOf(new Date())];
+  el('rel-yes').classList.toggle('sel', v === true);
+  el('rel-no').classList.toggle('sel', v === false);
+  var n = 0;
+  Object.keys(S.relcheck).forEach(function(k){ if(S.relcheck[k] === true) n++; });
+  el('rel-status').textContent = v === true
+    ? '✅ Logged for this week · ' + n + ' week' + (n === 1 ? '' : 's') + ' total'
+    : (v === false ? '○ Not yet — there is still time this week' : '○ Not logged for this week yet');
+}
+
+/* ---- 7 · reading tracker ---- */
+function renderReading(){
+  var r = S.reading;
+  var has = !!r.book && r.total > 0;
+  el('read-setup').classList.toggle('hidden', has);
+  el('read-active').classList.toggle('hidden', !has);
+  if(!has) return;
+  el('read-name').textContent = r.book;
+  var done = 0;
+  Object.keys(r.log).forEach(function(k){ done += r.log[k]; });
+  var pct = Math.min(100, Math.round(100 * done / r.total));
+  el('read-fill').style.width = pct + '%';
+  el('read-prog').textContent = done + ' / ' + r.total + ' pages · ' + pct + '%';
+}
+function setBook(){
+  var b = el('read-book').value.trim();
+  var t = parseInt(el('read-total').value, 10);
+  if(!b || !(t > 0)){ toast('Book name and total pages needed'); return; }
+  S.reading = {book:b, total:t, log:{}};
+  saveS();
+  renderReading();
+  toast('📖 Reading ' + b);
+}
+function logReading(){
+  var p = parseInt(el('read-pages').value, 10);
+  if(!(p > 0)){ toast('How many pages did you read?'); return; }
+  var k = todayKey();
+  S.reading.log[k] = (S.reading.log[k] || 0) + p;
+  el('read-pages').value = '';
+  saveS();
+  renderReading();
+  var done = 0;
+  Object.keys(S.reading.log).forEach(function(x){ done += S.reading.log[x]; });
+  if(done >= S.reading.total) toast('🏁 Book finished — that compounds');
+}
+function changeBook(){
+  S.reading = {book:'', total:0, log:{}};
+  saveS();
+  el('read-book').value = '';
+  el('read-total').value = '';
+  renderReading();
+}
+
+/* ---- 8 · money quick-log ---- */
+var MONEY_CATS = [['wedding','💍','#FBBF24'],['work','💼','#60A5FA'],['food','🍛','#34D399'],['other','✨','#A78BFA']];
+var moneyCat = '';
+function initMoneyUI(){
+  var chips = document.querySelectorAll('#money-cats .emchip');
+  Array.prototype.forEach.call(chips, function(c){
+    c.addEventListener('click', function(){
+      moneyCat = c.getAttribute('data-c');
+      Array.prototype.forEach.call(chips, function(x){ x.classList.toggle('sel', x === c); });
+    });
+  });
+}
+function fmtMoney(n){ return String(+(+n).toFixed(2)); }
+function logMoney(){
+  var a = parseFloat(el('money-amt').value);
+  if(!(a > 0)){ toast('Enter an amount first'); return; }
+  if(!moneyCat){ toast('Pick a category first'); return; }
+  S.money.push({date:todayKey(), amt:+a.toFixed(2), cat:moneyCat});
+  el('money-amt').value = '';
+  saveS();
+  renderMoney();
+  toast('💸 ' + fmtMoney(a) + ' · ' + moneyCat);
+}
+function delMoney(i){
+  S.money.splice(i,1);
+  saveS();
+  renderMoney();
+}
+function renderMoney(){
+  var wk = weekKeyOf(new Date());
+  var sums = {}, total = 0;
+  MONEY_CATS.forEach(function(c){ sums[c[0]] = 0; });
+  S.money.forEach(function(e){
+    if(e && e.date >= wk && sums[e.cat] !== undefined){ sums[e.cat] += e.amt; total += e.amt; }
+  });
+  var mx = 1;
+  MONEY_CATS.forEach(function(c){ if(sums[c[0]] > mx) mx = sums[c[0]]; });
+  var html = MONEY_CATS.map(function(c){
+    return `<div class='hrow'><span>${c[1]} ${c[0]}</span><div class='hbar'><i style='width:${Math.round(100*sums[c[0]]/mx)}%;background:${c[2]}'></i></div><span class='hval'>${fmtMoney(sums[c[0]])}</span></div>`;
+  }).join('');
+  html += `<div class='tlog'><b>This week</b><b>${fmtMoney(total)}</b></div>`;
+  var t = todayKey();
+  S.money.forEach(function(e,i){
+    if(e && e.date === t) html += `<div class='tlog'><span>today · ${esc(e.cat)}</span><span>${fmtMoney(e.amt)} <button class='tdel' onclick='delMoney(${i})' aria-label='Delete entry'>✕</button></span></div>`;
+  });
+  el('money-week').innerHTML = html;
+}
+
+/* ---- 9 · weekly reflection ---- */
+function openReflect(){
+  var wk = weekKeyOf(new Date());
+  var r = S.reflect[wk] || {};
+  el('rf-a').value = r.a || '';
+  el('rf-b').value = r.b || '';
+  el('rf-c').value = r.c || '';
+  var mon = new Date(wk + 'T12:00:00');
+  el('rf-wk').textContent = MONTHS[mon.getMonth()] + ' ' + mon.getDate();
+  el('reflect-ov').classList.remove('hidden');
+}
+function closeReflect(){
+  el('reflect-ov').classList.add('hidden');
+}
+function saveReflect(){
+  var a = el('rf-a').value.trim(), b = el('rf-b').value.trim(), c = el('rf-c').value.trim();
+  if(!a && !b && !c){ toast('Write at least one line first'); return; }
+  S.reflect[weekKeyOf(new Date())] = {a:a, b:b, c:c};
+  saveS();
+  closeReflect();
+  renderReflectStatus();
+  toast('Weekly reflection saved ✓');
+}
+function renderReflectStatus(){
+  var r = S.reflect[weekKeyOf(new Date())];
+  var s = el('reflect-status');
+  if(r) s.textContent = '✅ Saved this week — ' + (r.a || r.b || r.c || '').slice(0, 80);
+  else s.textContent = 'Not done yet this week. Three prompts, five minutes — Sunday evening is ideal.';
+}
+
+/* ---- 10 · milestone celebrations ---- */
+var MILE_STREAKS = [3,7,14,30];
+function mileMsg(n){
+  if(n === 3) return 'Three good days in a row — momentum is real now. This is exactly how streaks start.';
+  if(n === 7) return 'One full week of good days. Most people never get here — you just did.';
+  if(n === 14) return 'Two weeks. The system works — trust it on the hard days too.';
+  return 'A month of good days. This is identity change, not luck.';
+}
+function checkMilestones(live){
+  var st = calcStreak();
+  MILE_STREAKS.forEach(function(n){
+    var key = 'streak' + n;
+    if(st >= n && S.milestones.indexOf(key) < 0){
+      S.milestones.push(key);
+      saveS();
+      if(live) celebrate('🔥 ' + n + '-day GOOD-DAY streak', mileMsg(n));
+    }
+  });
+  var good = 0;
+  Object.keys(S.days).forEach(function(k){ if(isGood(S.days[k])) good++; });
+  if(good >= 10 && S.milestones.indexOf('good10') < 0){
+    S.milestones.push('good10');
+    saveS();
+    if(live) celebrate('🏅 10 good days banked', 'Ten days of hard evidence against the inner critic. Progress is real — keep going.');
+  }
+}
+function celebrate(title,msg){
+  el('mile-title').textContent = title;
+  el('mile-msg').textContent = msg;
+  var colors = ['#5EEAD4','#34D399','#FBBF24','#A78BFA','#60A5FA','#F87171'];
+  var html = '';
+  for(var i=0;i<60;i++){
+    var l = Math.round(Math.random()*100);
+    var dl = (Math.random()*1.2).toFixed(2);
+    var du = (2.2 + Math.random()*1.8).toFixed(2);
+    html += `<i style='left:${l}%;background:${colors[i%colors.length]};animation-delay:${dl}s;animation-duration:${du}s'></i>`;
+  }
+  el('confetti').innerHTML = html;
+  el('mile-ov').classList.remove('hidden');
+}
+function closeMile(){
+  el('mile-ov').classList.add('hidden');
+  el('confetti').innerHTML = '';
 }
 
 /* ================= init ================= */
@@ -1116,8 +1766,14 @@ initMood();
 buildTimeButtons();
 initTodayUI();
 initMindUI();
+initSleepUI();
+initMedUI();
+initMoneyUI();
 renderTopbar();
+applyTheme();
+checkMilestones(false);
 show('today');
+if(new Date().getDay() === 0 && !S.reflect[weekKeyOf(new Date())]) openReflect();
 if('serviceWorker' in navigator && location.protocol === 'https:'){
   navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
@@ -1133,55 +1789,61 @@ if('serviceWorker' in navigator && location.protocol === 'https:'){
   try { if (typeof WISDOM_MONEY_LEARNING !== 'undefined' && Array.isArray(WISDOM_MONEY_LEARNING)) ALL = ALL.concat(WISDOM_MONEY_LEARNING); } catch(e){}
   try { if (typeof WISDOM_TALKS !== 'undefined' && Array.isArray(WISDOM_TALKS)) ALL = ALL.concat(WISDOM_TALKS); } catch(e){}
   if (!ALL.length) return;
-  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   var doy = Math.floor((Date.now() - new Date(new Date().getFullYear(),0,0)) / 86400000);
   var gem = ALL[doy % ALL.length];
   var today = document.getElementById('view-today');
   if (today) {
     var card = document.createElement('div');
-    card.style.cssText = 'background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(94,234,212,.07));border:1px solid rgba(167,139,250,.35);border-radius:14px;padding:14px 16px;margin:0 0 12px';
-    card.innerHTML = '<div style="font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#A78BFA">' + (gem.domain || 'wisdom') + ' \u00b7 gem of the day</div>'
-      + '<div style="font-weight:700;margin:.3rem 0 .35rem;font-size:.95rem">' + esc(gem.title) + '</div>'
-      + '<div style="font-size:.85rem">' + esc(gem.insight) + '</div>'
-      + '<div style="font-size:.75rem;color:#8B9BB4;margin-top:.45rem">\ud83d\udcd6 ' + esc(gem.source) + '</div>'
-      + '<div style="font-size:.8rem;color:#5EEAD4;margin-top:.35rem">\u25b6 ' + esc(gem.action) + '</div>';
+    card.className = 'gemcard';
+    card.innerHTML = `<div class='gemdomain'>${gem.domain || 'wisdom'} · gem of the day</div>`
+      + `<div class='gemtitle'>${esc(gem.title)}</div>`
+      + `<div class='gemsight'>${esc(gem.insight)}</div>`
+      + `<div class='gemsrc'>📖 ${esc(gem.source)}</div>`
+      + `<div class='gemact'>▶ ${esc(gem.action)}</div>`;
     today.insertBefore(card, today.firstElementChild);
   }
 
   var mind = document.getElementById('view-mind');
   if (!mind) return;
   var wrap = document.createElement('div');
-  wrap.style.cssText = 'background:#101B2E;border:1px solid #1E2A44;border-radius:16px;padding:16px;margin-bottom:14px';
-  wrap.innerHTML = '<div style="font-weight:700;margin-bottom:.5rem">\ud83d\udca1 Wisdom library \u00b7 ' + ALL.length + ' gems</div>'
-    + '<div class="wchips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>'
-    + '<div class="wlist" style="max-height:420px;overflow-y:auto"></div>'
-    + '<div style="margin-top:.6rem;font-size:.72rem;color:#8B9BB4">Distilled from the named books. One gem a day = the library reads itself into you.</div>';
+  wrap.className = 'wiscard';
+  wrap.innerHTML = `<div class='wistitle'>💡 Wisdom library · ${ALL.length} gems</div>`
+    + `<input type='text' id='w-search' placeholder='Search titles and insights…' autocomplete='off'>`
+    + `<div class='wchips'></div>`
+    + `<div class='wlist'></div>`
+    + `<div class='wifoot'>Distilled from the named books. One gem a day = the library reads itself into you.</div>`;
   mind.insertBefore(wrap, mind.firstElementChild);
+  var search = wrap.querySelector('#w-search');
   var chips = wrap.querySelector('.wchips');
   var list = wrap.querySelector('.wlist');
   var domains = ['all']; ALL.forEach(function(w){ if (domains.indexOf(w.domain) < 0) domains.push(w.domain); });
   var current = 'all';
+  var wq = '';
   function renderList(){
     var items = current === 'all' ? ALL : ALL.filter(function(w){ return w.domain === current; });
+    var q = wq.trim().toLowerCase();
+    if(q) items = items.filter(function(w){ return (String(w.title) + ' ' + String(w.insight)).toLowerCase().indexOf(q) >= 0; });
     list.innerHTML = items.map(function(w){
-      return '<div style="border-bottom:1px solid rgba(30,42,68,.6);padding:10px 0">'
-        + '<b style="font-size:.9rem">' + esc(w.title) + '</b>'
-        + '<div style="font-size:.83rem;margin-top:.3rem">' + esc(w.insight) + '</div>'
-        + '<div style="font-size:.72rem;color:#8B9BB4;margin-top:.35rem">\ud83d\udcd6 ' + esc(w.source) + ' \u00b7 ' + esc(w.domain) + '</div>'
-        + '<div style="font-size:.8rem;color:#5EEAD4;margin-top:.3rem">\u25b6 ' + esc(w.action) + '</div></div>';
-    }).join('') || '<div class="mini">Nothing here yet.</div>';
+      return `<div class='wrow'><b class='wtitle'>${esc(w.title)}</b><div class='wins'>${esc(w.insight)}</div><div class='wsrc'>📖 ${esc(w.source)} · ${esc(w.domain)}</div><div class='gemact'>▶ ${esc(w.action)}</div></div>`;
+    }).join('') || `<div class='wrow'><div class='wins'>No gems match — try another word.</div></div>`;
   }
   function renderChips(){
     chips.innerHTML = domains.map(function(d){
       var n = d === 'all' ? ALL.length : ALL.filter(function(w){ return w.domain === d; }).length;
       var act = current === d;
-      return '<button data-d="' + d + '" style="background:' + (act ? 'rgba(94,234,212,.15)' : 'transparent') + ';border:1px solid ' + (act ? '#5EEAD4' : '#1E2A44') + ';color:' + (act ? '#5EEAD4' : 'inherit') + ';border-radius:999px;padding:4px 12px;font-size:.75rem;cursor:pointer">' + d + ' (' + n + ')</button>';
+      return `<button class='wchip${act ? ' on' : ''}' data-d='${d}'>${d} (${n})</button>`;
     }).join('');
     Array.prototype.forEach.call(chips.querySelectorAll('button'), function(b){
       b.addEventListener('click', function(){ current = b.getAttribute('data-d'); renderChips(); renderList(); });
     });
   }
+  var wT = null;
+  search.addEventListener('input', function(){
+    clearTimeout(wT);
+    wT = setTimeout(function(){ wq = search.value; renderList(); }, 300);
+  });
   renderChips(); renderList();
 })();
 </script>

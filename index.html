@@ -485,6 +485,11 @@ body.light .bnav{background:rgba(255,255,255,.97)}
 <!-- ============ STATS ============ -->
 <section id="view-stats" class="view hidden">
   <div class="card">
+    <h3>🙂 Mood — last 7 days</h3>
+    <div style="display:flex;gap:6px;align-items:flex-end;min-height:44px" id="mood-week"></div>
+    <p class="mini">Daily mood check-ins from TODAY. Gaps = days you didn't log.</p>
+  </div>
+  <div class="card">
     <h3>🗓️ Good days · last 12 months</h3>
     <div class="hmwrap">
       <div class="hwdays"><div></div><div>M</div><div></div><div>W</div><div></div><div>F</div><div></div></div>
@@ -802,7 +807,15 @@ function initMood(){
   });
   // restore today's mood if saved
   var d = S.days[todayKey()];
-  if (d && d.mood) {
+  var todays = (S.moods && S.moods[key]) ? S.moods[key] : [];
+  if (todays.length) {
+    var last = todays[todays.length - 1];
+    moodSel = last.mood; emosSel = (last.emos || []).slice();
+    Array.prototype.forEach.call(document.querySelectorAll('#emfaces .emface'), function(x){ x.classList.toggle('sel', +x.getAttribute('data-m') === moodSel); });
+    Array.prototype.forEach.call(document.querySelectorAll('#emchips .emchip'), function(c){ c.classList.toggle('sel', emosSel.indexOf(c.getAttribute('data-e')) >= 0); });
+    el('mood-save').disabled = false;
+    el('mood-saved').textContent = '✅ ' + todays.length + ' check-in' + (todays.length > 1 ? 's' : '') + ' logged today — latest: ' + MOOD_FACE[moodSel] + ' ' + MOOD_WORD[moodSel];
+  } else if (d && d.mood) {
     moodSel = d.mood; emosSel = d.emos || [];
     Array.prototype.forEach.call(faces, function(x){ x.classList.toggle('sel', +x.getAttribute('data-m') === moodSel); });
     Array.prototype.forEach.call(chips, function(c){ c.classList.toggle('sel', emosSel.indexOf(c.getAttribute('data-e')) >= 0); });
@@ -813,14 +826,26 @@ function initMood(){
 }
 function saveMood(){
   if (!moodSel) return;
-  var d = S.days[todayKey()] || currentDayFromUI();
+  // every save is a separate check-in entry (morning/afternoon/evening all count)
+  var key = todayKey();
+  S.moods = S.moods || {};
+  S.moods[key] = S.moods[key] || [];
+  S.moods[key].push({ts: Date.now(), mood: moodSel, emos: emosSel.slice()});
+  // keep the day-level summary = latest entry (stats + verdict use it)
+  var d = S.days[key] || currentDayFromUI();
   d.mood = moodSel; d.emos = emosSel.slice();
   if (!d.verdict) d.verdict = verdictFor(d.e || 3, d.t || 3).v;
-  S.days[todayKey()] = d;
-  saveS(); renderTodayDynamic(); renderTopbar();
-  el('mood-saved').textContent = '✅ Saved: ' + MOOD_FACE[moodSel] + ' ' + MOOD_WORD[moodSel] + (emosSel.length ? ' · ' + emosSel.join(', ') : '');
+  S.days[key] = d;
+  saveS(); renderTodayDynamic(); renderTopbar(); renderMoodWeek();
+  // reset the picker so the next check-in starts clean
+  moodSel = 0; emosSel = [];
+  document.querySelectorAll('#emfaces .emface').forEach(function(x){ x.classList.remove('sel'); });
+  document.querySelectorAll('#emchips .emchip').forEach(function(x){ x.classList.remove('sel'); });
+  var btn = el('mood-save'); btn.disabled = true;
+  el('mood-saved').textContent = '✅ Saved: ' + MOOD_FACE[MOOD_FACE.length-1] !== undefined ? '' : '';
+  el('mood-saved').textContent = '✅ Mood logged at ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) + ' — check-in #' + S.moods[key].length + ' today';
   var msBtn = el('mood-saved'); msBtn.classList.remove('pop'); void msBtn.offsetWidth; msBtn.classList.add('pop');
-  toast('Mood saved — see the pattern build in STATS');
+  renderMoodWeek();
 }
 function renderWater(){
   var d = S.days[todayKey()] || {};
@@ -1103,7 +1128,27 @@ function renderTime(){
 }
 
 /* ================= STATS ================= */
+/* ---------- 7-day mood strip ---------- */
+function renderMoodWeek(){
+  var host = document.getElementById('mood-week');
+  if (!host) return;
+  var out = '';
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(Date.now() - i*86400000);
+    var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    var entries = (S.moods && S.moods[key]) ? S.moods[key] : [];
+    var avgM = entries.length ? entries.reduce(function(a,e){return a+e.mood;},0)/entries.length : 0;
+    var face = entries.length ? MOOD_FACE[Math.max(1, Math.min(5, Math.round(avgM)))] : '\u00b7';
+    var col = entries.length ? (avgM >= 4 ? 'var(--green)' : avgM >= 3 ? 'var(--amber)' : 'var(--red)') : 'var(--border)';
+    var lab = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    out += '<div style="text-align:center;flex:1;min-width:0">'
+      + '<div style="font-size:1.2rem;line-height:1.3;color:' + col + '">' + face + '</div>'
+      + '<div style="font-size:.62rem;color:var(--muted)">' + lab + '</div></div>';
+  }
+  host.innerHTML = out;
+}
 function renderStats(){
+  renderMoodWeek();
   renderHeatmap();
   renderMonth();
   renderWeeklyStudy();

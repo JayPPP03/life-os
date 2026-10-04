@@ -85,6 +85,30 @@ h3{font-size:.92rem;margin-bottom:.7rem;color:var(--teal);letter-spacing:.02em}
 /* ---------- buttons ---------- */
 .savebtn{background:var(--teal);color:var(--bg);border-radius:12px;min-height:48px;font-weight:800;font-size:.95rem;width:100%;margin-top:10px;transition:opacity .18s,transform .1s}
 .savebtn:active{transform:scale(.98);opacity:.9}
+:root{--spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.25,.8,.25,1)}
+.view{animation:viewIn .28s var(--spring) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:none}}
+.card,.minline,.wbtn,.emchip,.tbtn,.catcard{transition:transform .18s var(--spring),border-color .15s ease,background .15s ease}
+.minline:active,.wbtn:active,.tbtn:active{transform:scale(.96)}
+.btab{transition:color .18s var(--spring)}
+.btab .bi{display:inline-block;transition:transform .25s var(--spring)}
+.btab.active .bi{transform:translateY(-2px) scale(1.12)}
+.rp{transition:stroke-dashoffset .7s var(--spring)}
+.emface{transition:transform .22s var(--spring),border-color .15s ease,background .15s ease}
+.emface.sel{transform:scale(1.14) rotate(-3deg)}
+.toast{transition:transform .35s var(--spring),opacity .25s ease;transform:translateY(120%);opacity:0}
+.toast.show{transform:translateY(0);opacity:1}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.pop{animation:pop .35s var(--spring) both}
+.emface{flex:1;min-height:56px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg2);font-size:1.7rem;cursor:pointer;transition:transform .12s,border-color .12s;padding:6px 0}
+.emface:active{transform:scale(.92)}
+.emface.sel{border-color:var(--teal);background:rgba(94,234,212,.12);transform:scale(1.06)}
+.emchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.emchip{border:1px solid var(--border);background:var(--bg2);border-radius:999px;padding:7px 13px;font-size:.8rem;cursor:pointer;transition:border-color .12s}
+.emchip.sel{border-color:var(--purple);background:rgba(167,139,250,.15);color:var(--purple)}
+.wbtn{flex:1;min-height:48px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text);font-size:.85rem;cursor:pointer;font-weight:600}
+.wbtn:active{transform:scale(.97)}
+.moodsaved{color:var(--green);font-weight:700;font-size:.85rem;margin-top:8px;text-align:center}
 .savebtn.slim{width:auto;min-width:76px;padding:0 18px;margin-top:0}
 .ghostbtn{width:100%;min-height:48px;border-radius:12px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:.88rem;margin-top:8px;transition:border-color .18s,color .18s}
 .ghostbtn:hover{border-color:var(--teal);color:var(--text)}
@@ -205,6 +229,23 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
   <div id="verdictbox" class="verdict v-push" aria-live="polite"></div>
 
   <div class="card">
+    <h3>🙂 How’s your mood right now? <span class="mini">— one tap, then Save</span></h3>
+    <div style="display:flex;gap:8px" id="emfaces">
+      <button class="emface" data-m="1" aria-label="Very low">😞</button>
+      <button class="emface" data-m="2" aria-label="Low">😕</button>
+      <button class="emface" data-m="3" aria-label="Okay">😐</button>
+      <button class="emface" data-m="4" aria-label="Good">🙂</button>
+      <button class="emface" data-m="5" aria-label="Great">😄</button>
+    </div>
+    <div class="emchips" id="emchips">
+      <span class="emchip" data-e="stressed">😰 stressed</span><span class="emchip" data-e="anxious">😰 anxious</span><span class="emchip" data-e="tired">🥱 tired</span><span class="emchip" data-e="calm">😌 calm</span><span class="emchip" data-e="happy">😊 happy</span><span class="emchip" data-e="grateful">🙏 grateful</span><span class="emchip" data-e="motivated">🔥 motivated</span><span class="emchip" data-e="lonely">🫥 lonely</span><span class="emchip" data-e="angry">😠 angry</span><span class="emchip" data-e="hopeful">🌟 hopeful</span>
+    </div>
+    <button class="savebtn" id="mood-save" onclick="saveMood()" disabled>Save my mood</button>
+    <div class="moodsaved" id="mood-saved"></div>
+    <p class="mini">Naming feelings precisely builds emotional regulation (Feldman Barrett, Northeastern). Saved moods appear in STATS monthly trends.</p>
+  </div>
+
+  <div class="card">
     <h3>✅ Today’s 3 minimums — tick = good day</h3>
     <div class="mins">
       <label class="minline" id="m-study-w"><input type="checkbox" id="c-study"><span>📚 Study 25 min<small>Arena quiz or lesson — anything counts</small></span></label>
@@ -212,6 +253,15 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
       <label class="minline" id="m-sleep-w"><input type="checkbox" id="c-sleep"><span>😴 Lights out by target time<small>The cheapest performance drug</small></span></label>
     </div>
     <p class="mini">All 3 = ✅ GOOD DAY. Extra hours are bonus, never required.</p>
+  </div>
+
+  <div class="card">
+    <h3>💧 Water — quick log</h3>
+    <div style="display:flex;gap:8px">
+      <button class="wbtn" onclick="logWater(1)">+ 1 glass 🥤</button>
+      <button class="wbtn" onclick="logWater(2)">+ 1 bottle 🍾</button>
+    </div>
+    <p class="mini" style="margin-top:8px"><b id="water-n">0</b> glasses today · target 8 · desk fatigue’s cheapest fix</p>
   </div>
 
   <div class="card priocard" role="button" tabindex="0" onclick="show('plan')" aria-label="Open plan to edit priority">
@@ -376,6 +426,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--teal)}
     <h3>🧭 Vision — north star</h3>
     <textarea class="journal short" id="vision" placeholder="Where is all of this going? One honest paragraph, in your own words."></textarea>
     <button class="savebtn" onclick="saveVision()">Save vision</button>
+    <button class="homebtn" style="width:100%;margin-top:8px" onclick="exportData()">⬇️ Export / backup my data (JSON)</button>
   </div>
   <div class="card">
     <h3>🏛️ Life pillars — with a trackable signal</h3>
@@ -520,6 +571,71 @@ function toast(msg){
   toastT = setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
+/* ================= MOOD / WATER / EXPORT ================= */
+var MOOD_FACE = {1:'😞',2:'😕',3:'😐',4:'🙂',5:'😄'};
+var MOOD_WORD = {1:'Very low',2:'Low',3:'Okay',4:'Good',5:'Great'};
+var moodSel = 0, emosSel = [];
+function initMood(){
+  var faces = document.querySelectorAll('#emfaces .emface');
+  Array.prototype.forEach.call(faces, function(b){
+    b.addEventListener('click', function(){
+      moodSel = +b.getAttribute('data-m');
+      Array.prototype.forEach.call(faces, function(x){ x.classList.toggle('sel', x === b); });
+      el('mood-save').disabled = false;
+    });
+  });
+  var chips = document.querySelectorAll('#emchips .emchip');
+  Array.prototype.forEach.call(chips, function(c){
+    c.addEventListener('click', function(){
+      var e = c.getAttribute('data-e');
+      if (emosSel.indexOf(e) < 0) { emosSel.push(e); c.classList.add('sel'); }
+      else { emosSel = emosSel.filter(function(x){ return x !== e; }); c.classList.remove('sel'); }
+    });
+  });
+  // restore today's mood if saved
+  var d = S.days[todayKey()];
+  if (d && d.mood) {
+    moodSel = d.mood; emosSel = d.emos || [];
+    Array.prototype.forEach.call(faces, function(x){ x.classList.toggle('sel', +x.getAttribute('data-m') === moodSel); });
+    Array.prototype.forEach.call(chips, function(c){ c.classList.toggle('sel', emosSel.indexOf(c.getAttribute('data-e')) >= 0); });
+    el('mood-save').disabled = false;
+    el('mood-saved').textContent = 'Saved: ' + MOOD_FACE[moodSel] + ' ' + MOOD_WORD[moodSel];
+  }
+  renderWater();
+}
+function saveMood(){
+  if (!moodSel) return;
+  var d = S.days[todayKey()] || currentDayFromUI();
+  d.mood = moodSel; d.emos = emosSel.slice();
+  if (!d.verdict) d.verdict = verdictFor(d.e || 3, d.t || 3).v;
+  S.days[todayKey()] = d;
+  saveS(); renderTodayDynamic(); renderTopbar();
+  el('mood-saved').textContent = '✅ Saved: ' + MOOD_FACE[moodSel] + ' ' + MOOD_WORD[moodSel] + (emosSel.length ? ' · ' + emosSel.join(', ') : '');
+  var msBtn = el('mood-saved'); msBtn.classList.remove('pop'); void msBtn.offsetWidth; msBtn.classList.add('pop');
+  toast('Mood saved — see the pattern build in STATS');
+}
+function renderWater(){
+  var d = S.days[todayKey()] || {};
+  el('water-n').textContent = d.water || 0;
+}
+function logWater(g){
+  var d = S.days[todayKey()] || currentDayFromUI();
+  d.water = (d.water || 0) + g;
+  S.days[todayKey()] = d;
+  saveS(); renderWater();
+  if (d.water === 8) toast('💧 8 glasses — hydration goal done');
+}
+function exportData(){
+  try {
+    var blob = new Blob([JSON.stringify(S, null, 2)], {type: 'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'life-os-backup-' + todayKey() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('Backup downloaded — keep it safe');
+  } catch(e){ toast('Export failed: ' + e); }
+}
+
 /* ================= TODAY ================= */
 function currentDayFromUI(){
   var e = +el('s-energy').value, f = +el('s-focus').value, t = +el('s-tension').value;
@@ -544,6 +660,7 @@ function renderRing(d){
   setRing('ring-move', d.m ? 1 : 0);
   setRing('ring-sleep', d.l ? 1 : 0);
   el('ring-count').textContent = d.minsMet + '/3';
+  if(d.minsMet === 3){ var rc = el('ring-count'); rc.classList.remove('pop'); void rc.offsetWidth; rc.classList.add('pop'); }
   el('ring-sub').textContent = d.minsMet === 3 ? 'GOOD DAY' : 'MINIMUMS';
 }
 function renderBanner(d){
@@ -822,7 +939,7 @@ function shiftMonth(n){
 function renderMonth(){
   el('m-title').textContent = MONTHS[mCur.m] + ' ' + mCur.y;
   var pre = mCur.y + '-' + String(mCur.m+1).padStart(2,'0');
-  var good = 0, study = 0, move = 0, rest = 0, es = [], fs = [], ts = [];
+  var good = 0, study = 0, move = 0, rest = 0, es = [], fs = [], ts = [], ms = [];
   Object.keys(S.days).forEach(function(k){
     if(k.indexOf(pre) !== 0) return;
     var d = S.days[k];
@@ -833,14 +950,18 @@ function renderMonth(){
     if(typeof d.e === 'number') es.push(d.e);
     if(typeof d.f === 'number') fs.push(d.f);
     if(typeof d.t === 'number') ts.push(d.t);
+    if(typeof d.mood === 'number') ms.push(d.mood);
   });
   el('m-good').textContent = good;
   el('m-study').textContent = study;
   el('m-move').textContent = move;
   el('m-rest').textContent = rest;
   var avg = function(a){ return a.length ? String(+((a.reduce(function(x,y){return x+y;},0)/a.length)).toFixed(1)) : '—'; };
-  el('m-avg').textContent = es.length
-    ? 'Avg check-ins: energy ' + avg(es) + ' · focus ' + avg(fs) + ' · tension ' + avg(ts)
+  var moodLine = ms.length
+    ? ' · mood ' + avg(ms) + '/5 ' + (avg(ms) >= 4 ? '(good month)' : avg(ms) >= 3 ? '(okay month)' : '(hard month — be kind)')
+    : '';
+  el('m-avg').textContent = es.length || ms.length
+    ? (es.length ? 'Avg check-ins: energy ' + avg(es) + ' · focus ' + avg(fs) + ' · tension ' + avg(ts) : 'No full check-ins') + moodLine
     : 'No check-ins this month';
 }
 function renderWeeklyStudy(){
@@ -991,6 +1112,7 @@ function renderPlan(){
 
 /* ================= init ================= */
 loadS();
+initMood();
 buildTimeButtons();
 initTodayUI();
 initMindUI();

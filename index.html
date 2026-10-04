@@ -167,8 +167,13 @@ h3{font-size:.92rem;margin-bottom:.7rem;color:var(--teal);letter-spacing:.02em}
 .hchk.on{border-color:var(--green);background:rgba(52,211,153,.12)}
 .hname{flex:1;font-size:.88rem}
 .hfire{font-size:.78rem;color:var(--amber);white-space:nowrap}
+/* ---------- stats range chips ---------- */
+.rchips{display:flex;gap:6px;flex-wrap:wrap}
+.rchip{border:1.5px solid var(--border);background:var(--bg2);color:var(--muted);border-radius:999px;padding:8px 14px;font-size:.78rem;font-weight:700;letter-spacing:.02em;transition:border-color .2s var(--spring),background .2s var(--spring),color .15s ease,transform .18s var(--spring)}
+.rchip:active{transform:scale(.94)}
+.rchip.on{border-color:var(--teal);background:rgba(94,234,212,.15);color:var(--teal)}
 /* ---------- inputs ---------- */
-input[type=text],input[type=number],textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font-size:16px;font-family:inherit;transition:border-color .18s}
+input[type=text],input[type=number],input[type=date],textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font-size:16px;font-family:inherit;transition:border-color .18s}
 input:focus,textarea:focus{outline:none;border-color:var(--teal)}
 .journal{min-height:120px;resize:vertical;line-height:1.5}
 .journal.short{min-height:96px}
@@ -484,10 +489,40 @@ body.light .bnav{background:rgba(255,255,255,.97)}
 
 <!-- ============ STATS ============ -->
 <section id="view-stats" class="view hidden">
+  <div class="card" style="padding:12px 16px 14px">
+    <h3 style="margin-bottom:8px">📊 Range</h3>
+    <div class="rchips" id="range-chips">
+      <button class="rchip on" data-r="1m" aria-pressed="true">This month</button>
+      <button class="rchip" data-r="3m" aria-pressed="false">3 months</button>
+      <button class="rchip" data-r="6m" aria-pressed="false">6 months</button>
+      <button class="rchip" data-r="12m" aria-pressed="false">12 months</button>
+    </div>
+    <p class="mini" id="range-note" style="margin-top:8px;margin-bottom:0">Mood, study and sleep charts below follow this range.</p>
+  </div>
   <div class="card">
-    <h3>🙂 Mood — last 7 days</h3>
-    <div style="display:flex;gap:6px;align-items:flex-end;min-height:44px" id="mood-week"></div>
-    <p class="mini">Daily mood check-ins from TODAY. Gaps = days you didn't log.</p>
+    <h3 id="mood-title">🙂 Mood — this month</h3>
+    <div id="mood-line"></div>
+    <p class="mini" id="mood-cap" style="margin-bottom:0"></p>
+  </div>
+  <div class="card">
+    <h3 id="study-title">📚 Study — this month</h3>
+    <div id="study-line"></div>
+    <p class="mini" id="study-cap" style="margin-bottom:0"></p>
+  </div>
+  <div class="card">
+    <h3>✏️ Back-fill study minutes</h3>
+    <div class="inrow">
+      <input type="date" id="bf-date" aria-label="Date to back-fill">
+      <input type="number" id="bf-min" inputmode="numeric" min="0" max="600" step="5" placeholder="Minutes">
+    </div>
+    <button class="savebtn" onclick="saveBackfill()">Save study minutes</button>
+    <div id="bf-list" style="margin-top:10px"></div>
+    <p class="mini" style="margin-bottom:0">Forgot a day? Enter its minutes here — they feed the chart, the ring and the monthly count. Delete an entry to take the credit back.</p>
+  </div>
+  <div class="card">
+    <h3 id="sleep-title">🌙 Sleep — this month</h3>
+    <div id="sleep-line"></div>
+    <p class="mini" id="sleep-cap" style="margin-bottom:0"></p>
   </div>
   <div class="card">
     <h3>🗓️ Good days · last 12 months</h3>
@@ -515,16 +550,6 @@ body.light .bnav{background:rgba(255,255,255,.97)}
       <div><b id="m-rest">0</b><span>rest days</span></div>
     </div>
     <p class="mini" id="m-avg"></p>
-  </div>
-  <div class="card">
-    <h3>📈 Weekly study trend</h3>
-    <div class="tcols" id="wk-bars"></div>
-    <p class="mini">Study minutes logged per week (last 8 weeks, Mon–Sun).</p>
-  </div>
-  <div class="card">
-    <h3>🌙 Sleep — last 7 nights</h3>
-    <div class="tcols" id="sleep-bars"></div>
-    <p class="mini" id="sleep7-avg"></p>
   </div>
   <div class="card">
     <h3>🏆 All-time</h3>
@@ -578,6 +603,7 @@ body.light .bnav{background:rgba(255,255,255,.97)}
       <div class="anchor"><span>💍 Engagement<span class="ad">Oct 20, 2026</span></span><span class="ancd" id="cd-eng"></span></div>
       <div class="anchor"><span>💒 Wedding<span class="ad">Jan 29, 2027</span></span><span class="ancd" id="cd-wed"></span></div>
       <div class="anchor"><span>🎯 Offer target<span class="ad">Dec 15, 2026</span></span><span class="ancd" id="cd-offer"></span></div>
+      <button onclick="openMonthlyReport()" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;border:1.5px solid #5EEAD4;background:transparent;color:#5EEAD4;font-size:.88rem;font-weight:700;cursor:pointer">📋 Open this month\u2019s report card</button>
       <div class="anchor"><span>⚡ Application engine ON<span class="ad">Oct 4, 2026</span></span><span class="ancd" id="cd-eng2"></span></div>
       <div class="anchor"><span>🚀 All projects public<span class="ad">Nov 8, 2026</span></span><span class="ancd" id="cd-pub"></span></div>
     </div>
@@ -667,7 +693,7 @@ body.light .bnav{background:rgba(255,255,255,.97)}
 'use strict';
 /* ================= state (backward compatible with lifeos_save_v1) ================= */
 var KEY = 'lifeos_save_v1';
-var DEF = {days:{},priority:'',time:{},journal:{},gratitude:{},habits:[],weights:{},vision:'',mindful:{},since:[],cbt:[],relcheck:{},reading:{book:'',total:0,log:{}},money:[],reflect:{},milestones:[],theme:'dark'};
+var DEF = {days:{},priority:'',time:{},journal:{},gratitude:{},habits:[],weights:{},vision:'',mindful:{},since:[],cbt:[],relcheck:{},reading:{book:'',total:0,log:{}},money:[],reflect:{},milestones:[],theme:'dark',moods:{},studyMin:{},studyDefault:25,statsRange:'1m'};
 var S = JSON.parse(JSON.stringify(DEF));
 function loadS(){
   try{
@@ -692,6 +718,11 @@ function loadS(){
   if(!Array.isArray(S.money)) S.money = [];
   if(!S.reflect || typeof S.reflect !== 'object' || Array.isArray(S.reflect)) S.reflect = {};
   if(!Array.isArray(S.milestones)) S.milestones = [];
+  if(!S.moods || typeof S.moods !== 'object' || Array.isArray(S.moods)) S.moods = {};
+  if(!S.studyMin || typeof S.studyMin !== 'object' || Array.isArray(S.studyMin)) S.studyMin = {};
+  if(typeof S.studyDefault !== 'number' || S.studyDefault <= 0) S.studyDefault = 25;
+  if(S.statsRange !== '3m' && S.statsRange !== '6m' && S.statsRange !== '12m') S.statsRange = '1m';
+  statsRange = S.statsRange;
   if(S.theme !== 'light') S.theme = 'dark';
 }
 function saveS(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
@@ -806,7 +837,8 @@ function initMood(){
     });
   });
   // restore today's mood if saved
-  var d = S.days[todayKey()];
+  var key = todayKey();
+  var d = S.days[key];
   var todays = (S.moods && S.moods[key]) ? S.moods[key] : [];
   if (todays.length) {
     var last = todays[todays.length - 1];
@@ -1148,11 +1180,9 @@ function renderMoodWeek(){
   host.innerHTML = out;
 }
 function renderStats(){
-  renderMoodWeek();
+  renderStatCharts();
   renderHeatmap();
   renderMonth();
-  renderWeeklyStudy();
-  renderSleep7();
   renderAllTime();
   renderWeight();
   renderSince();
@@ -1229,21 +1259,280 @@ function renderMonth(){
     ? (es.length ? 'Avg check-ins: energy ' + avg(es) + ' · focus ' + avg(fs) + ' · tension ' + avg(ts) : 'No full check-ins') + moodLine
     : 'No check-ins this month';
 }
-function renderWeeklyStudy(){
-  var now = new Date();
-  var monday = dateAdd(now, -((now.getDay()+6)%7));
-  var weeks = [], mx = 1;
-  for(var w = 7; w >= 0; w--){
-    var s = dateAdd(monday, -7*w);
-    var min = 0;
-    for(var i=0;i<7;i++) min += sumCat(dateAdd(s, i), 'study');
-    weeks.push({s:s, min:min});
-    if(min > mx) mx = min;
+/* ---------- range-scoped line charts (mood / study / sleep) + study back-fill ---------- */
+var statsRange = '1m';
+var RANGE_SPANS = {'1m':0,'3m':2,'6m':5,'12m':11};
+var RANGE_LABEL = {'1m':'this month','3m':'last 3 months','6m':'last 6 months','12m':'last 12 months'};
+function rangeStartDate(){
+  var n = new Date();
+  return new Date(n.getFullYear(), n.getMonth() - (RANGE_SPANS[statsRange] || 0), 1);
+}
+function chartDayLabel(k){ return MONTHS[+k.slice(5,7)-1] + ' ' + (+k.slice(8)); }
+function moodDotColor(v){ return v >= 4 ? 'var(--green)' : v >= 3 ? 'var(--amber)' : 'var(--red)'; }
+function weeklyPts(pts, mode){
+  var b = {};
+  pts.forEach(function(p){
+    var wk = weekKeyOf(new Date(p.d + 'T12:00:00'));
+    if(!b[wk]) b[wk] = {sum:0, n:0};
+    b[wk].sum += p.v;
+    b[wk].n++;
+  });
+  return Object.keys(b).sort().map(function(wk){
+    return {d:wk, v: mode === 'sum' ? b[wk].sum : b[wk].sum / b[wk].n};
+  });
+}
+function renderLineChart(containerId, series, opts){
+  var host = el(containerId);
+  if(!host) return;
+  opts = opts || {};
+  if(!series || !series.length){
+    host.innerHTML = `<p class='mini' style='margin:10px 0 4px'>No data in this range yet.</p>`;
+    return;
   }
-  el('wk-bars').innerHTML = weeks.map(function(w){
-    var h = Math.max(3, Math.round(92*(w.min/mx)));
-    return `<div class='tcol'><span class='tv'>${w.min ? fmtH(w.min/60) + 'h' : ''}</span><div class='tbars single' title='week of ${w.s.getMonth()+1}/${w.s.getDate()} · ${w.min} min'><i class='b-study' style='height:${h}px'></i></div><span class='tlab'>${w.s.getMonth()+1}/${w.s.getDate()}</span></div>`;
+  var W = 340, H = 170, padL = 34, padR = 12, padT = 14, padB = 24;
+  var lo = Infinity, hi = -Infinity, i, p;
+  for(i=0;i<series.length;i++){
+    p = series[i];
+    if(p.v < lo) lo = p.v;
+    if(p.v > hi) hi = p.v;
+  }
+  if(opts.yMin !== undefined) lo = Math.min(lo, opts.yMin);
+  if(opts.yMax !== undefined) hi = Math.max(hi, opts.yMax);
+  var lo0 = lo, hi0 = hi;
+  var span = (hi0 - lo0) || Math.abs(hi0) || 1;
+  lo = lo0 - span * 0.12;
+  hi = hi0 + span * 0.12;
+  var yspan = hi - lo;
+  var t0 = Date.parse(series[0].d + 'T12:00:00');
+  var t1 = Date.parse(series[series.length-1].d + 'T12:00:00');
+  if(!(t1 > t0)) t1 = t0 + 86400000;
+  function xOf(k){ return padL + (Date.parse(k + 'T12:00:00') - t0) / (t1 - t0) * (W - padL - padR); }
+  function yOf(v){ return padT + (1 - (v - lo) / yspan) * (H - padT - padB); }
+  function fmtV(v){ return opts.fmtV ? opts.fmtV(v) : String(+(v.toFixed(1))); }
+  var grid = '';
+  [lo0, (lo0 + hi0) / 2, hi0].forEach(function(tv){
+    var y = yOf(tv);
+    grid += `<line x1='${padL}' y1='${y.toFixed(1)}' x2='${W-padR}' y2='${y.toFixed(1)}' stroke='var(--border)' stroke-width='1' stroke-dasharray='3 4'/>`;
+    grid += `<text x='${padL-6}' y='${(y+3).toFixed(1)}' text-anchor='end' font-size='9' fill='var(--muted)'>${fmtV(tv)}</text>`;
+  });
+  grid += `<line x1='${padL}' y1='${H-padB}' x2='${W-padR}' y2='${H-padB}' stroke='var(--border)' stroke-width='1'/>`;
+  var path = '';
+  if(series.length > 1){
+    var dd = '';
+    series.forEach(function(pt, ix){
+      dd += (ix ? 'L' : 'M') + xOf(pt.d).toFixed(1) + ' ' + yOf(pt.v).toFixed(1) + ' ';
+    });
+    path = `<path d='${dd}' fill='none' stroke='${opts.color || 'var(--teal)'}' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/>`;
+  }
+  var r = series.length > 40 ? 2.2 : 3;
+  var unit = opts.unit || '';
+  var dots = series.map(function(pt){
+    var fill = opts.dotColor ? opts.dotColor(pt.v) : (opts.color || 'var(--teal)');
+    var tip = chartDayLabel(pt.d) + ' · ' + fmtV(pt.v) + unit;
+    return `<circle cx='${xOf(pt.d).toFixed(1)}' cy='${yOf(pt.v).toFixed(1)}' r='${r}' fill='${fill}' stroke='var(--card)' stroke-width='1'><title>${esc(tip)}</title></circle>`;
   }).join('');
+  var labs = [];
+  if(series.length < 2){
+    labs.push({k:series[0].d, txt:chartDayLabel(series[0].d)});
+  } else if((t1 - t0) / 86400000 > 100){
+    var md = new Date(t0);
+    md = new Date(md.getFullYear(), md.getMonth() + 1, 1);
+    while(Date.parse(ymd(md) + 'T12:00:00') < t1){
+      labs.push({k:ymd(md), txt:MONTHS[md.getMonth()]});
+      md = new Date(md.getFullYear(), md.getMonth() + 1, 1);
+    }
+    labs.push({k:series[series.length-1].d, txt:chartDayLabel(series[series.length-1].d)});
+    var lastX = xOf(labs[labs.length-1].k);
+    labs = labs.filter(function(l, ix){ return ix === labs.length - 1 || xOf(l.k) < lastX - 36; });
+  } else {
+    var n = series.length;
+    var idx = [0];
+    if(n > 2) idx.push(Math.round((n-1)/3));
+    if(n > 3) idx.push(Math.round((n-1)*2/3));
+    idx.push(n-1);
+    var seen = {};
+    idx.forEach(function(ix){
+      if(seen[ix]) return;
+      seen[ix] = 1;
+      labs.push({k:series[ix].d, txt:chartDayLabel(series[ix].d)});
+    });
+  }
+  var xlab = labs.map(function(l){
+    var x = xOf(l.k);
+    var anch = x > W - 46 ? 'end' : 'middle';
+    return `<text x='${x.toFixed(1)}' y='${H-8}' text-anchor='${anch}' font-size='9' fill='var(--muted)'>${esc(l.txt)}</text>`;
+  }).join('');
+  host.innerHTML = `<svg viewBox='0 0 ${W} ${H}' style='width:100%;height:auto;display:block' role='img' aria-label='${esc(opts.label || 'trend chart')}'>${grid}${path}${dots}${xlab}</svg>`;
+}
+function renderRangeChips(){
+  var chips = document.querySelectorAll('#range-chips .rchip');
+  Array.prototype.forEach.call(chips, function(c){
+    var on = c.getAttribute('data-r') === statsRange;
+    c.classList.toggle('on', on);
+    c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+function setStatsRange(r){
+  if(RANGE_SPANS[r] === undefined || r === statsRange) return;
+  statsRange = r;
+  S.statsRange = r;
+  saveS();
+  renderRangeChips();
+  renderMoodLine();
+  renderStudyLine();
+  renderSleepLine();
+}
+function renderMoodLine(){
+  el('mood-title').textContent = '🙂 Mood — ' + RANGE_LABEL[statsRange];
+  var from = ymd(rangeStartDate());
+  var pts = [];
+  Object.keys(S.moods || {}).sort().forEach(function(k){
+    if(k < from) return;
+    var arr = S.moods[k] || [];
+    var sum = 0, n = 0;
+    arr.forEach(function(e){ if(e && typeof e.mood === 'number'){ sum += e.mood; n++; } });
+    if(n) pts.push({d:k, v:sum/n});
+  });
+  var n = pts.length, sum = 0;
+  pts.forEach(function(p){ sum += p.v; });
+  el('mood-cap').textContent = n
+    ? n + ' check-in day' + (n === 1 ? '' : 's') + ' · average ' + (+(sum/n).toFixed(1)) + '/5 · dots: green 4+, amber 3–4, red below 3'
+    : 'No check-ins ' + RANGE_LABEL[statsRange] + ' — log your mood in TODAY.';
+  renderLineChart('mood-line', statsRange === '12m' ? weeklyPts(pts, 'avg') : pts, {yMin:1, yMax:5, color:'var(--teal)', dotColor:moodDotColor, unit:'/5', label:'Mood trend line chart'});
+}
+function studyDaily(){
+  var pts = [];
+  var d = rangeStartDate(), end = new Date();
+  while(d <= end){
+    var k = ymd(d);
+    var v = null;
+    if(S.studyMin && typeof S.studyMin[k] === 'number') v = S.studyMin[k];
+    else if(S.days[k] && S.days[k].s) v = S.studyDefault || 25;
+    if(v !== null) pts.push({d:k, v:v});
+    d = dateAdd(d, 1);
+  }
+  return pts;
+}
+function renderStudyLine(){
+  el('study-title').textContent = '📚 Study — ' + RANGE_LABEL[statsRange];
+  var daily = studyDaily();
+  var total = 0;
+  daily.forEach(function(p){ total += p.v; });
+  el('study-cap').textContent = daily.length
+    ? daily.length + ' day' + (daily.length === 1 ? '' : 's') + ' · total ' + fmtH(total/60) + 'h · back-filled days count the same'
+    : 'Nothing logged ' + RANGE_LABEL[statsRange] + ' — back-fill below.';
+  renderLineChart('study-line', statsRange === '12m' ? weeklyPts(daily, 'sum') : daily, {yMin:0, color:'var(--purple)', unit:' min', label:'Study minutes line chart'});
+}
+function sleepDaily(){
+  var pts = [];
+  var d = rangeStartDate(), end = new Date();
+  while(d <= end){
+    var k = ymd(d);
+    var day = S.days[k];
+    if(day && typeof day.sleepH === 'number' && day.sleepH > 0) pts.push({d:k, v:day.sleepH});
+    d = dateAdd(d, 1);
+  }
+  return pts;
+}
+function renderSleepLine(){
+  el('sleep-title').textContent = '🌙 Sleep — ' + RANGE_LABEL[statsRange];
+  var daily = sleepDaily();
+  var sum = 0;
+  daily.forEach(function(p){ sum += p.v; });
+  el('sleep-cap').textContent = daily.length
+    ? daily.length + ' night' + (daily.length === 1 ? '' : 's') + ' · average ' + (+(sum/daily.length).toFixed(1)) + 'h · target 7–9h'
+    : 'No nights logged ' + RANGE_LABEL[statsRange] + ' — use the sleep slider in TODAY.';
+  renderLineChart('sleep-line', statsRange === '12m' ? weeklyPts(daily, 'avg') : daily, {yMin:0, color:'var(--teal)', unit:'h', label:'Sleep hours line chart'});
+}
+function renderStatCharts(){
+  renderRangeChips();
+  renderMoodLine();
+  renderStudyLine();
+  renderSleepLine();
+  renderBackfillList();
+}
+function studyCreditElsewhere(k){
+  if(k === todayKey()){
+    var cb = el('c-study');
+    if(cb && cb.checked) return true;
+  }
+  var arr = S.time[k] || [];
+  for(var i=0;i<arr.length;i++) if(arr[i] && arr[i].cat === 'study') return true;
+  return false;
+}
+function saveBackfill(){
+  var k = el('bf-date').value;
+  var v = parseInt(el('bf-min').value, 10);
+  if(!k){ toast('Pick a date first'); return; }
+  if(k > todayKey()){ toast('That date is in the future'); return; }
+  if(!(v >= 0) || v > 600){ toast('Minutes must be 0 to 600'); return; }
+  S.studyMin[k] = v;
+  var d = S.days[k] || {};
+  d.s = v > 0 || studyCreditElsewhere(k);
+  S.days[k] = d;
+  saveS();
+  el('bf-min').value = '';
+  if(k === todayKey()){
+    var cb = el('c-study');
+    if(cb){ cb.checked = !!d.s; el('m-study-w').classList.toggle('done', cb.checked); }
+    renderTodayDynamic();
+    renderTopbar();
+  }
+  renderStudyLine();
+  renderBackfillList();
+  renderHeatmap();
+  renderMonth();
+  renderAllTime();
+  toast('📚 ' + v + ' min back-filled for ' + chartDayLabel(k));
+}
+function deleteBackfill(k){
+  if(typeof S.studyMin[k] !== 'number') return;
+  delete S.studyMin[k];
+  var d = S.days[k];
+  if(d) d.s = studyCreditElsewhere(k);
+  saveS();
+  if(k === todayKey()){
+    var cb = el('c-study');
+    if(cb){ cb.checked = !!(d && d.s); el('m-study-w').classList.toggle('done', cb.checked); }
+    renderTodayDynamic();
+    renderTopbar();
+  }
+  renderStudyLine();
+  renderBackfillList();
+  renderHeatmap();
+  renderMonth();
+  renderAllTime();
+  toast('Back-fill removed for ' + chartDayLabel(k));
+}
+function renderBackfillList(){
+  var host = el('bf-list');
+  if(!host) return;
+  var ks = Object.keys(S.studyMin || {}).sort().reverse().slice(0,5);
+  if(!ks.length){
+    host.innerHTML = `<p class='mini' style='margin:2px 0 0'>No back-filled days yet — that is what this card is for.</p>`;
+    return;
+  }
+  host.innerHTML = ks.map(function(k){
+    var lab = chartDayLabel(k) + (k === todayKey() ? ' · today' : '');
+    return `<div class='tlog' data-d='${k}'><span>✏️ ${esc(lab)}</span><span>${S.studyMin[k]} min <button class='tdel' aria-label='Delete back-filled entry'>✕</button></span></div>`;
+  }).join('');
+}
+function initStatsUI(){
+  var chips = document.querySelectorAll('#range-chips .rchip');
+  Array.prototype.forEach.call(chips, function(c){
+    c.addEventListener('click', function(){ setStatsRange(c.getAttribute('data-r')); });
+  });
+  renderRangeChips();
+  var bd = el('bf-date');
+  bd.value = todayKey();
+  bd.max = todayKey();
+  el('bf-list').addEventListener('click', function(ev){
+    var btn = ev.target && ev.target.closest ? ev.target.closest('.tdel') : null;
+    if(!btn) return;
+    var row = btn.closest('[data-d]');
+    if(row) deleteBackfill(row.getAttribute('data-d'));
+  });
+  renderBackfillList();
 }
 function renderAllTime(){
   var ks = Object.keys(S.days);
@@ -1432,22 +1721,6 @@ function initSleepUI(){
   }
   if(day && (typeof day.sleepH === 'number' || typeof day.sleepQ === 'number')) el('sleep-ind').textContent = 'Saved ✓';
 }
-function renderSleep7(){
-  var days = lastNDays(7);
-  el('sleep-bars').innerHTML = days.map(function(d){
-    var day = S.days[ymd(d)] || {};
-    var h = day.sleepH || 0;
-    var hpx = Math.max(3, Math.round(92 * h / 12));
-    var q = day.sleepQ ? ' · quality ' + day.sleepQ + '/5' : '';
-    var isT = ymd(d) === todayKey();
-    return `<div class='tcol'><span class='tv'>${h ? h + 'h' : ''}</span><div class='tbars single' title='${DOW[d.getDay()]} · ${h}h${q}'><i class='b-sleep' style='height:${hpx}px'></i></div><span class='tlab${isT ? ' tnow' : ''}'>${DOW[d.getDay()].slice(0,2)}</span></div>`;
-  }).join('');
-  var hs = [];
-  days.forEach(function(d){ var day = S.days[ymd(d)]; if(day && typeof day.sleepH === 'number') hs.push(day.sleepH); });
-  var avg = hs.length ? String(+((hs.reduce(function(a,b){ return a+b; }, 0) / hs.length)).toFixed(1)) : '—';
-  el('sleep7-avg').textContent = '7-night average: ' + avg + 'h · target 7–9h';
-}
-
 /* ---- 2 · 4-7-8 breathing ---- */
 var breathOn = false, breathT = null;
 var BREATH_PHASES = [['Inhale',4,1.62],['Hold',7,1.62],['Exhale',8,1]];
@@ -1814,6 +2087,7 @@ initMindUI();
 initSleepUI();
 initMedUI();
 initMoneyUI();
+initStatsUI();
 renderTopbar();
 applyTheme();
 checkMilestones(false);
@@ -1892,5 +2166,6 @@ if('serviceWorker' in navigator && location.protocol === 'https:'){
   renderChips(); renderList();
 })();
 </script>
+<script src="report_card.js"></script>
 </body>
 </html>
